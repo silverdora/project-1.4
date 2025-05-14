@@ -6,17 +6,26 @@ namespace Chapeau.Controllers
 {
     public class MenuItemController : Controller
     {
-        private readonly IMenuItemService _menuService;
+        private readonly IMenuItemService _menuItemService;
 
-        public MenuItemController(IMenuItemService menuService)
+        public MenuItemController(IMenuItemService menuItemService)
         {
-            _menuService = menuService;
+            _menuItemService = menuItemService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string selectedCard = "All", string selectedCategory = "All")
         {
-            List<MenuItem> menuItems = _menuService.GetAllMenuItems();
-            return View(menuItems);
+            var cards = _menuItemService.GetAllCards();
+            var categories = _menuItemService.GetAllCategories();
+
+            var items = _menuItemService.GetByCardAndCategory(selectedCard, selectedCategory);
+
+            ViewBag.AllCards = cards;
+            ViewBag.AllCategories = categories;
+            ViewBag.SelectedCard = selectedCard;
+            ViewBag.SelectedCategory = selectedCategory;
+
+            return View(items);
         }
     }
 }

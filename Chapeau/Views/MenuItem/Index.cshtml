@@ -2,6 +2,36 @@
 
 <h2>Menu Items</h2>
 
+
+<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
+    <div class="d-flex gap-3">
+        <!-- Card Filter -->
+        <div>
+            <label for="selectedCard">Card:</label>
+            <select name="selectedCard" id="selectedCard" class="form-select" onchange="this.form.submit()">
+                <option value="All" selected="@("All" == ViewBag.SelectedCard)">All</option>
+                @foreach (var card in (List<string>)ViewBag.AllCards)
+                {
+                    <option value="@card" selected="@(card == ViewBag.SelectedCard)">@card</option>
+                }
+            </select>
+        </div>
+
+        <!-- Category Filter -->
+        <div>
+            <label for="selectedCategory">Category:</label>
+            <select name="selectedCategory" id="selectedCategory" class="form-select" onchange="this.form.submit()">
+                <option value="All" selected="@("All" == ViewBag.SelectedCategory)">All</option>
+                @foreach (var cat in (List<string>)ViewBag.AllCategories)
+                {
+                    <option value="@cat" selected="@(cat == ViewBag.SelectedCategory)">@cat</option>
+                }
+            </select>
+        </div>
+    </div>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
@@ -13,6 +43,7 @@
         </tr>
     </thead>
     <tbody>
+
         @foreach (var item in Model)
         {
             <tr>

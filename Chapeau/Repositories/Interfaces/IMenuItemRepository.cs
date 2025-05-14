@@ -4,7 +4,10 @@ namespace Chapeau.Repositories.Interfaces
 {
     public interface IMenuItemRepository
     {
-        List<MenuItem> GetAll();
-       // List<MenuItem> GetFiltered(string card, string category);
+        List<MenuItem> GetByCardAndCategory(string card, string category);
+        List<string> GetAllCards();
+        List<string> GetAllCategories();
+
+
     }
 }

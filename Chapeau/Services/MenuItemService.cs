@@ -12,9 +12,21 @@ namespace Chapeau.Services
             _menuItemRepository = menuItemRepository;
         }
 
-        public List<MenuItem> GetAllMenuItems() //ask repository to ge All items from database
+        public List<MenuItem> GetByCardAndCategory(string card, string category)
         {
-            return _menuItemRepository.GetAll();
+            return _menuItemRepository.GetByCardAndCategory(card, category);
         }
+
+        public List<string> GetAllCards()
+        {
+            return _menuItemRepository.GetAllCards();
+        }
+
+        public List<string> GetAllCategories()
+        {
+            return _menuItemRepository.GetAllCategories();
+        }
+
+
     }
 }
