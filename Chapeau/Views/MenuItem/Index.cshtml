@@ -1,0 +1,50 @@
+﻿@model List<Chapeau.Models.MenuItem>
+
+<h2>Menu Items</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Item_name</td>
+                <td>@item.Description</td>
+                <td>@item.Price.ToString("C")</td> 
+                <td>@item.Category</td>
+                <td>
+                    @{
+                        string message;
+                        string color;
+
+                        if (item.StockQuantity == 0)
+                        {
+                            message = "Out of stock";
+                            color = "red";
+                        }
+                        else if (item.StockQuantity <= 10)
+                        {
+                            message = $"Low ({item.StockQuantity})";
+                            color = "orange";
+                        }
+                        else
+                        {
+                            message = $"In stock ({item.StockQuantity})";
+                            color = "green";
+                        }
+                    }
+
+                    <span style="color:@color;">@message</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

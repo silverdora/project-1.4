@@ -1,6 +1,8 @@
 ﻿using Chapeau.Services;
 using Chapeau.Models;
 using Chapeau.Controllers;
+using Chapeau.Repositories.Interfaces;
+using Chapeau.Repositories;
 
 
 
@@ -17,7 +19,14 @@ public class Program
         builder.Services.AddControllersWithViews();
 
         builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+        builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
+
+        // Add configuration access
+        string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+      
+       
         var app = builder.Build();
 
 

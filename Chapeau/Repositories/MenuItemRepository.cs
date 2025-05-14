@@ -36,7 +36,7 @@ namespace Chapeau.Repositories
                             items.Add(new MenuItem
                             {
                                 ItemID = (int)reader["ItemID"],
-                                ItemName = reader["ItemName"].ToString(),
+                                Item_name = reader["Item_name"].ToString(),
                                 Description = reader["Description"].ToString(),
                                 Price = (decimal)reader["Price"],
                                 VATPercent = (decimal)reader["VATPercent"],
