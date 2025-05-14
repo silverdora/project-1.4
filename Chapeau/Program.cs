@@ -1,4 +1,10 @@
-﻿namespace Chapeau;
+﻿using Chapeau.Services;
+using Chapeau.Models;
+using Chapeau.Controllers;
+
+
+
+namespace Chapeau;
 
 public class Program
 {
@@ -6,10 +12,15 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
+        builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+
         var app = builder.Build();
+
+
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
