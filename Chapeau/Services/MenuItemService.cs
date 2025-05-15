@@ -15,17 +15,7 @@ namespace Chapeau.Services
         public List<MenuItem> GetByCardAndCategory(string card, string category)
         {
             return _menuItemRepository.GetByCardAndCategory(card, category);
-        }
-
-        public List<string> GetAllCards()
-        {
-            return _menuItemRepository.GetAllCards();
-        }
-
-        public List<string> GetAllCategories()
-        {
-            return _menuItemRepository.GetAllCategories();
-        }
+        }       
 
 
     }

@@ -1,6 +1,7 @@
 ﻿using Chapeau.Models;
 using Chapeau.Services;
 using Microsoft.AspNetCore.Mvc;
+using Chapeau.HelperMethods;    
 
 namespace Chapeau.Controllers
 {
@@ -15,17 +16,16 @@ namespace Chapeau.Controllers
 
         public IActionResult Index(string selectedCard = "All", string selectedCategory = "All")
         {
-            var cards = _menuItemService.GetAllCards();
-            var categories = _menuItemService.GetAllCategories();
+            ViewBag.Cards = MenuItemFilters.Cards;
+            ViewBag.Categories = MenuItemFilters.Categories;
 
-            var items = _menuItemService.GetByCardAndCategory(selectedCard, selectedCategory);
-
-            ViewBag.AllCards = cards;
-            ViewBag.AllCategories = categories;
             ViewBag.SelectedCard = selectedCard;
             ViewBag.SelectedCategory = selectedCategory;
 
+            var items = _menuItemService.GetByCardAndCategory(selectedCard, selectedCategory);
             return View(items);
         }
+
+
     }
 }

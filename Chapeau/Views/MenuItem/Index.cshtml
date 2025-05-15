@@ -3,16 +3,15 @@
 <h2>Menu Items</h2>
 
 
-<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
+<<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
     <div class="d-flex gap-3">
         <!-- Card Filter -->
         <div>
             <label for="selectedCard">Card:</label>
             <select name="selectedCard" id="selectedCard" class="form-select" onchange="this.form.submit()">
-                <option value="All" selected="@("All" == ViewBag.SelectedCard)">All</option>
-                @foreach (var card in (List<string>)ViewBag.AllCards)
+                @foreach (var card in (List<string>)ViewBag.Cards)
                 {
-                    <option value="@card" selected="@(card == ViewBag.SelectedCard)">@card</option>
+                    <option value="@card" selected="@(card == ViewBag.SelectedCard ? "selected" : null)">@card</option>
                 }
             </select>
         </div>
@@ -21,16 +20,14 @@
         <div>
             <label for="selectedCategory">Category:</label>
             <select name="selectedCategory" id="selectedCategory" class="form-select" onchange="this.form.submit()">
-                <option value="All" selected="@("All" == ViewBag.SelectedCategory)">All</option>
-                @foreach (var cat in (List<string>)ViewBag.AllCategories)
+                @foreach (var category in (List<string>)ViewBag.Categories)
                 {
-                    <option value="@cat" selected="@(cat == ViewBag.SelectedCategory)">@cat</option>
+                    <option value="@category" selected="@(category == ViewBag.SelectedCategory ? "selected" : null)">@category</option>
                 }
             </select>
         </div>
     </div>
 </form>
-
 
 <table class="table">
     <thead>
