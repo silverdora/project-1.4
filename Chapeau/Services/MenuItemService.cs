@@ -1,5 +1,6 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
+using static Chapeau.HelperMethods.MenuItemFilters;
 
 namespace Chapeau.Services
 {
@@ -11,12 +12,21 @@ namespace Chapeau.Services
         {
             _menuItemRepository = menuItemRepository;
         }
-
-        public List<MenuItem> GetByCardAndCategory(string card, string category)
+      
+        public List<MenuItem> GetAllMenuItems()
         {
-            return _menuItemRepository.GetByCardAndCategory(card, category);
-        }       
+            return _menuItemRepository.GetAllMenuItems();
+        }
 
+        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
+        {
+            return _menuItemRepository.GetMenuItemsByCard(card);
+        }
+
+        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
+        {
+            return _menuItemRepository.GetMenuItemsByCategory(category);
+        }
 
     }
 }

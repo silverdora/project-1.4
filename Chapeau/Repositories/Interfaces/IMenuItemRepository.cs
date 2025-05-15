@@ -1,11 +1,13 @@
 ﻿using Chapeau.Models;
+using static Chapeau.HelperMethods.MenuItemFilters;
 
 namespace Chapeau.Repositories.Interfaces
 {
     public interface IMenuItemRepository
     {
-        List<MenuItem> GetByCardAndCategory(string card, string category);
-   
+        public List<MenuItem> GetAllMenuItems();
+        public List<MenuItem> GetMenuItemsByCard(MenuCard card);
+        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category);
 
     }
 }

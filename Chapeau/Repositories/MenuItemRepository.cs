@@ -2,6 +2,7 @@
 using Chapeau.Repositories.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using static Chapeau.HelperMethods.MenuItemFilters;
 
 
 namespace Chapeau.Repositories
@@ -15,58 +16,44 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        //public List<string> GetAllCards()
-        //{
-        //    List<string> cards = new List<string>();
-        //    using (SqlConnection connection = new SqlConnection(_connectionString))
-        //    {
-        //        string query = "SELECT DISTINCT card_name FROM MenuCard";
-        //        SqlCommand command = new SqlCommand(query, connection);
-        //        connection.Open();
-        //        using (SqlDataReader reader = command.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                cards.Add(reader["card_name"].ToString());
-        //            }
-        //        }
-        //    }
-        //    return cards;
-        //}
+        // 1. Get all menu items
+        public List<MenuItem> GetAllMenuItems()
+        {
+            return ExecuteQueryMapMenuItems("SELECT * FROM MenuItem");
+        }
 
-        //public List<string> GetAllCategories()
-        //{
-        //    List<string> categories = new List<string>();
-        //    using (SqlConnection connection = new SqlConnection(_connectionString))
-        //    {
-        //        string query = "SELECT DISTINCT category FROM MenuItem";
-        //        SqlCommand command = new SqlCommand(query, connection);
-        //        connection.Open();
-        //        using (SqlDataReader reader = command.ExecuteReader())
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                categories.Add(reader["category"].ToString());
-        //            }
-        //        }
-        //    }
-        //    return categories;
-        //}
+        // 2. Get items by card name
+        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
+        {
+            string query = @"
+                           SELECT mi.*
+                           FROM MenuItem mi
+                           JOIN MenuCard mc ON mi.cardID = mc.icardID
+                           WHERE mc.card_name = @card";
 
-        public List<MenuItem> GetByCardAndCategory(string card, string category)
+            var cardName = card.ToString(); // converting enum to string for SQL 
+
+            return ExecuteQueryMapMenuItems(query, new SqlParameter("@card", cardName));
+        }
+
+        // 3. Get items by category
+        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
+        {
+            string query = "SELECT * FROM MenuItem WHERE category = @category";
+            string categoryName = category.ToString(); // converting enum to string for SQL 
+            return ExecuteQueryMapMenuItems(query, new SqlParameter("@category", categoryName));
+        }
+
+        // Shared helper to reduce duplication
+        private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
         {
             List<MenuItem> items = new List<MenuItem>();
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = @" SELECT mi.* FROM MenuItem mi
-                               JOIN BelongsTo bt ON mi.itemID = bt.itemID
-                               JOIN MenuCard mc ON bt.icardID = mc.icardID
-                               WHERE (@card = 'All' OR mc.card_name = @card)
-                               AND (@category = 'All' OR mi.category = @category)";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@card", card);
-                command.Parameters.AddWithValue("@category", category);
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                if (parameters != null)
+                    command.Parameters.AddRange(parameters);
 
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -86,8 +73,9 @@ namespace Chapeau.Repositories
                     }
                 }
             }
+
             return items;
+
         }
     }
-    
 }
