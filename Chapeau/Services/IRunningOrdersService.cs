@@ -1,12 +1,14 @@
 ﻿using System;
 using Chapeau.Models;
-namespace Chapeau.Repositories.Interfaces
+
+namespace Chapeau.Services
 {
-	public interface IRunningOrdersRepository
+	public interface IRunningOrdersService
 	{
-		List<Order> GetAllRunningOrders();
+        List<Order> GetAllRunningOrders();
         List<Order> GetOrdersByStatus(string status);
         void ChangeOrderStatus(Includes include);
-	}
+    }
 }
+
 
