@@ -16,19 +16,19 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void ChangeOrderStatus(Includes include)
+        public void ChangeOrderStatus(OrderItem orderItem, int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = $"UPDATE Include " +
+                string query = $"UPDATE OrderItem " +
                     $"SET status = @status " +
                     $"WHERE orderID = @Id";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 // Preventing SQL injections
-                command.Parameters.AddWithValue("@Id", include.OrderID);
-                command.Parameters.AddWithValue("@status", include.Status);
+                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@status", orderItem.Status);
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();
@@ -171,13 +171,49 @@ namespace Chapeau.Repositories
             return new Table(tableID, tableNumber, isOccupied);
         }
 
-        private List<MenuItem> GetMenuItemsByOrderID(int id)
+        private List<OrderItem> GetOrderItemsByOrderID(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                List<OrderItem> orderItems = new List<OrderItem>();
+                string query = "SELECT itemID, includeDate, [status], quantity " +
+                    "FROM OrderItem " +
+                    "WHERE orderID = @Id; ";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Id", id);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    OrderItem orderItem = ReadOrderItem(reader);
+                    orderItems.Add(orderItem);
+                }
+                reader.Close();
+                return orderItems;
+            }
+        }
+
+        private OrderItem ReadOrderItem(SqlDataReader reader)
+        {
+            int itemID = (int)reader["itemID"];
+            MenuItem menuItem = GetMenuItemByID(itemID);
+
+            DateTime includeDate = (DateTime)reader["includeDate"];
+            Status status = (Status)reader["status"];
+            int quantity = (int)reader["quantity"];
+
+            return new OrderItem(menuItem, includeDate, status, quantity);
+        }
+
+        private MenuItem GetMenuItemByID(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT * " +
-                    "FROM [Table] " +
-                    "WHERE tableID = @Id; ";
+                    "FROM [MenuItem] " +
+                    "WHERE itemID = @Id; ";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -188,11 +224,23 @@ namespace Chapeau.Repositories
                 SqlDataReader reader = command.ExecuteReader();
                 if (!reader.Read())
                     return null;
-                Table table = ReadTable(reader);
+                MenuItem menuItem = ReadMenuItem(reader);
                 reader.Close();
 
-                return table;
+                return menuItem;
             }
+        }
+        private MenuItem ReadMenuItem(SqlDataReader reader)
+        {
+            int itemID = (int)reader["itemID"];
+            string item_name = (string)reader["item_name"];
+            string description = (string)reader["description"];
+            decimal price = (decimal)reader["price"];
+            decimal VATPercent = (decimal)reader["VATPercent"];
+            string category = (string)reader["category"];
+            int stockQuantity = (int)reader["stockQuantity"];
+
+            return new MenuItem(itemID, item_name, description, price, VATPercent, category, stockQuantity);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Chapeau.Services
 	{
         List<Order> GetAllRunningOrders();
         List<Order> GetOrdersByStatus(string status);
-        void ChangeOrderStatus(Includes include);
+        void ChangeOrderStatus(OrderItem orderItem, int id);
     }
 }
 

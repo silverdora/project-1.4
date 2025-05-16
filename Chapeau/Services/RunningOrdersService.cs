@@ -10,7 +10,7 @@ namespace Chapeau.Services
 		{
 		}
 
-        public void ChangeOrderStatus(Includes include)
+        public void ChangeOrderStatus(OrderItem orderItem, int id)
         {
             throw new NotImplementedException();
         }

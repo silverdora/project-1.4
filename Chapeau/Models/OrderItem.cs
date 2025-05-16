@@ -4,10 +4,10 @@
     {
         public MenuItem MenuItem { get; set; }
         public DateTime IncludeDate { get; set; }
-        public string Status { get; set; }
+        public Status Status { get; set; }
         public int Quantity { get; set; }
 
-        public OrderItem(MenuItem menuItem, DateTime includeDate, string status, int quantity)
+        public OrderItem(MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
             MenuItem = menuItem;
             IncludeDate = includeDate;
