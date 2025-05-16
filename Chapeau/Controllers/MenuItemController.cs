@@ -1,7 +1,7 @@
 ﻿using Chapeau.Models;
 using Chapeau.Services;
 using Microsoft.AspNetCore.Mvc;
-using Chapeau.HelperMethods;    
+using Chapeau.Repositories;    
 
 namespace Chapeau.Controllers
 {
@@ -14,18 +14,40 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-        public IActionResult Index(string selectedCard = "All", string selectedCategory = "All")
+        public IActionResult Index(MenuCard? card, MenuCategory? category)
         {
-            ViewBag.Cards = MenuItemFilters.Cards;
-            ViewBag.Categories = MenuItemFilters.Categories;
+            List<MenuItem> items = new List<MenuItem>();
 
-            ViewBag.SelectedCard = selectedCard;
-            ViewBag.SelectedCategory = selectedCategory;
+            // Both filters selected
+            if (card != null && category != null)
+            {
+                items = _menuItemService.GetMenuItemsByCardAndCategory(card.Value, category.Value);
+            }
+            // card selected
+            else if (card != null)
+            {
+                items = _menuItemService.GetMenuItemsByCard(card.Value);
+            }
+            //  category selected
+            else if (category != null)
+            {
+                items = _menuItemService.GetMenuItemsByCategory(category.Value);
+            }
+            //No filters
+            else
+            {
+                items = _menuItemService.GetAllMenuItems();
+            }
 
-            var items = _menuItemService.GetByCardAndCategory(selectedCard, selectedCategory);
+            // Send enum values and selected filters to the view
+            ViewBag.SelectedCard = card;
+            ViewBag.SelectedCategory = category;
+            ViewBag.Cards = Enum.GetValues(typeof(MenuCard));
+            ViewBag.Categories = Enum.GetValues(typeof(MenuCategory));
+
             return View(items);
         }
-
-
     }
+
+   
 }

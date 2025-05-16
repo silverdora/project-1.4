@@ -8,7 +8,7 @@
         public decimal VATPercent { get; set; }
         public string Category { get; set; }
         public int StockQuantity { get; set; }
-
+        public int CardID { get; set; }
         public bool IsOutOfStock
         {
             get
@@ -24,5 +24,6 @@
                 return StockQuantity > 0 && StockQuantity <= 10;
             }
         }
+
     }
 }

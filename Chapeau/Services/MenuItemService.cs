@@ -28,5 +28,10 @@ namespace Chapeau.Services
             return _menuItemRepository.GetMenuItemsByCategory(category);
         }
 
+        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
+        {
+            return _menuItemRepository.GetMenuItemsByCardAndCategory(card, category);
+        }
+
     }
 }

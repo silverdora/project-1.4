@@ -16,33 +16,45 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        // 1. Get all menu items
+        // Get all menu items
         public List<MenuItem> GetAllMenuItems()
         {
             return ExecuteQueryMapMenuItems("SELECT * FROM MenuItem");
         }
 
-        // 2. Get items by card name
+        // Get items by card name
         public List<MenuItem> GetMenuItemsByCard(MenuCard card)
         {
-            string query = @"
-                           SELECT mi.*
-                           FROM MenuItem mi
-                           JOIN MenuCard mc ON mi.cardID = mc.icardID
-                           WHERE mc.card_name = @card";
+            string query = @"SELECT mi.*
+                             FROM MenuItem mi
+                             JOIN MenuCard mc ON mi.cardID = mc.icardID
+                             WHERE mc.card_name = @card";
 
             var cardName = card.ToString(); // converting enum to string for SQL 
 
             return ExecuteQueryMapMenuItems(query, new SqlParameter("@card", cardName));
         }
 
-        // 3. Get items by category
+        // Get items by category
         public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
         {
             string query = "SELECT * FROM MenuItem WHERE category = @category";
             string categoryName = category.ToString(); // converting enum to string for SQL 
             return ExecuteQueryMapMenuItems(query, new SqlParameter("@category", categoryName));
         }
+
+        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
+        {
+            string query = @"SELECT mi.*
+                             FROM MenuItem mi
+                            JOIN MenuCard mc ON mi.cardID = mc.icardID
+                            WHERE mc.card_name = @card AND mi.category = @category";
+
+            return ExecuteQueryMapMenuItems(query,
+                new SqlParameter("@card", card.ToString()),
+                new SqlParameter("@category", category.ToString()));
+        }
+
 
         // Shared helper to reduce duplication
         private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)

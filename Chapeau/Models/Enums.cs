@@ -1,26 +1,23 @@
 ﻿namespace Chapeau.Models
 {
-    public class Enums
+    public enum MenuCard //as enum starts with 0 and in my database lunch = 1
     {
-        public enum MenuCard
-        {
-            Lunch,
-            Diner,
-            Drinks
-        }
+        Lunch = 1,
+        Diner =2,
+        Drinks=3
+    }
 
-        public enum MenuCategory
-        {
-            Starters,
-            Mains,
-            Desserts,
-            Entremets,
-            Beer,
-            Wine,
-            Spirits,
-            CoffeeTea,
-            SoftDrinks
-        }
-
+    public enum MenuCategory
+    {
+        Starters,
+        Mains,
+        Desserts,
+        Entremets,
+        Beer,
+        Wine,
+        Spirits,
+        Coffee,
+        Tea,
+        SoftDrink
     }
 }
