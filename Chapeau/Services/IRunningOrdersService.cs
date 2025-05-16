@@ -5,8 +5,10 @@ namespace Chapeau.Services
 {
 	public interface IRunningOrdersService
 	{
-        List<Order> GetAllRunningOrders();
-        List<Order> GetOrdersByStatus(string status);
+        List<Order> GetAllBarOrders();
+        List<Order> GetAllKitchenOrders();
+        List<Order> GetBarOrdersByStatus(Status status);
+        List<Order> GetKitchenOrdersByStatus(Status status);
         void ChangeOrderStatus(OrderItem orderItem, int id);
     }
 }

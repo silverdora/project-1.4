@@ -6,23 +6,36 @@ namespace Chapeau.Services
 {
 	public class RunningOrdersService:IRunningOrdersService
 	{
-		public RunningOrdersService()
-		{
-		}
+        private readonly IRunningOrdersRepository _runningOrdersRepository;
+
+        public RunningOrdersService(IRunningOrdersRepository runningOrdersRepository)
+        {
+            _runningOrdersRepository = runningOrdersRepository;
+        }
 
         public void ChangeOrderStatus(OrderItem orderItem, int id)
         {
-            throw new NotImplementedException();
+            _runningOrdersRepository.ChangeOrderStatus(orderItem, id);
         }
 
-        public List<Order> GetAllRunningOrders()
+        public List<Order> GetAllBarOrders()
         {
-            throw new NotImplementedException();
+            return _runningOrdersRepository.GetAllBarOrders();
         }
 
-        public List<Order> GetOrdersByStatus(string status)
+        public List<Order> GetAllKitchenOrders()
         {
-            throw new NotImplementedException();
+            return _runningOrdersRepository.GetAllKitchenOrders();
+        }
+
+        public List<Order> GetBarOrdersByStatus(string status)
+        {
+            return _runningOrdersRepository.GetBarOrdersByStatus(status);
+        }
+
+        public List<Order> GetKitchenOrdersByStatus(string status)
+        {
+            return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
     }
 }

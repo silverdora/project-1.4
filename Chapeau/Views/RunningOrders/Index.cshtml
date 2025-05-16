@@ -1,26 +1,40 @@
-﻿@model List<Chapeau.Models.Order>
+﻿@model Chapeau.ViewModels.RunningOrdersViewModel
+
+
+@{
+    ViewData["Title"] = "RunningOrders";
+}
 
 <h2>Orders</h2>
 
 <button type="button" class="btn btn-outline-primary" asp-action="Index">Refresh</button>
 
-<h7>Status</h7>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-    <label class="form-check-label" for="inlineRadio1">All</label>
-</div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-    <label class="form-check-label" for="inlineRadio1">New</label>
-</div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-    <label class="form-check-label" for="inlineRadio2">In progress</label>
-</div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
-    <label class="form-check-label" for="inlineRadio3">Ready</label>
-</div>
+<form asp-action="GetBarOrdersByStatus">
+    <h7>Status</h7>
+    <div class="form-check form-check-inline">
+        @if (Model.Status == Status.All)
+        {
+            <input class="form-check-input" type="radio" name="status" id="inlineRadio1" value="All">
+        }
+        else
+        {
+            <input class="form-check-input" type="radio" name="status" id="inlineRadio1" value="All">
+        }
+        <label class="form-check-label" for="inlineRadio1">All</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="status" id="inlineRadio1" value="New">
+        <label class="form-check-label" for="inlineRadio1">New</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="status" id="inlineRadio2" value="Inprogress">
+        <label class="form-check-label" for="inlineRadio2">In progress</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="status" id="inlineRadio3" value="Ready">
+        <label class="form-check-label" for="inlineRadio3">Ready</label>
+    </div>
+</form>
 
 <h6>New</h6>
 
