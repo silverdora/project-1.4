@@ -10,9 +10,20 @@ namespace Chapeau.Controllers
 {
     public class PaymentController : Controller
     {
-        public IActionResult Index()
+        private readonly IPaymentService _paymentService;
+
+        // ✅ Use ONE constructor
+        public PaymentController(IPaymentService paymentService)
         {
-            return View();
+            _paymentService = paymentService;
+        }
+
+        public ActionResult Index()
+        {
+            var payments = _paymentService.GetAllPayments(1); // Use your real service method
+            return View(payments);
         }
     }
 }
+
+
