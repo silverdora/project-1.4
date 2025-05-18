@@ -9,8 +9,9 @@
         public Status Status { get; set; }
         public int Quantity { get; set; }
 
-        public OrderItem(MenuItem menuItem, DateTime includeDate, Status status, int quantity)
+        public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
+            ItemID = itemID;
             MenuItem = menuItem;
             IncludeDate = includeDate;
             Status = status;

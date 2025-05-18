@@ -1,0 +1,68 @@
+﻿@model Chapeau.ViewModels.FilteredOrdersViewModel
+
+
+@{
+    ViewData["Title"] = "RunningOrders";
+}
+
+<h2>@Model.Status orders</h2>
+
+<a class="btn btn-primary" href="/RunningOrders/Index">Back to all</a>
+
+<div class="col-6">
+    <form asp-action="Filtered" method="get">
+        <div class="form-group">
+            <label for="type">Filter by status:</label>
+            <select class="form-control" id="type" name="status">
+                <option value="All">All</option>
+                <option value="New">New</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Ready">Ready</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        @{
+            foreach (Order order in Model.Orders)
+            {
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@order.Employee.employeeName</h5>
+                        <p class="card-text">time</p>
+                        <p class="card-text">@order.Table.TableNumber</p>
+                        <ul class="list-group list-group-flush">
+                            @{
+                                foreach (OrderItem orderItem in order.OrderItems)
+                                {
+                                    <li class="list-group-item">@orderItem.MenuItem.Item_name</li>
+
+
+                                    if (Model.Status == Status.New)
+                                    {
+                                        <button asp-action="ChangeOrderStatus" class="btn btn-primary">Prepare</button>
+                                    }
+                                    else if (Model.Status == Status.InProgress)
+                                    {
+                                        {
+                                            <button asp-action="ChangeOrderStatus" class="btn btn-primary">Ready</button>
+                                        }
+                                    }
+                                    else if (Model.Status == Status.Ready)
+                                    {
+                                        <button asp-action="ChangeOrderStatus" class="btn btn-primary">Close</button>
+                                    }
+                                }
+
+                            }
+                            
+                        </ul>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -20,7 +20,7 @@ namespace Chapeau.Repositories
 
         
 
-        public void ChangeOrderStatus(OrderItem orderItem, int id)
+        public void ChangeOrderStatus(int itemID, Status status)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -31,8 +31,8 @@ namespace Chapeau.Repositories
                 SqlCommand command = new SqlCommand(query, connection);
 
                 // Preventing SQL injections
-                command.Parameters.AddWithValue("@Id", id);
-                command.Parameters.AddWithValue("@status", orderItem.Status.ToString());
+                command.Parameters.AddWithValue("@Id", itemID);
+                command.Parameters.AddWithValue("@status", status.ToString());
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();
@@ -258,7 +258,7 @@ namespace Chapeau.Repositories
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
 
-            return new OrderItem(menuItem, includeDate, status, quantity);
+            return new OrderItem(itemID, menuItem, includeDate, status, quantity);
         }
 
         public MenuItem GetMenuItemByID(int id)

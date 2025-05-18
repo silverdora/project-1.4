@@ -62,48 +62,52 @@ namespace Chapeau.Controllers
 
 
 
-        [HttpGet]
-		public IActionResult GetBarOrdersByStatus(Status status)
-		{
-            if (status == Status.All)
-            {
-                var orders = _runningOrdersService.GetAllBarOrders();
-                return View("Index", orders);
-            }
-            else
-            {
-                var orders = _runningOrdersService.GetBarOrdersByStatus(status);
-                return View("Filtered", orders);
-            }
-        }
+  //      [HttpGet]
+		//public IActionResult Filtered(Status status)
+		//{
+  //          if (status == Status.All)
+  //          {
+  //              var orders = _runningOrdersService.GetAllBarOrders();
+  //              return View("Index", orders);
+  //          }
+  //          else
+  //          {
+  //              var orders = _runningOrdersService.GetBarOrdersByStatus(status);
+  //              return View("Filtered", orders);
+  //          }
+  //      }
 
         [HttpGet]
-        public IActionResult GetKitchenOrdersByStatus(Status status)
+        public IActionResult Filtered(Status status)
         {
 			if (status == Status.All)
 			{
-				var orders = _runningOrdersService.GetAllKitchenOrders();
-                return View("Index", orders);
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
+
+                //pass data to view
+                return View("Index", runningOrdersViewModel);
             }
 			else
 			{
-                var orders = _runningOrdersService.GetKitchenOrdersByStatus(status);
-                return View("Filtered", orders);
+                List<Order> orders = _runningOrdersService.GetKitchenOrdersByStatus(status);
+                FilteredOrdersViewModel filteredOrdersViewModel = new FilteredOrdersViewModel(orders, status);
+                return View(filteredOrdersViewModel);
             }
         }
 
-        [HttpGet]
-        public IActionResult ChangeOrderStatus()
-        {
-            return View();
-            //нужен какой-то viewbag с подтверждением
-        }
-
         [HttpPost]
-        public IActionResult ChangeOrderStatus(OrderItem orderItem, int id)
+        public IActionResult ChangeOrderStatus(int itemID, Status status)
         {
-            _runningOrdersService.ChangeOrderStatus(orderItem, id);
-            return View();
+            _runningOrdersService.ChangeOrderStatus(itemID, status);
+
+            
+
+            //go back 
+            return RedirectToAction("Index");
         }
     }
 }

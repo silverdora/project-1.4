@@ -9,7 +9,7 @@ namespace Chapeau.Repositories.Interfaces
         List<Order> GetAllKitchenOrders();
         List<Order> GetBarOrdersByStatus(Status status);
         List<Order> GetKitchenOrdersByStatus(Status status);
-        void ChangeOrderStatus(OrderItem orderItem, int id);
+        void ChangeOrderStatus(int itemID, Status status);
     }
 }
 
