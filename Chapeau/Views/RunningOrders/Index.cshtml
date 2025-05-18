@@ -25,75 +25,74 @@
 </div>
 
 <h3>New</h3>
-@{
-    foreach (Order order in Model.Orders)
-    {
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">@order.Employee.employeeName</h5>
-                <p class="card-text">time</p>
-                <p class="card-text">@order.Table.TableNumber</p>
-                <ul class="list-group list-group-flush">
-                    @{
-                        foreach (OrderItem orderItem in order.OrderItems)
-                        {
-                            if (orderItem.Status == Status.New)
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        @{
+            foreach (Order order in Model.NewOrders)
+            {
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@order.Employee.employeeName</h5>
+                        <p class="card-text">time</p>
+                        <p class="card-text">@order.Table.TableNumber</p>
+                        <ul class="list-group list-group-flush">
+                            @{
+                                foreach (OrderItem orderItem in order.OrderItems)
+                                {
+                                    <li class="list-group-item">@orderItem.MenuItem.Item_name <button asp-action="ChangeOrderStatus" class="btn btn-primary">Prepare</button></li>
+                                    
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+    <h3>In progress</h3>
+    @{
+        foreach (Order order in Model.InProgessOrders)
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">@order.Employee.employeeName</h5>
+                    <p class="card-text">time</p>
+                    <p class="card-text">@order.Table.TableNumber</p>
+                    <ul class="list-group list-group-flush">
+                        @{
+                            foreach (OrderItem orderItem in order.OrderItems)
                             {
-                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Prepare</button></li>
+                                <li class="list-group-item">@orderItem.MenuItem.Item_name</li>
+                                <button asp-action="ChangeOrderStatus" class="btn btn-primary">Ready</button>
                             }
                         }
-                    }
-                </ul>
+                    </ul>
+                </div>
             </div>
-        </div>
+        }
     }
-}
-
-<h3>In progress</h3>
-@{
-    foreach (Order order in Model.Orders)
-    {
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">@order.Employee.employeeName</h5>
-                <p class="card-text">time</p>
-                <p class="card-text">@order.Table.TableNumber</p>
-                <ul class="list-group list-group-flush">
-                    @{
-                        foreach (OrderItem orderItem in order.OrderItems)
-                        {
-                            if (orderItem.Status == Status.InProgress)
-                            {
-                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Completed</button></li>
+    <h3>Ready</h3>
+    @{
+        foreach (Order order in Model.ReadyOrders)
+        {
+            <div class="row">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@order.Employee.employeeName</h5>
+                        <p class="card-text">time</p>
+                        <p class="card-text">@order.Table.TableNumber</p>
+                        <ul class="list-group list-group-flush">
+                            @{
+                                foreach (OrderItem orderItem in order.OrderItems)
+                                {
+                                    <li class="list-group-item">@orderItem.MenuItem.Item_name</li>
+                                    <button asp-action="ChangeOrderStatus" class="btn btn-primary">Close</button>
+                                }
                             }
-                        }
-                    }
-                </ul>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
     }
-}
-<h3>Ready</h3>
-@{
-    foreach (Order order in Model.Orders)
-    {
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">@order.Employee.employeeName</h5>
-                <p class="card-text">time</p>
-                <p class="card-text">@order.Table.TableNumber</p>
-                <ul class="list-group list-group-flush">
-                    @{
-                        foreach (OrderItem orderItem in order.OrderItems)
-                        {
-                            if (orderItem.Status == Status.Ready)
-                            {
-                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Close</button></li>
-                            }
-                        }
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-}

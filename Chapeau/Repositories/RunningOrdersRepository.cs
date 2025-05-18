@@ -32,7 +32,7 @@ namespace Chapeau.Repositories
 
                 // Preventing SQL injections
                 command.Parameters.AddWithValue("@Id", id);
-                command.Parameters.AddWithValue("@status", orderItem.Status);
+                command.Parameters.AddWithValue("@status", orderItem.Status.ToString());
 
                 command.Connection.Open();
                 int nrOfRowsAffected = command.ExecuteNonQuery();
@@ -54,7 +54,7 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN ( " +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Drink' AND [status] != 'completed') " +
+                    "WHERE item_type = 'Drink' AND [status] != 'Completed') " +
                     "ORDER BY orderTime; ";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Connection.Open();
@@ -77,7 +77,7 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN ( " +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Dish' AND [status] != 'completed') " +
+                    "WHERE item_type = 'Dish' AND [status] != 'Completed') " +
                     "ORDER BY orderTime; ";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Connection.Open();
@@ -101,10 +101,10 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Drink' AND [status] != '@status') " +
+                    "WHERE item_type = 'Drink' AND [status] = '@status') " +
                     "ORDER BY orderTime;";
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@status", status);
+                command.Parameters.AddWithValue("@status", status.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -126,10 +126,10 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Dish' AND [status] != '@status') " +
+                    "WHERE item_type = 'Dish' AND OrderItem.[status] = @status) " +
                     "ORDER BY orderTime;";
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@status", status);
+                command.Parameters.AddWithValue("@status", status.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
@@ -154,7 +154,7 @@ namespace Chapeau.Repositories
 
             DateTime orderTime = (DateTime)reader["orderTime"];
             bool isServed = true;
-            List<OrderItem> orderItems = new List<OrderItem>();
+            List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId);
 
             return new Order(orderId, employee, table, orderTime, isServed, orderItems);
         }
@@ -254,7 +254,8 @@ namespace Chapeau.Repositories
             MenuItem menuItem = GetMenuItemByID(itemID);
 
             DateTime includeDate = (DateTime)reader["includeDate"];
-            Status status = (Status)reader["status"];
+            Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
+            //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
 
             return new OrderItem(menuItem, includeDate, status, quantity);

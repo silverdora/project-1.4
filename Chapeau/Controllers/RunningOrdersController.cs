@@ -49,10 +49,12 @@ namespace Chapeau.Controllers
             //    throw new Exception("no access");
             //}
 
-            List<Order> orders = _runningOrdersService.GetAllKitchenOrders();
-
+            //List<Order> orders = _runningOrdersService.GetAllKitchenOrders();
+            List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+            List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+            List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
             //store data in the running orders ViewModel
-            RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(orders);
+            RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
 
             //pass data to view
             return View(runningOrdersViewModel);
