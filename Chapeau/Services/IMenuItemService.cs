@@ -1,5 +1,4 @@
 ﻿using Chapeau.Models;
-//using static Chapeau.HelperMethods.MenuItemFilters;
 
 namespace Chapeau.Services
 {
@@ -10,7 +9,5 @@ namespace Chapeau.Services
         public List<MenuItem> GetMenuItemsByCategory(MenuCategory category);
 
         List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category);
-
-
     }
 }
