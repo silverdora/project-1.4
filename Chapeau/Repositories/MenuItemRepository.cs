@@ -2,7 +2,7 @@
 using Chapeau.Repositories.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
-using static Chapeau.HelperMethods.MenuItemFilters;
+//using static Chapeau.HelperMethods.MenuItemFilters;
 
 
 namespace Chapeau.Repositories

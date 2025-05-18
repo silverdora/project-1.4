@@ -24,7 +24,7 @@
     </form>
 </div>
 
-<h3>New</h3>
+<h5>New</h5>
 <div class="row row-cols-1 row-cols-md-2 g-4">
     <div class="col">
         @{
@@ -32,7 +32,7 @@
             {
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
-                        <h5 class="card-title">@order.Employee.employeeName</h5>
+                        <h6 class="card-title">@order.Employee.employeeName</h6>
                         <p class="card-text">time</p>
                         <p class="card-text">@order.Table.TableNumber</p>
                         <ul class="list-group list-group-flush">
@@ -54,7 +54,7 @@
         }
     </div>
 </div>
-    <h3>In progress</h3>
+    <h5>In progress</h5>
     <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col">
             @{
@@ -62,7 +62,7 @@
                 {
                     <div class="card" style="width: 18rem;">
                         <div class="card-body">
-                            <h5 class="card-title">@order.Employee.employeeName</h5>
+                            <h6 class="card-title">@order.Employee.employeeName</h6>
                             <p class="card-text">time</p>
                             <p class="card-text">@order.Table.TableNumber</p>
                             <ul class="list-group list-group-flush">
@@ -70,8 +70,8 @@
                                     foreach (OrderItem orderItem in order.OrderItems)
                                     {
                                         <li class="list-group-item">@orderItem.MenuItem.Item_name</li>
-                                        <form action="/RunningOrdersController/ChangeOrderStatus" method="post">
-                                            <input hidden name="orderItem" value="@orderItem" />
+                                        <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                            <input hidden name="itemID" value="@orderItem.ItemID" />
                                             <input hidden name="status" value="Ready" />
                                             <button type="submit" class="btn btn-primary">Ready</button>
                                         </form>
@@ -84,7 +84,7 @@
             }
             </div>
         </div>
-    <h3>Ready</h3>
+    <h5>Ready</h5>
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <div class="col">
                     @{
@@ -93,7 +93,7 @@
                             
                                 <div class="card" style="width: 18rem;">
                                     <div class="card-body">
-                                        <h5 class="card-title">@order.Employee.employeeName</h5>
+                                        <h6 class="card-title">@order.Employee.employeeName</h6>
                                         <p class="card-text">time</p>
                                         <p class="card-text">@order.Table.TableNumber</p>
                                         <ul class="list-group list-group-flush">
@@ -101,8 +101,8 @@
                                                 foreach (OrderItem orderItem in order.OrderItems)
                                                 {
                                                     <li class="list-group-item">@orderItem.MenuItem.Item_name</li>
-                                                    <form action="/RunningOrdersController/ChangeOrderStatus" method="post">
-                                                        <input hidden name="orderItem" value="@orderItem" />
+                                                    <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                        <input hidden name="itemID" value="@orderItem.ItemID" />
                                                         <input hidden name="status" value="Served" />
                                                         <button type="submit" class="btn btn-primary">Close</button>
                                                     </form>
