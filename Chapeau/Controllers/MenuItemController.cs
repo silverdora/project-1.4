@@ -39,15 +39,15 @@ namespace Chapeau.Controllers
                 items = _menuItemService.GetAllMenuItems();
             }
 
-            // Send enum values and selected filters to the view
+            // to remember the user's selected filter values
             ViewBag.SelectedCard = card;
             ViewBag.SelectedCategory = category;
+
+            //to make the dropdown based on the enum values
             ViewBag.Cards = Enum.GetValues(typeof(MenuCard));
             ViewBag.Categories = Enum.GetValues(typeof(MenuCategory));
 
             return View(items);
         }
-    }
-
-   
+    }   
 }

@@ -1,6 +1,5 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
-using static Chapeau.HelperMethods.MenuItemFilters;
 
 namespace Chapeau.Services
 {

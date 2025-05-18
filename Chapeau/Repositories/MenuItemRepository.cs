@@ -2,7 +2,6 @@
 using Chapeau.Repositories.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
-using static Chapeau.HelperMethods.MenuItemFilters;
 
 
 namespace Chapeau.Repositories
@@ -22,7 +21,7 @@ namespace Chapeau.Repositories
             return ExecuteQueryMapMenuItems("SELECT * FROM MenuItem");
         }
 
-        // Get items by card name
+        // Get items by card
         public List<MenuItem> GetMenuItemsByCard(MenuCard card)
         {
             string query = @"SELECT mi.*
@@ -32,7 +31,8 @@ namespace Chapeau.Repositories
 
             var cardName = card.ToString(); // converting enum to string for SQL 
 
-            return ExecuteQueryMapMenuItems(query, new SqlParameter("@card", cardName));
+            SqlParameter cardParameter = new SqlParameter("@card", cardName);//to replace @card in the query
+            return ExecuteQueryMapMenuItems(query, cardParameter);
         }
 
         // Get items by category
@@ -40,7 +40,9 @@ namespace Chapeau.Repositories
         {
             string query = "SELECT * FROM MenuItem WHERE category = @category";
             string categoryName = category.ToString(); // converting enum to string for SQL 
-            return ExecuteQueryMapMenuItems(query, new SqlParameter("@category", categoryName));
+
+            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);//to replace @category in the query
+            return ExecuteQueryMapMenuItems(query, categoryParameter);  
         }
 
         public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
@@ -50,9 +52,11 @@ namespace Chapeau.Repositories
                             JOIN MenuCard mc ON mi.cardID = mc.icardID
                             WHERE mc.card_name = @card AND mi.category = @category";
 
-            return ExecuteQueryMapMenuItems(query,
-                new SqlParameter("@card", card.ToString()),
-                new SqlParameter("@category", category.ToString()));
+            //SQL parameters
+            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
+            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
+
+            return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);    // Call the helper method with both parameters
         }
 
 
@@ -70,24 +74,33 @@ namespace Chapeau.Repositories
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    try
                     {
-                        items.Add(new MenuItem
+                        while (reader.Read())
                         {
-                            ItemID = (int)reader["itemID"],
-                            Item_name = reader["item_name"].ToString(),
-                            Description = reader["description"].ToString(),
-                            Price = (decimal)reader["price"],
-                            VATPercent = (decimal)reader["VATpercent"],
-                            Category = reader["category"].ToString(),
-                            StockQuantity = (int)reader["stockQuantity"]
-                        });
+                            items.Add(new MenuItem
+                            {
+                                ItemID = (int)reader["itemID"],
+                                Item_name = reader["item_name"].ToString(),
+                                Description = reader["description"].ToString(),
+                                Price = (decimal)reader["price"],
+                                VATPercent = (decimal)reader["VATpercent"],
+                                Category = reader["category"].ToString(),
+                                StockQuantity = (int)reader["stockQuantity"]
+                            });
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        throw new Exception("Database error while loading menu item.", ex);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Error mapping menu item from result.", ex);
                     }
                 }
             }
-
             return items;
-
         }
     }
 }
