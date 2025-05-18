@@ -27,16 +27,7 @@
         }
 
 
-        public MenuItem(int itemID, string item_name, string description, decimal price, decimal vATPercent, string category, int stockQuantity)
-        {
-            ItemID = itemID;
-            Item_name = item_name;
-            Description = description;
-            Price = price;
-            VATPercent = vATPercent;
-            Category = category;
-            StockQuantity = stockQuantity;
-        }
+        
 
     }
 }

@@ -260,7 +260,7 @@ namespace Chapeau.Repositories
             return new OrderItem(menuItem, includeDate, status, quantity);
         }
 
-        private MenuItem GetMenuItemByID(int id)
+        public MenuItem GetMenuItemByID(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -285,15 +285,17 @@ namespace Chapeau.Repositories
         }
         private MenuItem ReadMenuItem(SqlDataReader reader)
         {
-            int itemID = (int)reader["itemID"];
-            string item_name = (string)reader["item_name"];
-            string description = (string)reader["description"];
-            decimal price = (decimal)reader["price"];
-            decimal VATPercent = (decimal)reader["VATPercent"];
-            string category = (string)reader["category"];
-            int stockQuantity = (int)reader["stockQuantity"];
 
-            return new MenuItem(itemID, item_name, description, price, VATPercent, category, stockQuantity);
+            return new MenuItem
+            {
+                ItemID = (int)reader["itemID"],
+                Item_name = reader["item_name"].ToString(),
+                Description = reader["description"].ToString(),
+                Price = (decimal)reader["price"],
+                VATPercent = (decimal)reader["VATpercent"],
+                Category = reader["category"].ToString(),
+                StockQuantity = (int)reader["stockQuantity"]
+            };
         }
     }
 }

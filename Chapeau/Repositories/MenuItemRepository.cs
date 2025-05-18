@@ -72,7 +72,7 @@ namespace Chapeau.Repositories
                 {
                     while (reader.Read())
                     {
-                        items.Add(new MenuItem
+                        items.Add(new MenuItem 
                         {
                             ItemID = (int)reader["itemID"],
                             Item_name = reader["item_name"].ToString(),
