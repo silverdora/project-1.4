@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using project_1._4.Models;
+using project-1.4.Models;
 using System.Data.SqlClient;
 
 public class MenuController : Controller

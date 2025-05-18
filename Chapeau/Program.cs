@@ -1,6 +1,11 @@
-﻿namespace Chapeau;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-public class Program
+namespace project-1.4
+{
+    public class Program
 {
     public static void Main(string[] args)
     {
@@ -9,13 +14,15 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
+        // Make configuration available throughout the app
+        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 
@@ -33,4 +40,4 @@ public class Program
         app.Run();
     }
 }
-
+}
