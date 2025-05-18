@@ -4,6 +4,7 @@ using Chapeau.Models;
 using Chapeau.Services;
 using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using static NuGet.Packaging.PackagingConstants;
 
 namespace Chapeau.Controllers

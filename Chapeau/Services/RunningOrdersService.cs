@@ -28,12 +28,12 @@ namespace Chapeau.Services
             return _runningOrdersRepository.GetAllKitchenOrders();
         }
 
-        public List<Order> GetBarOrdersByStatus(string status)
+        public List<Order> GetBarOrdersByStatus(Status status)
         {
             return _runningOrdersRepository.GetBarOrdersByStatus(status);
         }
 
-        public List<Order> GetKitchenOrdersByStatus(string status)
+        public List<Order> GetKitchenOrdersByStatus(Status status)
         {
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }

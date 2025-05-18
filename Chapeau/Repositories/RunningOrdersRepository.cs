@@ -2,7 +2,8 @@
 using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+//using System.Data.SqlClient;
 using Chapeau.Enumerations;
 using Humanizer;
 

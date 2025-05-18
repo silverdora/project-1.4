@@ -37,7 +37,10 @@
                     @{
                         foreach (OrderItem orderItem in order.OrderItems)
                         {
-                            <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Prepare</button></li>
+                            if (orderItem.Status == Status.New)
+                            {
+                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Prepare</button></li>
+                            }
                         }
                     }
                 </ul>
@@ -59,7 +62,10 @@
                     @{
                         foreach (OrderItem orderItem in order.OrderItems)
                         {
-                            <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Mark as completed</button></li>
+                            if (orderItem.Status == Status.InProgress)
+                            {
+                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Completed</button></li>
+                            }
                         }
                     }
                 </ul>
@@ -80,7 +86,10 @@
                     @{
                         foreach (OrderItem orderItem in order.OrderItems)
                         {
-                            <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Mark as served</button></li>
+                            if (orderItem.Status == Status.Ready)
+                            {
+                                <li class="list-group-item">@orderItem.MenuItem.Item_name<button asp-action="ChangeOrderStatus" class="btn btn-primary">Close</button></li>
+                            }
                         }
                     }
                 </ul>
