@@ -1,0 +1,138 @@
+﻿@model Chapeau.ViewModels.RunningOrdersViewModel
+
+
+@{
+    ViewData["Title"] = "RunningOrders";
+}
+
+<h2>Orders</h2>
+
+<a class="btn btn-primary" href="/RunningOrders/Index">Refresh</a>
+
+<div class="col-6">
+    <form asp-action="Filtered" method="get">
+        <div class="form-group">
+            <label for="type">Filter by status:</label>
+            <select class="form-control" id="type" name="status">
+                <option value="All">All</option>
+                <option value="New">New</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Ready">Ready</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+</div>
+
+<h5>New</h5>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        @{
+            foreach (Order order in Model.NewOrders)
+            {
+                <li class="list-group-item">
+                    @{
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h6 class="card-title">@order.Employee.employeeName</h6>
+                                <p class="card-text">table #@order.Table.TableNumber</p>
+                                <ul class="list-group list-group-flush">
+                                    @{
+                                        foreach (OrderItem orderItem in order.OrderItems)
+                                        {
+                                            <p><em>@orderItem.MenuItem.Item_name</em></p>
+                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                            <br />
+                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                            <br />
+                                            <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                <input hidden name="status" value="InProgress" />
+                                                <button type="submit" class="btn btn-primary">Prepare</button>
+                                            </form>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </li>
+            }
+        }
+
+    </div>
+</div>
+<h5>In progress</h5>
+<div class="row">
+    <div class="col col-sm-6">
+        @{
+            foreach (Order order in Model.InProgessOrders)
+            {
+                
+                    
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">@order.Employee.employeeName</h6>
+                                <p class="card-text">table #@order.Table.TableNumber</p>
+                                <ul class="list-group list-group-flush">
+                                    @{
+                                        foreach (OrderItem orderItem in order.OrderItems)
+                                        {
+                                            <p><em>@orderItem.MenuItem.Item_name</em></p>
+                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                            <br />
+                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                            <br />
+                                            <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                <input hidden name="status" value="Ready" />
+                                                <button type="submit" class="btn btn-primary">Ready</button>
+                                            </form>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    
+                
+            }
+        }
+    </div>
+</div>
+<h5>Ready</h5>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        @{
+            foreach (Order order in Model.ReadyOrders)
+            {
+                <li class="list-group-item">
+                    @{
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h6 class="card-title">@order.Employee.employeeName</h6>
+                                <p class="card-text">table #@order.Table.TableNumber</p>
+                                <ul class="list-group list-group-flush">
+                                    @{
+                                        foreach (OrderItem orderItem in order.OrderItems)
+                                        {
+                                            <p><em>@orderItem.MenuItem.Item_name</em></p>
+                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                            <br />
+                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                            <br />
+                                            <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                <input hidden name="status" value="Served" />
+                                                <button type="submit" class="btn btn-primary">Close</button>
+                                            </form>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </li>
+            }
+        }
+    </div>
+</div>

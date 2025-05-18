@@ -76,7 +76,9 @@ namespace Chapeau.Repositories
                 {
                     try
                     {
+
                         while (reader.Read())
+
                         {
                             items.Add(new MenuItem
                             {

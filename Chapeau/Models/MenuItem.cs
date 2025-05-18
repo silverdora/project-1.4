@@ -1,7 +1,8 @@
 ﻿namespace Chapeau.Models
 {
     public class MenuItem
-    {   public int ItemID { get; set; }
+    {
+        public int ItemID { get; set; }
         public string Item_name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
@@ -24,6 +25,9 @@
                 return StockQuantity > 0 && StockQuantity <= 10;
             }
         }
+
+
+        
 
     }
 }

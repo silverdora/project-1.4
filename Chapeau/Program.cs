@@ -21,6 +21,8 @@ public class Program
         builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
         builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
 
+        builder.Services.AddSingleton<IRunningOrdersService, RunningOrdersService>();
+        builder.Services.AddSingleton<IRunningOrdersRepository, RunningOrdersRepository>();
 
         // Add configuration access
         string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
