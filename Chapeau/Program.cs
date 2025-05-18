@@ -1,4 +1,12 @@
-﻿namespace Chapeau;
+﻿using Chapeau.Services;
+using Chapeau.Models;
+using Chapeau.Controllers;
+using Chapeau.Repositories.Interfaces;
+using Chapeau.Repositories;
+
+
+
+namespace Chapeau;
 
 public class Program
 {
@@ -6,10 +14,22 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
+        builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+        builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+
+
+        // Add configuration access
+        string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+      
+       
         var app = builder.Build();
+
+
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
