@@ -5,18 +5,16 @@ namespace Chapeau.ViewModels
 {
 	public class RunningOrdersViewModel
 	{
-		public Order Order;
-		public List<OrderItem> OrderItems;
-		public Status Status;
+		public List<Order> Orders;
+		//public Employee Employee;
 		public RunningOrdersViewModel()
 		{
 		}
 
-        public RunningOrdersViewModel(Order order, Status status)
+        public RunningOrdersViewModel(List<Order> orders)
         {
-            this.Order = order;
-			this.Status = status;
-            this.OrderItems = order.OrderItems;
+            Orders = orders;
+            //Employee = employee;
         }
     }
 }
