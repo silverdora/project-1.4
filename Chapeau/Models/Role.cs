@@ -3,7 +3,7 @@ namespace Chapeau.Enumerations
 {
 	public enum Role
 	{
-		Waiter,
+		Server,
 		Bar,
 		Kitchen,
 		Manager

@@ -187,7 +187,7 @@ namespace Chapeau.Repositories
         {
             int employeeId = (int)reader["employeeID"];
             string name = (string)reader["employee_name"];
-            Role role = (Role)reader["employee_role"];
+            Role role = (Role)Enum.Parse(typeof(Role), (string)reader["employee_role"], true);
 
             return new Employee(employeeId, name, role);
         }
