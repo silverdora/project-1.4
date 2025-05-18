@@ -9,7 +9,7 @@
         public decimal VATPercent { get; set; }
         public string Category { get; set; }
         public int StockQuantity { get; set; }
-
+        public int CardID { get; set; }
         public bool IsOutOfStock
         {
             get
@@ -26,6 +26,7 @@
             }
         }
 
+
         public MenuItem(int itemID, string item_name, string description, decimal price, decimal vATPercent, string category, int stockQuantity)
         {
             ItemID = itemID;
@@ -36,5 +37,6 @@
             Category = category;
             StockQuantity = stockQuantity;
         }
+
     }
 }

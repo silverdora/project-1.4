@@ -4,11 +4,11 @@
     {
         public int OrderID { get; set; }
         public Employee Employee { get; set; }
-        //public int TableID { get; set; }
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
         public bool IsServed { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
 
         public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isServed, List<OrderItem> orderItems)
         {
@@ -19,5 +19,8 @@
             IsServed = isServed;
             OrderItems = orderItems;
         }
+
+        
+
     }
 }

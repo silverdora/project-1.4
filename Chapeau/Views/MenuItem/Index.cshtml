@@ -1,35 +1,41 @@
 ﻿@model List<Chapeau.Models.MenuItem>
 
-<h2>Menu Items</h2>
 
-
-<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
+    <<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
     <div class="d-flex gap-3">
+        <div style="width: 150px;">
         <!-- Card Filter -->
-        <div>
-            <label for="selectedCard">Card:</label>
-            <select name="selectedCard" id="selectedCard" class="form-select" onchange="this.form.submit()">
-                <option value="All" selected="@("All" == ViewBag.SelectedCard)">All</option>
-                @foreach (var card in (List<string>)ViewBag.AllCards)
-                {
-                    <option value="@card" selected="@(card == ViewBag.SelectedCard)">@card</option>
-                }
-            </select>
+        <select name="card" id="selectedCard" class="form-select" style=" width: auto;" onchange="this.form.submit()">
+            <!-- onchange = dropdown -->
+
+            <option value="">-- All Cards --</option>
+            @foreach (MenuCard card in ViewBag.Cards)
+            {
+                <option value="@card" selected="@(ViewBag.SelectedCard != null && card.Equals(ViewBag.SelectedCard) ? "selected" : null)">
+                    @card
+                </option>
+            }
+        </select>
         </div>
 
         <!-- Category Filter -->
-        <div>
-            <label for="selectedCategory">Category:</label>
-            <select name="selectedCategory" id="selectedCategory" class="form-select" onchange="this.form.submit()">
-                <option value="All" selected="@("All" == ViewBag.SelectedCategory)">All</option>
-                @foreach (var cat in (List<string>)ViewBag.AllCategories)
-                {
-                    <option value="@cat" selected="@(cat == ViewBag.SelectedCategory)">@cat</option>
-                }
-            </select>
+        <div style="width: 150px;">
+        <select name="category" id="selectedCategory" class="form-select" style=" width: auto;" onchange="this.form.submit()">
+            <option value="">-- All Categories --</option>
+            @foreach (MenuCategory category in ViewBag.Categories)
+            {
+                <option value="@category" selected="@(ViewBag.SelectedCategory != null && category.Equals(ViewBag.SelectedCategory) ? "selected" : null)">
+                    @category
+                </option>
+            }
+        </select>
         </div>
     </div>
 </form>
+
+
+<h2>Menu Items</h2>
+
 
 
 <table class="table">
