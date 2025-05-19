@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<Chapeau.Models.Payment>
+
+<h2>Payments</h2>
+<table class="table">
+    <tr>
+        <th>Order ID</th>
+        <th>Payment Type</th>
+        <th>Amount Paid</th>
+        <th>Tip</th>
+        <th>Low VAT</th>
+        <th>High VAT</th>
+        <th>Date</th>
+    </tr>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@p.orderID</td>
+            <td>@p.paymentType</td>
+            <td>@p.amountPaid</td>
+            <td>@p.tipAmount</td>
+            <td>@p.lowVATAmount</td>
+            <td>@p.highVATAmount</td>
+            <td>@p.paymentDAte.ToShortDateString()</td>
+        </tr>
+    }
+</table>
+
+

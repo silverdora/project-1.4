@@ -1,10 +1,11 @@
+
 ﻿using Chapeau.Services;
 using Chapeau.Models;
 using Chapeau.Controllers;
 using Chapeau.Repositories.Interfaces;
 using Chapeau.Repositories;
 
-
+using Chapeau.Services.Interfaces;
 
 namespace Chapeau;
 
@@ -17,6 +18,12 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        
+
+        // Register application services
+        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+        builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 
         builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
         builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();

@@ -30,5 +30,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HelperMethods\" />
+    <Compile Remove="ViewModels\**" />
+    <Content Remove="ViewModels\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="ViewModels\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
+    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
   </ItemGroup>
 </Project>
