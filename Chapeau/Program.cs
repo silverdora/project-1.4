@@ -1,4 +1,10 @@
-﻿namespace Chapeau;
+﻿using Chapeau.Repository;
+using Chapeau.Repository.Interface;
+using Chapeau.Service;
+using Chapeau.Service.Interface;
+
+
+namespace Chapeau;
 
 public class Program
 {
@@ -8,6 +14,19 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+        builder.Services.AddScoped<ITableRepository, TableRepository>();
+        builder.Services.AddScoped<ITableService, TableService>();
+
+
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
 
         var app = builder.Build();
 
@@ -22,13 +41,15 @@ public class Program
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 
+        app.UseSession();
+
         app.UseRouting();
 
         app.UseAuthorization();
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
+            pattern: "{controller=Employee}/{action=Login}/{id?}");
 
         app.Run();
     }

@@ -1,0 +1,33 @@
+﻿@model List<Chapeau.Models.Table>
+
+<h2>Restaurant Seating Overview</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Table #</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var table in Model)
+        {
+            <tr>
+                <td>@table.TableNumber</td>
+                <td>
+                    @if (table.Status == TableStatus.Occupied)
+                    {
+                        <span class="badge bg-danger">Occupied</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Free</span>
+                    }
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-outline-primary" href="/Restaurant/Overview">Refresh</a>
