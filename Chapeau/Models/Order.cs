@@ -11,6 +11,7 @@ namespace Chapeau.Models
         public bool IsServed { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+        public Status Status { get; set; }
 
         public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isServed, List<OrderItem> orderItems)
         {

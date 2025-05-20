@@ -311,12 +311,18 @@ namespace Chapeau.Repositories
                 {
                     if (reader.Read())
                     {
-                        order = new Order
+                        int employeeID = (int)reader["employeeID"];
+                        int tableID = (int)reader["tableID"];
+                        DateTime orderTime = (DateTime)reader["orderTime"];
+                        Status status = (Status)Enum.Parse(typeof(Status), reader["status"].ToString());
+
+                        Employee employee = GetEmployeeByID(employeeID);
+                        Table table = GetTableByID(tableID);
+                        List<OrderItem> items = GetOrderItemsByOrderID(orderId);
+
+                        order = new Order(orderId, employee, table, orderTime, status == Status.Served, items)
                         {
-                            OrderID = (int)reader["orderID"],
-                            TableID = (int)reader["tableID"],
-                            Status = (Status)Enum.Parse(typeof(Status), reader["status"].ToString()),
-                            // Add more fields if needed
+                            Status = status // Optional: if you added it to Order model
                         };
                     }
                 }
@@ -331,7 +337,7 @@ namespace Chapeau.Repositories
                 string query = "UPDATE [Order] SET status = @status WHERE orderID = @orderId";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@orderId", orderId);
-                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
+                cmd.Parameters.AddWithValue("@status", Status.Served.ToString());
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
