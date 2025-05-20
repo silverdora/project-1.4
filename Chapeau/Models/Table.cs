@@ -1,14 +1,13 @@
-﻿using System;
 namespace Chapeau.Models
 {
-	public class Table
-	{
-		public int TableId { get; set; }
+    public class Table
+    {
+        public int TableId { get; set; }
         public int TableNumber { get; set; }
-		public bool IsOccupied { get; set; }
+        public bool IsOccupied { get; set; }
         public Table()
-		{
-		}
+        {
+        }
 
         public Table(int tableId, int tableNumber, bool isOccupied)
         {
@@ -18,4 +17,3 @@ namespace Chapeau.Models
         }
     }
 }
-

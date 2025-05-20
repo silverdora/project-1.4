@@ -1,5 +1,6 @@
-﻿using System;
-namespace Chapeau.Enumerations
+
+using System;
+namespace Chapeau.Models
 {
 	public enum Role
 	{
@@ -9,4 +10,3 @@ namespace Chapeau.Enumerations
 		Manager
 	}
 }
-

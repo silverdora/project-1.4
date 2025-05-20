@@ -1,0 +1,37 @@
+﻿@model List<Chapeau.Models.Table>
+
+<h2 class="text-center mb-4">Restaurant Seating Overview</h2>
+
+<div class="container">
+
+    <!-- 🔄 Refresh button at the top right -->
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-outline-primary" href="/Restaurant/Overview">
+            🔄 Refresh
+        </a>
+    </div>
+
+    <!-- Table grid layout -->
+    <div class="row row-cols-2 g-4 justify-content-center">
+        @foreach (var table in Model.OrderBy(t => t.TableNumber))
+        {
+            <div class="col d-flex justify-content-center">
+                <div class="restaurant-table @(table.IsOccupied ? "occupied" : "free")">
+                    <div class="table-top">
+                        <span>Table @table.TableNumber</span>
+                    </div>
+                    <div class="table-status">
+                        @if (table.IsOccupied)
+                        {
+                            <span class="badge bg-danger">Occupied</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Free</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

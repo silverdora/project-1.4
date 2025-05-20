@@ -1,4 +1,6 @@
-﻿namespace Chapeau.Models
+﻿
+
+namespace Chapeau.Models
 {
     public class Order
     {

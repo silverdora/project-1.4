@@ -4,7 +4,7 @@ using Chapeau.Repositories.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
 //using System.Data.SqlClient;
-using Chapeau.Enumerations;
+
 using Humanizer;
 
 namespace Chapeau.Repositories
