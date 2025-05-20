@@ -12,6 +12,7 @@ namespace Chapeau.Repositories.Interfaces
         void ChangeOrderStatus(int itemID, Status status);
 
         Order GetOrderById(int orderId);
+        void CloseOrder(int orderId);
     }
 }
 
