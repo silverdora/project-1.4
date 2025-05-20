@@ -61,14 +61,35 @@ namespace Chapeau.Controllers
         [HttpPost]
         public IActionResult CompletePayment(int orderId, Payment payment)
         {
-            // Save payment
-            _paymentService.AddPayment(payment);
+            var order = _orderService.GetOrderById(orderId);
 
-            // Close the order
-            _orderService.CloseOrder(orderId);
+            // You can calculate total price dynamically if needed
+            var totalAmount = order.OrderItems.Sum(item => item.MenuItem.Price);
+
+            var payment = new Payment
+            {
+                orderID = orderId,
+                amountPaid = totalAmount,
+                paymentDAte = DateTime.Now
+            };
+
+            return View(payment);
+        }
+        [HttpPost]
+        public IActionResult CompletePayment(Payment payment)
+        {
+            payment.paymentDAte = DateTime.Now;
+
+            // (Optional) calculate VAT here
+            payment.lowVATAmount = 0.09m * payment.amountPaid;
+            payment.highVATAmount = 0.21m * payment.amountPaid;
+
+            _paymentService.AddPayment(payment);
+            _orderService.CloseOrder(payment.orderID);
 
             return RedirectToAction("Index");
         }
+
 
     }
 }

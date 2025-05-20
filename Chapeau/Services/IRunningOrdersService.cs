@@ -10,9 +10,11 @@ namespace Chapeau.Services
         List<Order> GetBarOrdersByStatus(Status status);
         List<Order> GetKitchenOrdersByStatus(Status status);
         void ChangeOrderStatus(int itemID, Status status);
+        Order GetOrderById(int orderId);
+        void CloseOrder(int orderId);
 
 
-       
+
     }
 }
 
