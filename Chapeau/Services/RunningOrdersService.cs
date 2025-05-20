@@ -7,6 +7,7 @@ namespace Chapeau.Services
 	public class RunningOrdersService:IRunningOrdersService
 	{
         private readonly IRunningOrdersRepository _runningOrdersRepository;
+        
 
         public RunningOrdersService(IRunningOrdersRepository runningOrdersRepository)
         {
@@ -38,6 +39,17 @@ namespace Chapeau.Services
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
 
+        public Order GetOrderById(int orderId)
+        {
+            return _orderRepository.GetOrderById(orderId);
+        }
+
+        public void CloseOrder(int orderId)
+        {
+            _orderRepository.CloseOrder(orderId);
+        }
     }
+
+}
 }
 

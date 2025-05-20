@@ -21,6 +21,8 @@
             </select>
         </div>
         <button class="btn btn-primary" type="submit">Filter</button>
+        <a asp-controller="Payment" asp-action="PayOrder" asp-route-orderId="@order.OrderID" class="btn btn-primary">Finish & Pay</a>
+
     </form>
 </div>
 

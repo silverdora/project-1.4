@@ -298,6 +298,47 @@ namespace Chapeau.Repositories
                 StockQuantity = (int)reader["stockQuantity"]
             };
         }
+        public Order GetOrderById(int orderId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM [Order] WHERE OrderID = @OrderId";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Order
+                        {
+                            OrderID = (int)reader["OrderID"],
+                            Table = new Table { TableID = (int)reader["TableID"] },
+                            OrderItems = new List<OrderItem>(), // optional to load separately
+                                                                // Add more properties as needed
+                        };
+                    }
+                }
+            }
+
+            return null;
+        }
+        public void CloseOrder(int orderId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE [Order] SET Status = @Status WHERE OrderID = @OrderId";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@Status", Status.Served); // or Status.Closed, as per your enum
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+
     }
 }
 
