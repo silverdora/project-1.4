@@ -17,7 +17,13 @@ namespace Chapeau.Services
         {
             return _paymentRepository.GetAllPayments();
         }
-      
+
+        public void AddPayment(Payment payment)
+        {
+            _paymentRepository.AddPayment(payment);
+        }
+
+
 
     }
 }
