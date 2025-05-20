@@ -7,6 +7,7 @@ namespace Chapeau.Services.Interfaces
         List<Payment> GetAllPayments(int orderId);
         void ProcessPaymentForOrder(Order order, string paymentType, decimal tip);
 
+
         // ...
     }
 }
