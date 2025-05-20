@@ -8,31 +8,36 @@
 *@
 @{
 }
-@model List<Chapeau.Models.Payment>
+@model List<Chapeau.Models.Order>
 
-<h2>Payments</h2>
+<h2>Open Orders</h2>
+
 <table class="table">
-    <tr>
-        <th>Order ID</th>
-        <th>Payment Type</th>
-        <th>Amount Paid</th>
-        <th>Tip</th>
-        <th>Low VAT</th>
-        <th>High VAT</th>
-        <th>Date</th>
-    </tr>
-    @foreach (var p in Model)
-    {
+    <thead>
         <tr>
-            <td>@p.orderID</td>
-            <td>@p.paymentType</td>
-            <td>@p.amountPaid</td>
-            <td>@p.tipAmount</td>
-            <td>@p.lowVATAmount</td>
-            <td>@p.highVATAmount</td>
-            <td>@p.paymentDAte.ToShortDateString()</td>
+            <th>Order ID</th>
+            <th>Table Number</th>
+            <th>Order Time</th>
+            <th>Is Served</th>
+            <th>Actions</th>
         </tr>
-    }
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderID</td>
+                <td>@order.Table.TableNumber</td>
+                <td>@order.OrderTime.ToString("g")</td>
+                <td>@(order.IsServed ? "Yes" : "No")</td>
+                <td>
+                    <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderID" class="btn btn-primary btn-sm">View Order</a>
+                    <a asp-controller="Payments" asp-action="Create" asp-route-orderId="@order.OrderID" class="btn btn-success btn-sm">Finish Order</a>
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
+
 
 
