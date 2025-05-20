@@ -15,9 +15,10 @@ namespace Chapeau.Controllers
         private readonly IRunningOrdersService _orderService; //// Make sure this is injected
 
         // ✅ Use ONE constructor
-        public PaymentController(IPaymentService paymentService)
+        public PaymentController(IPaymentService paymentService, IRunningOrdersService orderService)
         {
             _paymentService = paymentService;
+            _orderService = orderService;
         }
 
         public ActionResult Index()
