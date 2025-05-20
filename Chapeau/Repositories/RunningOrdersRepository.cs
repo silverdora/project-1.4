@@ -300,41 +300,40 @@ namespace Chapeau.Repositories
         }
         public Order GetOrderById(int orderId)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            Order order = null;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * FROM [Order] WHERE OrderID = @OrderId";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@OrderId", orderId);
-
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
+                string query = "SELECT * FROM [Order] WHERE orderID = @orderId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@orderId", orderId);
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        return new Order
+                        order = new Order
                         {
-                            OrderID = (int)reader["OrderID"],
-                            Table = new Table { TableID = (int)reader["TableID"] },
-                            OrderItems = new List<OrderItem>(), // optional to load separately
-                                                                // Add more properties as needed
+                            OrderID = (int)reader["orderID"],
+                            TableID = (int)reader["tableID"],
+                            Status = (Status)Enum.Parse(typeof(Status), reader["status"].ToString()),
+                            // Add more fields if needed
                         };
                     }
                 }
             }
-
-            return null;
+            return order;
         }
+
         public void CloseOrder(int orderId)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE [Order] SET Status = @Status WHERE OrderID = @OrderId";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@Status", Status.Served); // or Status.Closed, as per your enum
-                command.Parameters.AddWithValue("@OrderId", orderId);
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                string query = "UPDATE [Order] SET status = @status WHERE orderID = @orderId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@orderId", orderId);
+                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
+                conn.Open();
+                cmd.ExecuteNonQuery();
             }
         }
 
