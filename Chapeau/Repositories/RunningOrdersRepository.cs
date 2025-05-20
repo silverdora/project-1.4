@@ -303,7 +303,7 @@ namespace Chapeau.Repositories
             Order order = null;
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * FROM [Order] WHERE orderID = @orderId";
+                string query = "SELECT * FROM Order WHERE orderID = @orderId";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@orderId", orderId);
                 conn.Open();
@@ -334,7 +334,7 @@ namespace Chapeau.Repositories
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE [Order] SET status = @status WHERE orderID = @orderId";
+                string query = "UPDATE Order SET status = @status WHERE orderID = @orderId";
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@orderId", orderId);
                 cmd.Parameters.AddWithValue("@status", Status.Served.ToString());
