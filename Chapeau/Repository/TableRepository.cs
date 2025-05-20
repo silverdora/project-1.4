@@ -16,7 +16,7 @@ namespace Chapeau.Repository
         public List<Table> GetAllTables()
         {
             List<Table> tables = new List<Table>();
-            string query = "SELECT tableID, table_number, isOccupied FROM [Table]";
+            string query = "SELECT tableID, table_number, isOccupied AS is_occupied FROM [Table]";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
@@ -28,9 +28,9 @@ namespace Chapeau.Repository
                     {
                         tables.Add(new Table
                         {
-                            TableID = Convert.ToInt32(reader["tableID"]),
+                            TableId = Convert.ToInt32(reader["tableID"]),
                             TableNumber = Convert.ToInt32(reader["table_number"]),
-                            Status = Convert.ToBoolean(reader["isOccupied"]) ? TableStatus.Occupied : TableStatus.Available,  
+                            IsOccupied = Convert.ToBoolean(reader["is_occupied"])
                         });
                     }
                 }

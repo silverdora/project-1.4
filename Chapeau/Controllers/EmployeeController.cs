@@ -36,7 +36,7 @@ namespace Chapeau.Controllers
             switch (employee.Role)
             {
                 case Role.Server:
-                    return RedirectToAction("Overview", "Waiter");
+                    return RedirectToAction("Overview", "Restaurant");
                 case Role.Bar:
                     return RedirectToAction("Overview", "Bar");
                 case Role.Kitchen:
