@@ -41,13 +41,14 @@ namespace Chapeau.Services
 
         public Order GetOrderById(int orderId)
         {
-            return _orderRepository.GetOrderById(orderId);
+            return _runningOrdersRepository.GetOrderById(orderId);
         }
 
         public void CloseOrder(int orderId)
         {
-            _orderRepository.CloseOrder(orderId);
+            _runningOrdersRepository.CloseOrder(orderId);
         }
+
     }
 
 }

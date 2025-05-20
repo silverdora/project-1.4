@@ -58,6 +58,18 @@ namespace Chapeau.Controllers
             // Redirect back to orders page or payment index
             return RedirectToAction("Index", "RunningOrders");
         }
+        [HttpPost]
+        public IActionResult CompletePayment(int orderId, Payment payment)
+        {
+            // Save payment
+            _paymentService.AddPayment(payment);
+
+            // Close the order
+            _orderService.CloseOrder(orderId);
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
     
