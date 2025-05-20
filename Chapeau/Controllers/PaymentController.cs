@@ -20,22 +20,47 @@ namespace Chapeau.Controllers
             _paymentService = paymentService;
             _orderService = orderService;
         }
-        [HttpPost]
-        public IActionResult Pay(int orderId, string paymentType, decimal tip)
-        {
-            var order = _orderService.GetOrderWithItems(orderId); // you'll add this next
-            if (order == null)
-                return NotFound();
-
-            _paymentService.ProcessPayment(order, paymentType, tip);
-            return RedirectToAction("Index", "Orders");
-        }
+        
         public ActionResult Index()
         {
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
             return View(payments);
         }
+        // GET: Show payment form for the order
+        [HttpGet]
+        public IActionResult PayOrder(int orderId)
+        {
+            var order = _orderService.GetOrderById(orderId);  // Add this method if you don't have it
+            if (order == null)
+                return NotFound();
+
+            var payment = new Payment
+            {
+                orderID = orderId,
+                paymentDAte = DateTime.Now
+            };
+            return View(payment);
+        }
+
+        // POST: Process payment
+        [HttpPost]
+        public IActionResult PayOrder(Payment payment)
+        {
+            if (!ModelState.IsValid)
+                return View(payment);
+
+            // Store payment in DB
+            _paymentService.AddPayment(payment);
+
+            // Close order (mark as served/closed)
+            _orderService.CloseOrder(payment.orderID);
+
+            // Redirect back to orders page or payment index
+            return RedirectToAction("Index", "RunningOrders");
+        }
     }
 }
+    
+
 
 

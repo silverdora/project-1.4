@@ -37,6 +37,7 @@ namespace Chapeau.Services
         {
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
+
     }
 }
 

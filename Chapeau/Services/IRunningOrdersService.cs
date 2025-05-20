@@ -12,7 +12,7 @@ namespace Chapeau.Services
         void ChangeOrderStatus(int itemID, Status status);
 
 
-        Order GetOrderWithItems(int orderId);//implemented for scenario 4
+       
     }
 }
 
