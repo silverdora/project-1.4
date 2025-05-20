@@ -20,7 +20,7 @@ namespace Chapeau.Controllers
             _paymentService = paymentService;
             _orderService = orderService;
         }
-        
+
         public ActionResult Index()
         {
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
@@ -58,12 +58,14 @@ namespace Chapeau.Controllers
             // Redirect back to orders page or payment index
             return RedirectToAction("Index", "RunningOrders");
         }
-        [HttpPost]
-        public IActionResult CompletePayment(int orderId, Payment payment)
+        // GET: Show preview of payment
+        [HttpGet]
+        public IActionResult CompletePayment(int orderId)
         {
             var order = _orderService.GetOrderById(orderId);
+            if (order == null)
+                return NotFound();
 
-            // You can calculate total price dynamically if needed
             var totalAmount = order.OrderItems.Sum(item => item.MenuItem.Price);
 
             var payment = new Payment
@@ -73,14 +75,17 @@ namespace Chapeau.Controllers
                 paymentDAte = DateTime.Now
             };
 
-            return View(payment);
+            return View(payment); // Show preview/confirmation
         }
+
+        // POST: Finalize and store the payment
         [HttpPost]
         public IActionResult CompletePayment(Payment payment)
         {
-            payment.paymentDAte = DateTime.Now;
+            if (!ModelState.IsValid)
+                return View(payment);
 
-            // (Optional) calculate VAT here
+            payment.paymentDAte = DateTime.Now;
             payment.lowVATAmount = 0.09m * payment.amountPaid;
             payment.highVATAmount = 0.21m * payment.amountPaid;
 
@@ -90,10 +95,11 @@ namespace Chapeau.Controllers
             return RedirectToAction("Index");
         }
 
-
     }
 }
-    
+
+
+
 
 
 
