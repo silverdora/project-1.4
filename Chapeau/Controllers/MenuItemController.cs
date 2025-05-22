@@ -15,7 +15,7 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-        public IActionResult Index(MenuCard? card, MenuCategory? category)
+        public IActionResult Index(MenuCard? card, MenuCategory? category, int? orderID)
         {
             var filteredItems = _menuItemService.GetFilteredMenuItems(card, category);
 
@@ -31,6 +31,8 @@ namespace Chapeau.Controllers
             {
                 viewModel.AllItemsForSelectedCard = _menuItemService.GetMenuItemsByCard(card.Value);
             }
+
+            ViewBag.CurrentOrderID = orderID;
 
             return View(viewModel);
         }

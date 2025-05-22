@@ -1,0 +1,39 @@
+﻿@model Chapeau.ViewModels.OrderDetailsViewModel
+
+<h2>Order #@Model.OrderID</h2>
+
+<p><strong>Table:</strong> @Model.TableNumber</p>
+<p><strong>Waiter:</strong> @Model.EmployeeName</p>
+<p><strong>Order Time:</strong> @Model.OrderTime.ToString("HH:mm:ss")</p>
+
+<h3>Items</h3>
+
+@if (Model.Items == null)
+{
+    <p>No items added yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Waiting Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.MenuItem.Item_name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Status</td>
+                    <td>@item.WaitingTime.Minutes min</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+}

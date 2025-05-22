@@ -78,6 +78,7 @@ else
                 <th>Price</th>
                 <th>Category</th>
                 <th>Stock</th>
+                <th>Add</th>
             </tr>
         </thead>
         <tbody>
@@ -111,6 +112,23 @@ else
                         }
 
                         <span style="color:@color;">@message</span>
+                    </td>
+                    <!-- Add order buttons -->
+
+                    <td>
+                        @if (item.StockQuantity > 0)
+                        {
+                            <form asp-controller="Order" asp-action="AddItem" method="post">
+                                <input type="hidden" name="orderID" value="@ViewBag.CurrentOrderID" />
+                                <input type="hidden" name="itemID" value="@item.ItemID" />
+                                <input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" style="width: 60px;" />
+                                <button type="submit">Add</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span style="color: gray;">N/A</span>
+                        }
                     </td>
                 </tr>
             }
