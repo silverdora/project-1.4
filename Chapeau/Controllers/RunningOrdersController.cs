@@ -109,6 +109,60 @@ namespace Chapeau.Controllers
             //go back 
             return RedirectToAction("Index");
         }
+
+        // Show full order details for a table/order
+        public IActionResult Details(int orderId)
+        {
+            // You might have a method to get an order by ID; if not, add it
+            var order = _runningOrdersService.GetOrderById(orderId);
+            if (order == null) return NotFound();
+
+            return View(order);
+        }
+
+        // GET: Confirm finish order page (show payment form)
+        [HttpGet]
+        public IActionResult FinishOrder(int orderId)
+        {
+            var order = _runningOrdersService.GetOrderById(orderId);
+            if (order == null) return NotFound();
+
+            var model = new PaymentViewModel
+            {
+                OrderId = orderId,
+                Amount = CalculateTotalAmount(order) // Implement this helper
+            };
+
+            return View(model);
+        }
+
+        // POST: Finish the order, save payment and close order
+        [HttpPost]
+        public IActionResult FinishOrder(PaymentViewModel paymentModel)
+        {
+            if (!ModelState.IsValid)
+                return View(paymentModel);
+
+            // Map ViewModel to Payment model
+            var payment = new Payment
+            {
+                OrderId = paymentModel.OrderId,
+                Amount = paymentModel.Amount,
+                PaymentMethod = paymentModel.PaymentMethod,
+                PaymentTime = DateTime.Now
+            };
+
+            _runningOrdersService.FinishOrder(paymentModel.OrderId, payment);
+
+            return RedirectToAction("Index", "Tables"); // Or wherever your home page is
+        }
+
+        // Helper for total calculation (optional)
+        private decimal CalculateTotalAmount(Order order)
+        {
+            return order.OrderItems.Sum(item => item.Price * item.Quantity);
+        }
     }
 }
+
 

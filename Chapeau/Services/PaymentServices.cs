@@ -13,7 +13,7 @@ namespace Chapeau.Services
             _paymentRepository = paymentRepository;
         }
 
-        public List<Payment> GetAllPayments(int orderId)
+        public List<Payment> GetAllPayments(int orderID)
         {
             return _paymentRepository.GetAllPayments();
         }
@@ -22,6 +22,8 @@ namespace Chapeau.Services
         {
             _paymentRepository.AddPayment(payment);
         }
+
+
 
 
 

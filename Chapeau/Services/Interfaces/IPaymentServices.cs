@@ -4,7 +4,7 @@ namespace Chapeau.Services.Interfaces
 {
     public interface IPaymentService
     {
-        List<Payment> GetAllPayments(int orderId);
+        List<Payment> GetAllPayments(int orderID);
         void AddPayment(Payment payment);
         // ...
     }

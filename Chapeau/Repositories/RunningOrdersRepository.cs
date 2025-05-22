@@ -298,7 +298,65 @@ namespace Chapeau.Repositories
                 StockQuantity = (int)reader["stockQuantity"]
             };
         }
-       
+
+        public Order GetCompleteOrderForTable(int tableId)
+        {
+            // 1. Query Orders table for open order on the table
+            // 2. Query OrderItems for that order
+            // 3. Query Employee and Table info if needed
+            // Build and return Order object
+
+            Order order = null;
+
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string orderQuery = "SELECT * FROM Orders WHERE TableID = @tableId AND Status != @status";
+                SqlCommand cmd = new SqlCommand(orderQuery, conn);
+                cmd.Parameters.AddWithValue("@tableId", tableId);
+                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        int orderId = (int)reader["OrderID"];
+                        int employeeId = (int)reader["EmployeeID"];
+                        DateTime orderTime = (DateTime)reader["OrderTime"];
+                        bool isServed = (bool)reader["IsServed"];
+                        Status status = Enum.Parse<Status>(reader["Status"].ToString());
+
+                        Employee employee = GetEmployeeById(employeeId); // You need to implement this
+                        Table table = GetTableById(tableId); // Implement this too
+                        List<OrderItem> orderItems = GetOrderItemsByOrderId(orderId); // And this
+
+                        order = new Order(orderId, employee, table, orderTime, isServed, orderItems)
+                        {
+                            Status = status
+                        };
+                    }
+                }
+            }
+
+            return order;
+        }
+
+        public void CloseOrder(int orderId)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                string updateQuery = "UPDATE Orders SET Status = @status WHERE OrderID = @orderId";
+                SqlCommand cmd = new SqlCommand(updateQuery, conn);
+                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
+                cmd.Parameters.AddWithValue("@orderId", orderId);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
 
 
     }

@@ -11,7 +11,8 @@ namespace Chapeau.Repositories.Interfaces
         List<Order> GetKitchenOrdersByStatus(Status status);
         void ChangeOrderStatus(int itemID, Status status);
 
-       
+        Order GetCompleteOrderForTable(int tableId);
+        void CloseOrder(int orderId);
     }
 }
 

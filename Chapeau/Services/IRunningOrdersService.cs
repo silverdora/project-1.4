@@ -12,7 +12,7 @@ namespace Chapeau.Services
         void ChangeOrderStatus(int itemID, Status status);
 
         Order GetCompleteOrderForTable(int tableId);
-        void CloseOrder(int orderId);
+        void CloseOrder(int orderID);
 
 
     }

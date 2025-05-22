@@ -26,5 +26,36 @@ namespace Chapeau.Controllers
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
             return View(payments);
         }
+        // Show the complete order of a table to the waiter
+        public IActionResult CompleteOrder(int tableId)
+        {
+            var order = _runningOrdersService.GetCompleteOrderForTable(tableId);
+            if (order == null)
+            {
+                return NotFound("No open order found for this table.");
+            }
+            return View(order);
+        }
+
+        // Finish the order and save payment info
+        [HttpPost]
+        public IActionResult FinishOrder(int orderId, decimal amountPaid, string paymentMethod)
+        {
+            // Create Payment object
+            var payment = new Payment
+            {
+                OrderID = orderId,
+                AmountPaid = amountPaid,
+                PaymentMethod = paymentMethod,
+                PaymentTime = DateTime.Now
+            };
+
+            // Finish the order and add payment
+            _runningOrdersService.FinishOrder(orderId, payment);
+
+            return RedirectToAction("BarOrders", "RunningOrders"); // Redirect to orders list or confirmation page
+        }
+    }
+}
         // GET: Show payment form for the order
        
