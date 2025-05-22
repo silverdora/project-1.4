@@ -6,34 +6,20 @@
 @model Chapeau.Models.Payment
 
 @{
-    ViewData["Title"] = "Complete Payment";
+    ViewData["Title"] = "Confirm Payment";
 }
 
-<h2>Complete Payment</h2>
+<h2>Confirm Payment</h2>
 
-<form asp-action="CompletePayment" method="post">
-    <input type="hidden" name="orderID" value="@Model.orderID" />
+<div class="card p-3 shadow-sm">
+    <p><strong>Order ID:</strong> @Model.orderID</p>
+    <p><strong>Total Amount:</strong> €@Model.amountPaid.ToString("0.00")</p>
 
-    <div class="form-group">
-        <label>Order Total (€):</label>
-        <input type="text" class="form-control" value="@Model.amountPaid" readonly />
-    </div>
-
-    <div class="form-group">
-        <label>Tip (€):</label>
-        <input type="number" step="0.01" class="form-control" name="tipAmount" value="0.00" required />
-    </div>
-
-    <div class="form-group">
-        <label>Payment Type:</label>
-        <select name="paymentType" class="form-control" required>
-            <option value="">Select type</option>
-            <option value="Cash">Cash</option>
-            <option value="Card">Card</option>
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-3">Finish Payment</button>
-    <a asp-controller="RunningOrders" asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
-</form>
+    <form method="post" asp-action="CompletePayment">
+        <input type="hidden" asp-for="orderID" />
+        <input type="hidden" asp-for="amountPaid" />
+        <button type="submit" class="btn btn-success">Confirm & Pay</button>
+        <a asp-controller="RunningOrders" asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 
