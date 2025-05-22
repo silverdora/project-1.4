@@ -16,7 +16,7 @@ namespace Chapeau.Repositories
         }
 
         // Get all menu items
-        public List<MenuItem> GetAllMenuItems()
+        public List<MenuItem> GetMenuItems()
         {
             return ExecuteQueryMapMenuItems("SELECT * FROM MenuItem");
         }

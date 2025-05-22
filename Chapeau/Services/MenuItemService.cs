@@ -12,9 +12,9 @@ namespace Chapeau.Services
             _menuItemRepository = menuItemRepository;
         }
       
-        public List<MenuItem> GetAllMenuItems()
+        public List<MenuItem> GetMenuItems()
         {
-            return _menuItemRepository.GetAllMenuItems();
+            return _menuItemRepository.GetMenuItems();
         }
 
         public List<MenuItem> GetMenuItemsByCard(MenuCard card)
@@ -30,6 +30,25 @@ namespace Chapeau.Services
         public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
         {
             return _menuItemRepository.GetMenuItemsByCardAndCategory(card, category);
+        }
+        public List<MenuItem> GetFilteredMenuItems(MenuCard? card, MenuCategory? category)
+        {
+            if (card != null && category != null)
+            {
+                return GetMenuItemsByCardAndCategory(card.Value, category.Value);
+            }
+            else if (card != null)
+            {
+                return GetMenuItemsByCard(card.Value);
+            }
+            else if (category != null)
+            {
+                return GetMenuItemsByCategory(category.Value);
+            }
+            else
+            {
+                return GetMenuItems(); // all items
+            }
         }
 
     }
