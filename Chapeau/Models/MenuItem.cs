@@ -1,16 +1,35 @@
-namespace project-1.4.Models
+namespace Chapeau.Models
 {
     public class MenuItem
     {
-        public int itemID { get; set; }
-        public string item_name { get; set; }
-        public string description { get; set; }
-        public decimal price { get; set; }
+        public int ItemID { get; set; }
+        public string Item_name { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
         public decimal VATPercent { get; set; }
-        public string category { get; set; }
-        public int stockQuantity { get; set; }
-        public int cardID { get; set; }
-        public string item_type { get; set; }
+        public string Category { get; set; }
+        public int StockQuantity { get; set; }
+        public int CardID { get; set; }
+        public string Item_Type { get; set; }           
         public bool IsActive { get; set; }
+        public bool IsOutOfStock
+        {
+            get
+            {
+                return StockQuantity == 0;
+            }
+        }
+
+        public bool IsLowStock
+        {
+            get
+            {
+                return StockQuantity > 0 && StockQuantity <= 10;
+            }
+        }
+
+
+
+
     }
 }

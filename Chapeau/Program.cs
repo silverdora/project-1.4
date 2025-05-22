@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Chapeau.Services;
+using Chapeau.Models;
+using Chapeau.Controllers;
+using Chapeau.Repositories.Interfaces;
+using Chapeau.Repositories;
 
-namespace project-1.4
-{
-    public class Program
+namespace Chapeau;
+
+public class Program
 {
     public static void Main(string[] args)
     {
@@ -14,8 +15,18 @@ namespace project-1.4
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        // Make configuration available throughout the app
-        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
+
+        builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
+        builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+
+        // Add configuration access
+        string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
         var app = builder.Build();
 
@@ -29,15 +40,17 @@ namespace project-1.4
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 
+        app.UseSession();
+
         app.UseRouting();
 
         app.UseAuthorization();
 
+        // Changed the default route to Home/Index
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
     }
-}
 }

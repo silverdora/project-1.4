@@ -1,0 +1,106 @@
+﻿@model List<Chapeau.Models.MenuItem>
+
+<
+<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
+    <div class="d-flex gap-3">
+       
+        <div style="width: 150px;">
+            <select name="card" class="form-select" onchange="this.form.submit()">
+                <option value="">-- All Cards --</option>
+                @foreach (MenuCard card in ViewBag.Cards)
+                {
+                    <option value="@card" selected="@(ViewBag.SelectedCard != null && card.Equals(ViewBag.SelectedCard) ? "selected" : null)">
+                        @card
+                    </option>
+                }
+            </select>
+        </div>
+
+        
+        <div style="width: 150px;">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">-- All Categories --</option>
+                @foreach (MenuCategory category in ViewBag.Categories)
+                {
+                    <option value="@category" selected="@(ViewBag.SelectedCategory != null && category.Equals(ViewBag.SelectedCategory) ? "selected" : null)">
+                        @category
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+</form>
+
+
+<div class="text-end mb-3">
+    <a asp-action="Add" class="btn btn-success">Add New Menu Item</a>
+</div>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Card</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>VAT %</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Item_name</td>
+                <td>@item.Category</td>
+                <td>@(Enum.GetName(typeof(MenuCard), item.CardID))</td>
+                <td>@item.Price.ToString("C")</td>
+
+                <td>
+                    @{
+                        string message;
+                        string color;
+
+                        if (item.StockQuantity == 0)
+                        {
+                            message = "Out of stock";
+                            color = "red";
+                        }
+                        else if (item.StockQuantity <= 10)
+                        {
+                            message = $"Low ({item.StockQuantity})";
+                            color = "orange";
+                        }
+                        else
+                        {
+                            message = $"In stock ({item.StockQuantity})";
+                            color = "green";
+                        }
+                    }
+                    <span style="color:@color;">@message</span>
+                </td>
+
+                <td>@item.VATPercent %</td>
+
+                <td style="color:@(item.IsActive ? "green" : "red")">
+                    @(item.IsActive ? "Active" : "Inactive")
+                </td>
+
+                <td>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Edit", "MenuItem", new { id = item.ItemID })">Edit</a>
+
+                    <form asp-controller="MenuItem" asp-action="ToggleActive" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@item.ItemID" />
+                        <input type="hidden" name="isActive" value="@(item.IsActive ? "false" : "true")" />
+                        <button type="submit" class="btn btn-sm btn-secondary">
+                            @(item.IsActive ? "Deactivate" : "Activate")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
