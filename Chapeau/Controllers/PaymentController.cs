@@ -58,7 +58,6 @@ namespace Chapeau.Controllers
             // Redirect back to orders page or payment index
             return RedirectToAction("Index", "RunningOrders");
         }
-        // GET: Show preview of payment
         [HttpGet]
         public IActionResult CompletePayment(int orderID)
         {
@@ -75,10 +74,9 @@ namespace Chapeau.Controllers
                 paymentDAte = DateTime.Now
             };
 
-            return View(payment); // Show preview/confirmation
+            return View(payment); // Razor view must exist here
         }
 
-        // POST: Finalize and store the payment
         [HttpPost]
         public IActionResult CompletePayment(Payment payment)
         {
@@ -92,9 +90,8 @@ namespace Chapeau.Controllers
             _paymentService.AddPayment(payment);
             _orderService.CloseOrder(payment.orderID);
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "RunningOrders");
         }
-
     }
 }
 
