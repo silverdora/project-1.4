@@ -33,6 +33,8 @@
                 <td>
                     <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderID" class="btn btn-primary btn-sm">View Order</a>
                     <a asp-controller="Payments" asp-action="Create" asp-route-orderId="@order.OrderID" class="btn btn-success btn-sm">Finish Order</a>
+                    <a href="/Payment/CompletePayment?orderId=@order.OrderID" class="btn btn-success">Pay</a>
+
                 </td>
             </tr>
         }

@@ -60,9 +60,9 @@ namespace Chapeau.Controllers
         }
         // GET: Show preview of payment
         [HttpGet]
-        public IActionResult CompletePayment(int orderId)
+        public IActionResult CompletePayment(int orderID)
         {
-            var order = _orderService.GetOrderById(orderId);
+            var order = _orderService.GetOrderById(orderID);
             if (order == null)
                 return NotFound();
 
@@ -70,7 +70,7 @@ namespace Chapeau.Controllers
 
             var payment = new Payment
             {
-                orderID = orderId,
+                orderID = orderID,
                 amountPaid = totalAmount,
                 paymentDAte = DateTime.Now
             };
