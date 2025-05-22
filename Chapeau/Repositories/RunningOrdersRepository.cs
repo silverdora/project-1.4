@@ -298,44 +298,7 @@ namespace Chapeau.Repositories
                 StockQuantity = (int)reader["stockQuantity"]
             };
         }
-        public Order GetOrderById(int orderId)
-        {
-            Order order = null;
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT OrderID, EmployeeID, TableID, OrderTime FROM [Order] WHERE OrderID = @orderId";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@orderId", orderId);
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        int employeeID = (int)reader["employeeID"];
-                        int tableID = (int)reader["tableID"];
-                        DateTime orderTime = (DateTime)reader["orderTime"];
-                        
-                        Employee employee = GetEmployeeByID(employeeID);
-                        Table table = GetTableByID(tableID);
-                        List<OrderItem> items = GetOrderItemsByOrderID(orderId);
-                    }
-                }
-            }
-            return order;
-        }
-
-        public void CloseOrder(int orderId)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                string query = "UPDATE  [Order] SET status = @status WHERE orderID = @orderId";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@orderId", orderId);
-                cmd.Parameters.AddWithValue("@status", Status.Served.ToString());
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
+       
 
 
     }
