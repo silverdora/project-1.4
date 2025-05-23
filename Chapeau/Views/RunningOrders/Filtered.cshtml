@@ -7,20 +7,20 @@
 
 <h5>@Model.Status orders</h5>
 
-<a class="btn btn-primary" href="/RunningOrders/Index">Back to all</a>
+@*<a class="btn btn-primary" href="/RunningOrders/Index">Back to all</a>*@
 
 <div class="col-6">
     <form asp-action="Filtered" method="get">
         <div class="form-group">
-            <label for="type">Filter by status:</label>
+            <label for="type">Choose order status:</label>
             <select class="form-control" id="type" name="status">
-                <option value="All">All</option>
+                @*<option value="All">All</option>*@
                 <option value="New">New</option>
                 <option value="InProgress">In Progress</option>
                 <option value="Ready">Ready</option>
             </select>
         </div>
-        <button class="btn btn-primary" type="submit">Filter</button>
+        <button class="btn btn-primary" type="submit">Open</button>
     </form>
 </div>
 
@@ -64,14 +64,10 @@
                                                     <button type="submit" class="btn btn-primary">Close</button>
                                                 </form>
                                             }
-
                                         }
                                     </li>
                                 }
                             }
-
-
-
                         </ul>
                     </div>
                 </div>

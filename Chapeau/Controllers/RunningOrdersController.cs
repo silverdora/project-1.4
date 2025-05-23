@@ -80,23 +80,23 @@ namespace Chapeau.Controllers
         [HttpGet]
         public IActionResult Filtered(Status status)
         {
-			if (status == Status.All)
-			{
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
-                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+			//if (status == Status.All)
+			//{
+   //             List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+   //             List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+   //             List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
 
-                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
+   //             RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
 
-                //pass data to view
-                return View("Index", runningOrdersViewModel);
-            }
-			else
-			{
+   //             //pass data to view
+   //             return View("Index", runningOrdersViewModel);
+   //         }
+			//else
+			//{
                 List<Order> orders = _runningOrdersService.GetKitchenOrdersByStatus(status);
                 FilteredOrdersViewModel filteredOrdersViewModel = new FilteredOrdersViewModel(orders, status);
                 return View(filteredOrdersViewModel);
-            }
+            //}
         }
 
         [HttpPost]
