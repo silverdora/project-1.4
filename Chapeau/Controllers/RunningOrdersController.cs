@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Chapeau.Models;
+using Chapeau.Models.Extensions;
+using Chapeau.Service.Interface;
 using Chapeau.Services;
 using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -12,52 +14,51 @@ namespace Chapeau.Controllers
 	public class RunningOrdersController:Controller
 	{
 		private readonly IRunningOrdersService _runningOrdersService;
+        private readonly IEmployeeService _employeeService;
 
-		public RunningOrdersController(IRunningOrdersService runningOrdersService)
+        public RunningOrdersController(IRunningOrdersService runningOrdersService, IEmployeeService employeeService)
 		{
 			_runningOrdersService = runningOrdersService;
-		}
+            _employeeService = employeeService;
+
+        }
 
         //for the time when log in implementation is not available, only kitchen orders are displayed
         [HttpGet]
         public IActionResult Index()
 		{
-            //user needs to be logged in
-            //Employee? employee = HttpContext.Session.GetObject<Employee>("LoggedInUser");
-            //if (employee == null)
-            //{
-            //    throw new Exception("no access");
-            //}
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no access");
+            }
 
-            ////get Employee object via employees repository
-            //Employee? employee = _usersService.GetUserById(employee.employeeID);
-
-
-
-            //get all orders
-            //List<Order>? orders = new List<Order>();
-            //if (employee.Role == Enumerations.Role.Bar)
-            //{
-            //    orders = _runningOrdersService.GetAllBarOrders();
-            //}
-            //else if (employee.Role == Enumerations.Role.Kitchen)
-            //{
-            //    orders = _runningOrdersService.GetAllKitchenOrders();
-            //}
-            //else
-            //{
-            //    throw new Exception("no access");
-            //}
-
-            //List<Order> orders = _runningOrdersService.GetAllKitchenOrders();
-            List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
-            List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
-            List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
-            //store data in the running orders ViewModel
-            RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
-
-            //pass data to view
-            return View(runningOrdersViewModel);
+            if (loggedInEmployee.Role == Role.Bar)
+            {
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                //store data in the running orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+            
+            else if (loggedInEmployee.Role == Role.Kitchen)
+            {
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                //store data in the running orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+            else
+            {
+                throw new Exception("no access");
+            }
 		}
 
 
