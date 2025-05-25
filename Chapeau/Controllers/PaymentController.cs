@@ -55,26 +55,24 @@ namespace Chapeau.Controllers
         [HttpGet]
         public IActionResult CompletePayment(int id)
         {
-            var order = _orderService.GetOrderById(id);
-            if (order == null) return NotFound();
-
-            decimal totalAmount = order.OrderItems.Sum(i => i.MenuItem.Price * i.Quantity);
-
-            Payment payment = new Payment
+            try
             {
-                orderID = order.OrderID,
-                amountPaid = totalAmount,
-                tipAmount = 0,
-                paymentType = "Card",
-                paymentDAte = DateTime.Now,
-                lowVATAmount = 0,
-                highVATAmount = totalAmount * 0.21m
-            };
+                var order = _orderService.GetOrderById(id);
+                if (order == null)
+                    return NotFound();
 
-            _paymentService.AddPayment(payment);
+                _paymentService.CompletePayment(id);
 
-            return View("PaymentSuccess");
+                return View("PaymentSuccess");
+            }
+            catch (Exception ex)
+            {
+                // Log ex.Message or ex.ToString() somewhere (file, console, debug window)
+                return Content($"Error: {ex.Message}");
+            }
         }
+
+
 
 
         [HttpPost]

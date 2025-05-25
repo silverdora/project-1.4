@@ -40,6 +40,18 @@ else
 <p><strong>Tip:</strong> €@Model.tipAmount.ToString("F2")</p>
 <p><strong>Total Paid:</strong> €@Model.amountPaid.ToString("F2")</p>
 
+<form method="post" asp-controller="Payment" asp-action="CompletePayment">
+    <input type="hidden" name="orderID" value="@Model.orderID" />
+
+    <label for="tipAmount">Tip (€):</label>
+    <input type="number" id="tipAmount" name="tipAmount" step="0.01" min="0" value="@Model.tipAmount" />
+
+    <p><strong>Total Paid:</strong> €@((Model.amountPaid + Model.tipAmount).ToString("F2"))</p>
+
+
+</form>
+
+
 
 <a asp-controller="Payment" asp-action="CompletePayment" asp-route-id="@Model.orderID" class="btn btn-success">Confirm Payment</a>
 
