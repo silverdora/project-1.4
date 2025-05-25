@@ -306,15 +306,15 @@ namespace Chapeau.Repositories
             {
                 string query = @"
             SELECT 
-            o.OrderID, o.TableID, o.OrderTime,
-            t.TableNumber,
-            i.OrderItemID AS ItemID, i.Quantity, i.IncludeDate, i.Status, i.Comment,
-            m.ItemID AS MenuItemID, m.Item_name, m.Description, m.Price, m.VATPercent, m.Category, m.StockQuantity, m.CardID
-        FROM [Order] o
-        JOIN [Table] t ON o.TableID = t.TableID
-        JOIN OrderItems i ON o.OrderID = i.OrderID
-        JOIN MenuItems m ON i.MenuItemID = m.ItemID
-        WHERE o.OrderID = @OrderID";
+                o.OrderID, o.TableID, o.OrderTime,
+                t.table_number,
+                i.ItemID, i.Quantity, i.IncludeDate, i.Status,
+                m.ItemID AS MenuItemID, m.Item_name, m.Description, m.Price, m.VATPercent, m.Category, m.StockQuantity, m.CardID
+            FROM [Order] o
+            JOIN [Table] t ON o.TableID = t.TableId
+            JOIN OrderItem i ON o.OrderID = i.OrderID
+            JOIN MenuItem m ON i.ItemID = m.ItemID
+                    WHERE o.OrderID = @OrderID";
 
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -333,7 +333,7 @@ namespace Chapeau.Repositories
                                 Table = new Table
                                 {
                                     TableId = (int)reader["TableID"],
-                                    TableNumber = (int)reader["TableNumber"]
+                                    TableNumber = (int)reader["table_number"]
                                 },
                                 OrderItems = new List<OrderItem>(),
                                 OrderTime = (DateTime)reader["OrderTime"]

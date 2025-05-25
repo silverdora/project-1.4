@@ -5,7 +5,14 @@
 }
 @model Chapeau.Models.Payment
 
-<h2>Payment Details for Table @Model.Table.TableNumber</h2>
+@if (Model?.Table != null)
+{
+    <h2>Payment Details for Table @Model.Table.TableNumber</h2>
+}
+else
+{
+    <h2>Payment Details</h2>
+}
 
 <table class="table">
     <thead>
@@ -34,4 +41,3 @@
 <p><strong>Total Paid:</strong> €@Model.amountPaid.ToString("F2")</p>
 
 <a asp-controller="Payment" asp-action="CompletePayment" asp-route-orderId="@Model.orderID" class="btn btn-success">Confirm Payment</a>
-

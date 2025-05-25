@@ -26,9 +26,9 @@ namespace Chapeau.Controllers
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
             return View(payments);
         }
-        public IActionResult ViewPaymentDetails(int orderID)
+        public IActionResult ViewPaymentDetails(int id)
         {
-            var order = _orderService.GetOrderById(orderID);
+            var order = _orderService.GetOrderById(id);
 
             if (order == null)
                 return NotFound();
@@ -43,11 +43,29 @@ namespace Chapeau.Controllers
                 paymentType = "Card",
                 paymentDAte = DateTime.Now,
                 lowVATAmount = 0, // just set to 0 for now
-                highVATAmount = totalAmount * 0.21m // assume everything is high VAT
+                highVATAmount = totalAmount * 0.21m, // assume everything is high VAT
+
+                
+                OrderItems = order.OrderItems,
+                Table = order.Table
             };
 
             return View("Details", payment);
         }
+        [HttpGet]
+        public IActionResult CompletePayment(int orderId)
+        {
+            var order = _orderService.GetOrderById(orderId);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            _paymentService.CompletePayment(orderId); // Optional: your payment logic
+
+            return View("PaymentSuccess"); // Or redirect as needed
+        }
+
     }
 }
 

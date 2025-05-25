@@ -131,8 +131,9 @@
                                     }
                                 </ul>
                                 <div class="mt-3">
-                                    <a asp-controller="RunningOrders" asp-action="Details" asp-route-orderId="@order.OrderID" class="btn btn-info mr-2">View Order</a>
-                                    <a asp-controller="Payment" asp-action="CompletePayment" asp-route-orderId="@order.OrderID" class="btn btn-success">Pay</a>
+                                    <a asp-controller="RunningOrders" asp-action="Details" asp-route-id="@order.OrderID" class="btn btn-info mr-2">View Order</a>
+                                    <a asp-controller="Payment" asp-action="ViewPaymentDetails" asp-route-id="@order.OrderID" class="btn btn-success">Pay</a>
+
                                 </div>
                             </div>
                         </div>

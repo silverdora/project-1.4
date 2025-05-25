@@ -110,9 +110,9 @@ namespace Chapeau.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult Details(int orderID)
+        public IActionResult Details(int id)
         {
-            Order? order = _runningOrdersService.GetOrderById(orderID);
+            Order? order = _runningOrdersService.GetOrderById(id);
             if (order == null)
             {
                 return NotFound(); // Optional handling
