@@ -9,8 +9,8 @@ using Humanizer;
 
 namespace Chapeau.Repositories
 {
-	public class RunningOrdersRepository : IRunningOrdersRepository
-	{
+    public class RunningOrdersRepository : IRunningOrdersRepository
+    {
         private readonly string _connectionString;
 
         public RunningOrdersRepository(IConfiguration configuration)
@@ -18,7 +18,7 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        
+
 
         public void ChangeOrderStatus(int itemID, Status status)
         {
@@ -43,7 +43,7 @@ namespace Chapeau.Repositories
             }
         }
 
-        
+
 
         public List<Order> GetAllBarOrders()
         {
@@ -159,7 +159,7 @@ namespace Chapeau.Repositories
             return new Order(orderId, employee, table, orderTime, isServed, orderItems);
         }
 
-        private Employee GetEmployeeByID (int id)
+        private Employee GetEmployeeByID(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -298,67 +298,83 @@ namespace Chapeau.Repositories
                 StockQuantity = (int)reader["stockQuantity"]
             };
         }
-
-        public Order GetCompleteOrderForTable(int tableId)
+        public Order GetOrderById(int orderID)
         {
-            // 1. Query Orders table for open order on the table
-            // 2. Query OrderItems for that order
-            // 3. Query Employee and Table info if needed
-            // Build and return Order object
-
             Order order = null;
 
-            using (var conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                string query = @"SELECT o.*, t.TableNumber, i.*, m.Name, m.Price 
+                         FROM Orders o
+                         JOIN Tables t ON o.TableID = t.TableID
+                         JOIN OrderItems i ON o.OrderID = i.OrderID
+                         JOIN MenuItems m ON i.MenuItemID = m.MenuItemID
+                         WHERE o.OrderID = @OrderID";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@OrderID", orderID);
                 conn.Open();
 
-                string orderQuery = "SELECT * FROM Orders WHERE TableID = @tableId AND Status != @status";
-                SqlCommand cmd = new SqlCommand(orderQuery, conn);
-                cmd.Parameters.AddWithValue("@tableId", tableId);
-                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
-
-                using (var reader = cmd.ExecuteReader())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        int orderId = (int)reader["OrderID"];
-                        int employeeId = (int)reader["EmployeeID"];
-                        DateTime orderTime = (DateTime)reader["OrderTime"];
-                        bool isServed = (bool)reader["IsServed"];
-                        Status status = Enum.Parse<Status>(reader["Status"].ToString());
-
-                        Employee employee = GetEmployeeById(employeeId); // You need to implement this
-                        Table table = GetTableById(tableId); // Implement this too
-                        List<OrderItem> orderItems = GetOrderItemsByOrderId(orderId); // And this
-
-                        order = new Order(orderId, employee, table, orderTime, isServed, orderItems)
+                        if (order == null)
                         {
-                            Status = status
-                        };
+                            order = new Order
+                            {
+                                OrderID = (int)reader["OrderID"],
+                                Table = new Table
+                                {
+                                    TableID = (int)reader["TableID"],
+                                    TableNumber = (int)reader["TableNumber"]
+                                },
+                                OrderItems = new List<OrderItem>(),
+                                OrderTime = (DateTime)reader["OrderTime"]
+                            };
+                        }
+
+                        order.OrderItems.Add(new OrderItem
+                        {
+                            OrderItemID = (int)reader["OrderItemID"],
+                            Quantity = (int)reader["Quantity"],
+                            Comment = reader["Comment"].ToString(),
+                            MenuItem = new MenuItem
+                            {
+                                Name = reader["Name"].ToString(),
+                                Price = (decimal)reader["Price"]
+                            }
+                        });
                     }
                 }
             }
 
             return order;
         }
-
-        public void CloseOrder(int orderId)
+        public void MarkOrderAsCompleted(int orderID)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                string query = "UPDATE Orders SET IsCompleted = 1 WHERE OrderID = @OrderID";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@OrderID", orderID);
                 conn.Open();
-                string updateQuery = "UPDATE Orders SET Status = @status WHERE OrderID = @orderId";
-                SqlCommand cmd = new SqlCommand(updateQuery, conn);
-                cmd.Parameters.AddWithValue("@status", Status.Closed.ToString());
-                cmd.Parameters.AddWithValue("@orderId", orderId);
                 cmd.ExecuteNonQuery();
             }
         }
 
 
 
-
-
     }
 }
+
+
+
+       
+
+
+
+    
+
 

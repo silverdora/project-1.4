@@ -41,21 +41,23 @@ namespace Chapeau.Services
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
 
-        public void FinishOrder(int orderId, Payment payment)
+        public Order GetOrderById(int orderId)
         {
-            CloseOrder(orderId);
-            _paymentService.AddPayment(payment);
+            return _runningOrdersRepository.GetOrderById(orderId);
         }
 
-        // Helper method to close order
-        public void CloseOrder(int orderId)
+        public void MarkOrderAsCompleted(int orderId)
         {
-            _runningOrdersRepository.CloseOrder(orderId);
+            _runningOrdersRepository.MarkOrderAsCompleted(orderId);
         }
 
-        // Add your other methods (like GetCompleteOrderForTable) here as well
+
+
     }
+
+    // Add your other methods (like GetCompleteOrderForTable) here as well
 }
+
 
 
 

@@ -11,8 +11,9 @@ namespace Chapeau.Services
         List<Order> GetKitchenOrdersByStatus(Status status);
         void ChangeOrderStatus(int itemID, Status status);
 
-        Order GetCompleteOrderForTable(int tableId);
-        void CloseOrder(int orderID);
+        Order GetOrderById(int orderId);
+        void MarkOrderAsCompleted(int orderId);
+
 
 
     }

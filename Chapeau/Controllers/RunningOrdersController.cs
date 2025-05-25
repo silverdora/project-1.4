@@ -9,19 +9,19 @@ using static NuGet.Packaging.PackagingConstants;
 
 namespace Chapeau.Controllers
 {
-	public class RunningOrdersController:Controller
-	{
-		private readonly IRunningOrdersService _runningOrdersService;
+    public class RunningOrdersController : Controller
+    {
+        private readonly IRunningOrdersService _runningOrdersService;
 
-		public RunningOrdersController(IRunningOrdersService runningOrdersService)
-		{
-			_runningOrdersService = runningOrdersService;
-		}
+        public RunningOrdersController(IRunningOrdersService runningOrdersService)
+        {
+            _runningOrdersService = runningOrdersService;
+        }
 
         //for the time when log in implementation is not available, only kitchen orders are displayed
         [HttpGet]
         public IActionResult Index()
-		{
+        {
             //user needs to be logged in
             //Employee? employee = HttpContext.Session.GetObject<Employee>("LoggedInUser");
             //if (employee == null)
@@ -58,30 +58,30 @@ namespace Chapeau.Controllers
 
             //pass data to view
             return View(runningOrdersViewModel);
-		}
+        }
 
 
 
-  //      [HttpGet]
-		//public IActionResult Filtered(Status status)
-		//{
-  //          if (status == Status.All)
-  //          {
-  //              var orders = _runningOrdersService.GetAllBarOrders();
-  //              return View("Index", orders);
-  //          }
-  //          else
-  //          {
-  //              var orders = _runningOrdersService.GetBarOrdersByStatus(status);
-  //              return View("Filtered", orders);
-  //          }
-  //      }
+        //      [HttpGet]
+        //public IActionResult Filtered(Status status)
+        //{
+        //          if (status == Status.All)
+        //          {
+        //              var orders = _runningOrdersService.GetAllBarOrders();
+        //              return View("Index", orders);
+        //          }
+        //          else
+        //          {
+        //              var orders = _runningOrdersService.GetBarOrdersByStatus(status);
+        //              return View("Filtered", orders);
+        //          }
+        //      }
 
         [HttpGet]
         public IActionResult Filtered(Status status)
         {
-			if (status == Status.All)
-			{
+            if (status == Status.All)
+            {
                 List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
                 List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
@@ -91,8 +91,8 @@ namespace Chapeau.Controllers
                 //pass data to view
                 return View("Index", runningOrdersViewModel);
             }
-			else
-			{
+            else
+            {
                 List<Order> orders = _runningOrdersService.GetKitchenOrdersByStatus(status);
                 FilteredOrdersViewModel filteredOrdersViewModel = new FilteredOrdersViewModel(orders, status);
                 return View(filteredOrdersViewModel);
@@ -104,65 +104,27 @@ namespace Chapeau.Controllers
         {
             _runningOrdersService.ChangeOrderStatus(itemID, status);
 
-            
+
 
             //go back 
             return RedirectToAction("Index");
         }
-
-        // Show full order details for a table/order
-        public IActionResult Details(int orderId)
-        {
-            // You might have a method to get an order by ID; if not, add it
-            var order = _runningOrdersService.GetOrderById(orderId);
-            if (order == null) return NotFound();
-
-            return View(order);
-        }
-
-        // GET: Confirm finish order page (show payment form)
         [HttpGet]
-        public IActionResult FinishOrder(int orderId)
+        public IActionResult Details(int orderID)
         {
-            var order = _runningOrdersService.GetOrderById(orderId);
-            if (order == null) return NotFound();
-
-            var model = new PaymentViewModel
+            Order? order = _runningOrdersService.GetOrderById(orderID);
+            if (order == null)
             {
-                OrderId = orderId,
-                Amount = CalculateTotalAmount(order) // Implement this helper
-            };
+                return NotFound(); // Optional handling
+            }
 
-            return View(model);
+            return View(order); // Create a view for this
         }
+s
 
-        // POST: Finish the order, save payment and close order
-        [HttpPost]
-        public IActionResult FinishOrder(PaymentViewModel paymentModel)
-        {
-            if (!ModelState.IsValid)
-                return View(paymentModel);
-
-            // Map ViewModel to Payment model
-            var payment = new Payment
-            {
-                OrderId = paymentModel.OrderId,
-                Amount = paymentModel.Amount,
-                PaymentMethod = paymentModel.PaymentMethod,
-                PaymentTime = DateTime.Now
-            };
-
-            _runningOrdersService.FinishOrder(paymentModel.OrderId, payment);
-
-            return RedirectToAction("Index", "Tables"); // Or wherever your home page is
-        }
-
-        // Helper for total calculation (optional)
-        private decimal CalculateTotalAmount(Order order)
-        {
-            return order.OrderItems.Sum(item => item.Price * item.Quantity);
-        }
     }
 }
+
+      
 
 
