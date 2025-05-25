@@ -40,6 +40,8 @@ else
 <p><strong>Tip:</strong> €@Model.tipAmount.ToString("F2")</p>
 <p><strong>Total Paid:</strong> €@Model.amountPaid.ToString("F2")</p>
 
-<a asp-controller="Payment" asp-action="CompletePayment" asp-route-orderId="@Model.orderID" class="btn btn-success">Confirm Payment</a>
+
+<a asp-controller="Payment" asp-action="CompletePayment" asp-route-id="@Model.orderID" class="btn btn-success">Confirm Payment</a>
+
 
 

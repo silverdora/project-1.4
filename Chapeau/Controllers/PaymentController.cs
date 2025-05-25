@@ -54,18 +54,29 @@ namespace Chapeau.Controllers
         }
         [HttpGet]
         public IActionResult CompletePayment(int id)
-
         {
             var order = _orderService.GetOrderById(id);
-            if (order == null)
+            if (order == null) return NotFound();
+
+            decimal totalAmount = order.OrderItems.Sum(i => i.MenuItem.Price * i.Quantity);
+
+            Payment payment = new Payment
             {
-                return NotFound();
-            }
+                orderID = order.OrderID,
+                amountPaid = totalAmount,
+                tipAmount = 0,
+                paymentType = "Card",
+                paymentDAte = DateTime.Now,
+                lowVATAmount = 0,
+                highVATAmount = totalAmount * 0.21m
+            };
 
-            _paymentService.CompletePayment(id); // Optional: your payment logic
+            _paymentService.AddPayment(payment);
 
-            return View("PaymentSuccess"); // Or redirect as needed
+            return View("PaymentSuccess");
         }
+
+
         [HttpPost]
         public IActionResult CompletePayment(Payment payment)
         {
