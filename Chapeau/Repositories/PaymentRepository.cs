@@ -94,10 +94,44 @@ namespace Chapeau.Repositories
             // Implementation optional based on need
             throw new NotImplementedException();
         }
+        public void MarkPaymentComplete(int orderId)
+        {
+            string query = "UPDATE Payment SET paymentDAte = @paymentDate WHERE orderID = @orderId";
 
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@paymentDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@orderId", orderId);
 
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
 
+        public void CompletePayment(Payment payment)
+        {
+            string query = @"
+        INSERT INTO Payment 
+        (orderID, paymentType, amountPaid, tipAmount, paymentDAte, lowVATAmount, highVATAmount)
+        VALUES
+        (@orderID, @paymentType, @amountPaid, @tipAmount, @paymentDAte, @lowVATAmount, @highVATAmount)";
 
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@orderID", payment.orderID);
+                cmd.Parameters.AddWithValue("@paymentType", payment.paymentType);
+                cmd.Parameters.AddWithValue("@amountPaid", payment.amountPaid);
+                cmd.Parameters.AddWithValue("@tipAmount", payment.tipAmount);
+                cmd.Parameters.AddWithValue("@paymentDAte", payment.paymentDAte);
+                cmd.Parameters.AddWithValue("@lowVATAmount", payment.lowVATAmount);
+                cmd.Parameters.AddWithValue("@highVATAmount", payment.highVATAmount);
 
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+  
     }
 }

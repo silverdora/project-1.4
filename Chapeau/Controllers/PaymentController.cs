@@ -53,17 +53,28 @@ namespace Chapeau.Controllers
             return View("Details", payment);
         }
         [HttpGet]
-        public IActionResult CompletePayment(int orderId)
+        public IActionResult CompletePayment(int id)
+
         {
-            var order = _orderService.GetOrderById(orderId);
+            var order = _orderService.GetOrderById(id);
             if (order == null)
             {
                 return NotFound();
             }
 
-            _paymentService.CompletePayment(orderId); // Optional: your payment logic
+            _paymentService.CompletePayment(id); // Optional: your payment logic
 
             return View("PaymentSuccess"); // Or redirect as needed
+        }
+        [HttpPost]
+        public IActionResult CompletePayment(Payment payment)
+        {
+            if (payment == null)
+                return BadRequest();
+
+            _paymentService.CompletePayment(payment);
+
+            return View("PaymentSuccess");
         }
 
     }

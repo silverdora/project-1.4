@@ -6,6 +6,9 @@ namespace Chapeau.Services.Interfaces
     {
         List<Payment> GetAllPayments(int orderID);
         void AddPayment(Payment payment);
+
+        void CompletePayment(int id);
+        void CompletePayment(Payment payment);
         // ...
     }
 }
