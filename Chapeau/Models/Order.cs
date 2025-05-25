@@ -12,6 +12,11 @@ namespace Chapeau.Models
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         public Status Status { get; set; }
+        public Order()
+        {
+            OrderItems = new List<OrderItem>();
+        }
+
 
         public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isServed, List<OrderItem> orderItems)
         {

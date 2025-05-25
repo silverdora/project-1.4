@@ -26,32 +26,29 @@ namespace Chapeau.Controllers
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
             return View(payments);
         }
-        public IActionResult CompletePayment(int orderID)
+        public IActionResult ViewPaymentDetails(int orderID)
         {
             var order = _orderService.GetOrderById(orderID);
 
             if (order == null)
                 return NotFound();
 
+            decimal totalAmount = order.OrderItems.Sum(i => i.MenuItem.Price * i.Quantity);
+
             Payment payment = new Payment
             {
                 orderID = order.OrderID,
-                amountPaid = order.TotalAmount,
-                tipAmount = 0, // Add a form later if needed
-                paymentType = "Card", // hardcoded for now
+                amountPaid = totalAmount,
+                tipAmount = 0,
+                paymentType = "Card",
                 paymentDAte = DateTime.Now,
-                lowVATAmount = order.LowVATTotal,
-                highVATAmount = order.HighVATTotal
+                lowVATAmount = 0, // just set to 0 for now
+                highVATAmount = totalAmount * 0.21m // assume everything is high VAT
             };
 
-            _paymentService.AddPayment(payment);
-            _orderService.MarkOrderAsCompleted(order.OrderID);
-
-            return RedirectToAction("Index", "RunningOrders");
+            return View("Details", payment);
         }
-
-
     }
 }
+
         // Show the complete order of a table to the waiter
-       

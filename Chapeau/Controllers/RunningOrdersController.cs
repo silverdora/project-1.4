@@ -120,7 +120,6 @@ namespace Chapeau.Controllers
 
             return View(order); // Create a view for this
         }
-s
 
     }
 }

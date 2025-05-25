@@ -304,12 +304,18 @@ namespace Chapeau.Repositories
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = @"SELECT o.*, t.TableNumber, i.*, m.Name, m.Price 
-                         FROM Orders o
-                         JOIN Tables t ON o.TableID = t.TableID
-                         JOIN OrderItems i ON o.OrderID = i.OrderID
-                         JOIN MenuItems m ON i.MenuItemID = m.MenuItemID
-                         WHERE o.OrderID = @OrderID";
+                string query = @"
+            SELECT 
+            o.OrderID, o.TableID, o.OrderTime,
+            t.TableNumber,
+            i.OrderItemID AS ItemID, i.Quantity, i.IncludeDate, i.Status, i.Comment,
+            m.ItemID AS MenuItemID, m.Item_name, m.Description, m.Price, m.VATPercent, m.Category, m.StockQuantity, m.CardID
+        FROM [Order] o
+        JOIN [Table] t ON o.TableID = t.TableID
+        JOIN OrderItems i ON o.OrderID = i.OrderID
+        JOIN MenuItems m ON i.MenuItemID = m.ItemID
+        WHERE o.OrderID = @OrderID";
+
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@OrderID", orderID);
@@ -326,7 +332,7 @@ namespace Chapeau.Repositories
                                 OrderID = (int)reader["OrderID"],
                                 Table = new Table
                                 {
-                                    TableID = (int)reader["TableID"],
+                                    TableId = (int)reader["TableID"],
                                     TableNumber = (int)reader["TableNumber"]
                                 },
                                 OrderItems = new List<OrderItem>(),
@@ -334,28 +340,39 @@ namespace Chapeau.Repositories
                             };
                         }
 
-                        order.OrderItems.Add(new OrderItem
+                        var menuItem = new MenuItem
                         {
-                            OrderItemID = (int)reader["OrderItemID"],
-                            Quantity = (int)reader["Quantity"],
-                            Comment = reader["Comment"].ToString(),
-                            MenuItem = new MenuItem
-                            {
-                                Name = reader["Name"].ToString(),
-                                Price = (decimal)reader["Price"]
-                            }
-                        });
+                            ItemID = (int)reader["MenuItemID"],
+                            Item_name = reader["Item_name"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            Price = (decimal)reader["Price"],
+                            VATPercent = (decimal)reader["VATPercent"],
+                            Category = reader["Category"].ToString(),
+                            StockQuantity = (int)reader["StockQuantity"],
+                            CardID = (int)reader["CardID"]
+                        };
+
+                        var orderItem = new OrderItem(
+                            itemID: (int)reader["ItemID"],
+                            menuItem: menuItem,
+                            includeDate: (DateTime)reader["IncludeDate"],
+                            status: (Status)Enum.Parse(typeof(Status), reader["Status"].ToString()), // Adjust if Status is stored differently
+                            quantity: (int)reader["Quantity"]
+                        );
+
+                        order.OrderItems.Add(orderItem);
                     }
                 }
             }
 
             return order;
         }
+
         public void MarkOrderAsCompleted(int orderID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE Orders SET IsCompleted = 1 WHERE OrderID = @OrderID";
+                string query = "UPDATE [Order] SET IsCompleted = 1 WHERE OrderID = @OrderID";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@OrderID", orderID);
