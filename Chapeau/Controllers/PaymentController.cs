@@ -76,15 +76,30 @@ namespace Chapeau.Controllers
 
 
         [HttpPost]
-        public IActionResult CompletePayment(Payment payment)
+        public IActionResult CompletePayment(int orderID, decimal tipAmount, string paymentType)
         {
-            if (payment == null)
-                return BadRequest();
+            var order = _orderService.GetOrderById(orderID);
+            if (order == null)
+                return NotFound();
+
+            decimal totalAmount = order.OrderItems.Sum(i => i.MenuItem.Price * i.Quantity);
+
+            var payment = new Payment
+            {
+                orderID = orderID,
+                amountPaid = totalAmount,
+                tipAmount = tipAmount,
+                paymentType = paymentType,
+                paymentDAte = DateTime.Now,
+                lowVATAmount = 0, // calculate as needed
+                highVATAmount = totalAmount * 0.21m
+            };
 
             _paymentService.CompletePayment(payment);
 
             return View("PaymentSuccess");
         }
+
 
     }
 }

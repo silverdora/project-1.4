@@ -4,6 +4,12 @@
 @{
 }
 @model Chapeau.Models.Payment
+@{
+    string selectedCredit = Model.paymentType == "Credit Card" ? "selected" : "";
+    string selectedDebit = Model.paymentType == "Debit Card" ? "selected" : "";
+    string selectedCash = Model.paymentType == "Cash" ? "selected" : "";
+}
+
 
 @if (Model?.Table != null)
 {
@@ -40,16 +46,7 @@ else
 <p><strong>Tip:</strong> €@Model.tipAmount.ToString("F2")</p>
 <p><strong>Total Paid:</strong> €@Model.amountPaid.ToString("F2")</p>
 
-<form method="post" asp-controller="Payment" asp-action="CompletePayment">
-    <input type="hidden" name="orderID" value="@Model.orderID" />
 
-    <label for="tipAmount">Tip (€):</label>
-    <input type="number" id="tipAmount" name="tipAmount" step="0.01" min="0" value="@Model.tipAmount" />
-
-    <p><strong>Total Paid:</strong> €@((Model.amountPaid + Model.tipAmount).ToString("F2"))</p>
-
-
-</form>
 
 
 
