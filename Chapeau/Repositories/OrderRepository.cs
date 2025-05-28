@@ -18,14 +18,14 @@ namespace Chapeau.Repositories
             _tableRepository = tableRepository;
             _employeeRepository = employeeRepository;
         }
-         // ✅ Public method: insert + return full Order
+        //Insert + return full Order
         public Order TakeNewOrder(int tableId, Employee employee)
         {
             int newOrderID = InsertNewOrder(tableId, employee);
             return GetOrderByID(newOrderID);
         }
 
-        // ✅ Public method to get Order by ID
+        //Get Order by ID
         public Order GetOrderByID(int orderID)
         {
             string query = "SELECT * FROM [Order] WHERE orderID = @orderID";
@@ -36,7 +36,7 @@ namespace Chapeau.Repositories
             return MapOrdersFromQuery(query, parameters).FirstOrDefault();
         }
 
-        // ✅ Private helper to insert only
+        //Private helper to insert only
         private int InsertNewOrder(int tableId, Employee employee)
         {
             int newOrderID;
@@ -45,30 +45,32 @@ namespace Chapeau.Repositories
             {
                 connection.Open();
 
-                string insertQuery = @"
-                    INSERT INTO [Order] (employeeID, tableID, order_time, isServed)
-                    VALUES (@employeeID, @tableID, @orderTime, @isServed)";
+                string query = @"
+            INSERT INTO [Order] (employeeID, tableID, orderTime)
+            VALUES (@employeeID, @tableID, @orderTime);
+            SELECT CAST(SCOPE_IDENTITY() AS int);";
 
-                using (SqlCommand insertCommand = new SqlCommand(insertQuery, connection))
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    insertCommand.Parameters.AddWithValue("@employeeID", employee.employeeID);
-                    insertCommand.Parameters.AddWithValue("@tableID", tableId);
-                    insertCommand.Parameters.AddWithValue("@orderTime", DateTime.Now);
-                    insertCommand.Parameters.AddWithValue("@isServed", false);
-                    insertCommand.ExecuteNonQuery();
-                }
+                    command.Parameters.AddWithValue("@employeeID", employee.employeeID);
+                    command.Parameters.AddWithValue("@tableID", tableId);
+                    command.Parameters.AddWithValue("@orderTime", DateTime.Now);
 
-                string selectIdQuery = "SELECT CAST(SCOPE_IDENTITY() AS int)";
-                using (SqlCommand selectCommand = new SqlCommand(selectIdQuery, connection))
-                {
-                    newOrderID = (int)selectCommand.ExecuteScalar();
+                    object result = command.ExecuteScalar();
+
+                    if (result == null || result == DBNull.Value)
+                    {
+                        throw new Exception("Failed to retrieve new Order ID.");
+                    }
+
+                    newOrderID = Convert.ToInt32(result);
                 }
             }
 
             return newOrderID;
         }
 
-        // ✅ Private helper to map SQL rows to Order objects
+        // Private helper to map SQL rows to Order objects
         private List<Order> MapOrdersFromQuery(string query, SqlParameter[] parameters)
         {
             List<Order> orders = new List<Order>();
@@ -86,7 +88,7 @@ namespace Chapeau.Repositories
                         int orderId = Convert.ToInt32(reader["orderID"]);
                         int employeeId = Convert.ToInt32(reader["employeeID"]);
                         int tableId = Convert.ToInt32(reader["tableID"]);
-                        DateTime orderTime = Convert.ToDateTime(reader["order_time"]);
+                        DateTime orderTime = Convert.ToDateTime(reader["ordertime"]);
                         bool isServed = Convert.ToBoolean(reader["isServed"]);
 
                         Employee employee = _employeeRepository.GetEmployeeByID(employeeId);
@@ -107,7 +109,7 @@ namespace Chapeau.Repositories
             return orders;
         }
 
-        // ✅ Private helper to get full Table object (no lambda)
+        //Private helper to get full Table object 
         private Table GetTableById(int tableId)
         {
             List<Table> tables = _tableRepository.GetAllTables();

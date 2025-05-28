@@ -16,21 +16,20 @@ namespace Chapeau.Controllers
 
         public IActionResult TakeOrder(int tableId)
         {
-            // For now, simulate logged-in employee (later use session)
+            // testing
             Employee currentEmployee = new Employee { employeeID = 1, employeeName = "Test", Role = Role.Server };
 
             Order newOrder = _orderService.TakeNewOrder(tableId, currentEmployee);
 
-            // You can redirect to a view or return order info
+            
             return RedirectToAction("OrderDetails", new { id = newOrder.OrderID });         
         }
 
         [HttpPost]
         public IActionResult AddItem(int orderID, int itemID, int quantity)
         {
-            // Later this will call your service to save the item
-            // For now, just redirect back to the order page
-            return RedirectToAction("OrderDetails", new { id = orderID });
+            // I believe I need to redirect to index
+            return RedirectToAction();                                                                        //("OrderDetails", new { id = orderID });
         }
 
         public IActionResult OrderDetails(int id)
@@ -39,7 +38,7 @@ namespace Chapeau.Controllers
 
             if (order == null)
             {
-                return NotFound(); // Or redirect to an error page
+                return NotFound(); 
             }
 
             var viewModel = new OrderDetailsViewModel
