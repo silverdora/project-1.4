@@ -3,12 +3,12 @@ namespace Chapeau.Models
 {
 	public enum Status
 	{
-		All,
-		New,
-		InProgress,
+		All,// need to be removed 
+		New,// need to be removed
+        InProgress,
 		Ready,
 		Served,
-		Completed
-	}
+        Completed, //need to be removed 
+    }
 }
 

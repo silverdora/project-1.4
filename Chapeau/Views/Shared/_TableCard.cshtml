@@ -1,0 +1,36 @@
+﻿@model Chapeau.Models.Table
+
+<div class="restaurant-table @(Model.IsOccupied ? "occupied" : "free")">
+    <div class="table-top">
+        <span>Table @Model.TableNumber</span>
+    </div>
+    <div class="table-status">
+        <span class="badge @(Model.IsOccupied ? "bg-danger" : "bg-success")">
+            @(Model.IsOccupied ? "Occupied" : "Free")
+        </span>
+        <br />
+        @if (Model.IsOccupied && Model.OrderStatus.HasValue)
+        {
+            switch (Model.OrderStatus.Value)
+            {
+                case Chapeau.Models.Status.InProgress:
+                    <span class="badge bg-warning text-dark">Being Prepared</span>
+                    ;
+                    break;
+                case Chapeau.Models.Status.Ready:
+                    <span class="badge bg-success">Ready to Serve</span>
+                    ;
+                    break;
+                case Chapeau.Models.Status.Served:
+                    <span class="badge bg-secondary">Served</span>
+                    ;
+                    break;
+            }
+        }
+        else if (Model.IsOccupied)
+        {
+            <span class="text-muted small">No Order</span>
+        }
+
+    </div>
+</div>

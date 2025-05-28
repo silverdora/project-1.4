@@ -38,6 +38,47 @@ namespace Chapeau.Repository
 
             return tables;
         }
+        public List<Table> GetTablesWithOrderStatus()
+        {
+            List<Table> tables = new List<Table>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+    SELECT t.tableID, t.table_number, t.isOccupied,
+           MAX(oi.status) AS OrderStatus
+    FROM [Table] t
+    LEFT JOIN [Order] o ON t.tableID = o.tableID
+    LEFT JOIN [OrderItem] oi ON o.orderID = oi.orderID
+    GROUP BY t.tableID, t.table_number, t.isOccupied
+";
+
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Table table = new Table
+                    {
+                        TableId = Convert.ToInt32(reader["tableID"]),
+                        TableNumber = Convert.ToInt32(reader["table_number"]),
+                        IsOccupied = Convert.ToBoolean(reader["isOccupied"]),
+                        OrderStatus = reader["OrderStatus"] != DBNull.Value
+                            ? Enum.TryParse<Status>(reader["OrderStatus"].ToString(), out var status) ? status : null
+                            : null
+
+                    };
+
+                    tables.Add(table);
+                }
+            }
+
+            return tables;
+        }
+
+
     }
 }
 
