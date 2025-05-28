@@ -1,0 +1,50 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Chapeau.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h2>Order Details - Order #@Model.OrderID</h2>
+
+<div>
+    <strong>Employee:</strong> @Model.Employee?.employeeName <br />
+    <strong>Table:</strong> @Model.Table?.TableNumber <br />
+    <strong>Order Time:</strong> @Model.OrderTime.ToString("f") <br />
+    <strong>Status:</strong> @Model.Status <br />
+    <strong>Served:</strong> @(Model.IsServed ? "Yes" : "No")
+</div>
+
+<hr />
+
+<h3>Order Items</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Status</th>
+            <th>Waiting Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>@item.MenuItem.Item_name</td>
+                <td>@item.MenuItem.Description</td>
+                <td>@item.Quantity</td>
+                <td>@item.Status</td>
+                <td>@item.WaitingTime.Minutes mins</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-secondary" href="@Url.Action("Index", "Order")">Back to List</a>
+

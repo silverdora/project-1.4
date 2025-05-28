@@ -30,6 +30,10 @@ public class Program
         builder.Services.AddScoped<ITableRepository, TableRepository>();
         builder.Services.AddScoped<ITableService, TableService>();
 
+        builder.Services.AddScoped<IDummyOrderRepository, DummyOrderRepository>();
+        builder.Services.AddScoped<IDummyOrderService, DummyOrderService>();
+
+
 
         builder.Services.AddSession(options =>
         {

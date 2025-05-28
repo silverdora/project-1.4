@@ -1,0 +1,26 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Chapeau.Models.Order
+
+<h2>Create Order</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="OrderTime"></label>
+        <input asp-for="OrderTime" class="form-control" />
+        <span asp-validation-for="OrderTime" class="text-danger"></span>
+    </div>
+
+    <!-- Add fields for Employee, Table, IsServed, etc. -->
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
