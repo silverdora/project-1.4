@@ -220,8 +220,11 @@ namespace Chapeau.Repositories
             int tableID = (int)reader["tableID"];
             int tableNumber = (int)reader["table_number"];
             bool isOccupied = (bool)reader["isOccupied"];
+            Status? orderStatus = reader["orderStatus"] != DBNull.Value // Mo for sprint 2
+                ? (Status)Enum.Parse(typeof(Status), (string)reader["orderStatus"], true)
+                : null;
 
-            return new Table(tableID, tableNumber, isOccupied);
+            return new Table(tableID, tableNumber, isOccupied, orderStatus);   // Mo for sprint 2
         }
 
         private List<OrderItem> GetOrderItemsByOrderID(int id)
