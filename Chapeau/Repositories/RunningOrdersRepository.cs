@@ -229,7 +229,7 @@ namespace Chapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
-                string query = "SELECT itemID, includeDate, [status], quantity " +
+                string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
                     "FROM OrderItem " +
                     "WHERE orderID = @Id; ";
                 SqlCommand command = new SqlCommand(query, connection);
@@ -257,6 +257,7 @@ namespace Chapeau.Repositories
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
+            
 
             return new OrderItem(itemID, menuItem, includeDate, status, quantity);
         }

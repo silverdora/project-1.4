@@ -37,6 +37,33 @@ namespace Chapeau.Services
         {
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
+        public Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> orders)
+        {
+            Dictionary<int, List<MenuCategory>> categoriesByOrderId = new Dictionary<int, List<MenuCategory>>();
+
+            List<MenuCategory> courses = new List<MenuCategory> { MenuCategory.Starters, MenuCategory.Mains, MenuCategory.Desserts, MenuCategory.Entremets, MenuCategory.Beer, MenuCategory.Wine, MenuCategory.Spirits, MenuCategory.Coffee, MenuCategory.Tea, MenuCategory.SoftDrink };
+            foreach (MenuCategory course in courses)
+            {
+                foreach(Order order in orders)
+                {
+                    foreach (OrderItem orderItem in order.OrderItems)
+                    {
+                        if (orderItem.MenuItem.Category == course)
+                        {
+                            if (!categoriesByOrderId.ContainsKey(order.OrderID))
+                            {
+                                categoriesByOrderId.Add(order.OrderID, new List<MenuCategory> {course});
+                            }
+                            else
+                            {
+                                categoriesByOrderId[order.OrderID].Add(course);
+                            }
+                        }
+                    }
+                }
+            }
+            return categoriesByOrderId;
+        }
     }
 }
 

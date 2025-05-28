@@ -16,6 +16,7 @@
 
         public Status Status { get; set; }
         public int Quantity { get; set; }
+        //public MenuCategory Course { get; set; }
 
         public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
@@ -24,6 +25,7 @@
             IncludeDate = includeDate;
             Status = status;
             Quantity = quantity;
+            //Course = course;
         }
     }
 }

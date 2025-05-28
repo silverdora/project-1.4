@@ -10,6 +10,7 @@ namespace Chapeau.Services
         List<Order> GetBarOrdersByStatus(Status status);
         List<Order> GetKitchenOrdersByStatus(Status status);
         void ChangeOrderStatus(int itemID, Status status);
+        Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> order);
     }
 }
 

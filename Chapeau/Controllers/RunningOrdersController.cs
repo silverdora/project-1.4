@@ -31,16 +31,22 @@ namespace Chapeau.Controllers
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
             if (loggedInEmployee == null)
             {
-                throw new Exception("no access");
+                throw new Exception("no user");
             }
 
             if (loggedInEmployee.Role == Role.Bar)
             {
                 List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
+
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
+
                 List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
+
                 //store data in the running orders ViewModel
-                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, loggedInEmployee);
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, newOrdersByCourse, preparingOrdersByCourse, readyOrdersByCourse, loggedInEmployee);
                 //pass data to view
                 return View(runningOrdersViewModel);
             }
@@ -48,10 +54,15 @@ namespace Chapeau.Controllers
             else if (loggedInEmployee.Role == Role.Kitchen)
             {
                 List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
+
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
+
                 List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
                 //store data in the running orders ViewModel
-                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, loggedInEmployee);
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, newOrdersByCourse, preparingOrdersByCourse, readyOrdersByCourse, loggedInEmployee);
                 //pass data to view
                 return View(runningOrdersViewModel);
             }
@@ -110,6 +121,7 @@ namespace Chapeau.Controllers
             //go back 
             return RedirectToAction("Index");
         }
+        
     }
 }
 
