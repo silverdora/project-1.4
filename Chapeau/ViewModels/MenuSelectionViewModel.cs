@@ -16,6 +16,10 @@ namespace Chapeau.ViewModels
 
         //to be able to show the buttons that are not current 
         public List<MenuItem> AllItemsForSelectedCard { get; set; } = new();
+        public int OrderID { get; set; } // ✅ NEW
+
+        public int TableID { get; set; }
+
 
     }
 }

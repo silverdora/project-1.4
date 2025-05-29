@@ -15,7 +15,7 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-        public IActionResult Index(MenuCard? card, MenuCategory? category, int? orderID)
+        public IActionResult Index(MenuCard? card, MenuCategory? category, int? orderID, int? tableID)
         {
             var filteredItems = _menuItemService.GetFilteredMenuItems(card, category);
 
@@ -23,18 +23,17 @@ namespace Chapeau.Controllers
             {
                 SelectedCard = card,
                 SelectedCategory = category,
-                Items = filteredItems
+                Items = filteredItems,
+                OrderID = orderID ?? 0,   // 0 = no order yet
+                TableID = tableID ?? 0    // ✅ capture the selected table
             };
 
-            // This fills the list with ALL items from the selected card
             if (card != null)
             {
                 viewModel.AllItemsForSelectedCard = _menuItemService.GetMenuItemsByCard(card.Value);
             }
 
-            ViewBag.CurrentOrderID = orderID;
-
             return View(viewModel);
         }
-    }   
+    }
 }

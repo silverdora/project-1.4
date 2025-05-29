@@ -59,8 +59,13 @@
         }
     </div>
 }
+<!-- Order detail buttons -->
 
-<hr />
+<form asp-controller="Order" asp-action="OrderDetails" method="get">
+    <input type="hidden" name="id" value="@Model.OrderID" />
+    <button type="submit">View Order Details</button>
+</form>
+
 
 <h3>Menu Items</h3>
 
@@ -119,8 +124,9 @@ else
                         @if (item.StockQuantity > 0)
                         {
                             <form asp-controller="Order" asp-action="AddItem" method="post">
-                                <input type="hidden" name="orderID" value="@ViewBag.CurrentOrderID" />
+                                <input type="hidden" name="orderID" value="@Model.OrderID" />
                                 <input type="hidden" name="itemID" value="@item.ItemID" />
+                                <input type="hidden" name="tableID" value="@Model.TableID" />
                                 <input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" style="width: 60px;" />
                                 <button type="submit">Add</button>
                             </form>

@@ -14,23 +14,38 @@ namespace Chapeau.Controllers
             _orderService = orderService;
         }
 
+        [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
-            // testing
-            Employee currentEmployee = new Employee { employeeID = 1, employeeName = "Test", Role = Role.Server };
-
-            Order newOrder = _orderService.TakeNewOrder(tableId, currentEmployee);
-
-            
-            return RedirectToAction("OrderDetails", new { id = newOrder.OrderID });         
+            // Just pass tableId forward, do not create order yet
+            return RedirectToAction("Index", "MenuItem", new { tableID = tableId });
         }
 
         [HttpPost]
-        public IActionResult AddItem(int orderID, int itemID, int quantity)
+        public IActionResult AddItem(int orderID, int itemID, int quantity, int tableID)
         {
-            // I believe I need to redirect to index
-            return RedirectToAction();                                                                        //("OrderDetails", new { id = orderID });
+            // Simulated employee – replace with logged-in user later
+            Employee currentEmployee = new Employee
+            {
+                employeeID = 1,
+                employeeName = "Test",
+                Role = Role.Server
+            };
+
+            // Create a new order if orderID is 0
+            if (orderID == 0)
+            {
+                Order newOrder = _orderService.TakeNewOrder(tableID, currentEmployee);
+                orderID = newOrder.OrderID;
+            }
+
+            // Add the item to the order
+            _orderService.AddSingleItemToOrder(orderID, itemID, quantity);
+
+            // Redirect back to MenuItem with updated orderID and tableID
+            return RedirectToAction("Index", "MenuItem", new { orderID = orderID, tableID = tableID });
         }
+
 
         public IActionResult OrderDetails(int id)
         {

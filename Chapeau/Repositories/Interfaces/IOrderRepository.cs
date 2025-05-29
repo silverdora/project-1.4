@@ -6,6 +6,7 @@ namespace Chapeau.Repositories.Interfaces
     {
         Order TakeNewOrder(int tableId, Employee employee);
         Order GetOrderByID(int orderID);
+        void UpdateOrderItems(Order order);
 
     }
 }

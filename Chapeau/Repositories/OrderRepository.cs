@@ -30,11 +30,158 @@ namespace Chapeau.Repositories
         {
             string query = "SELECT * FROM [Order] WHERE orderID = @orderID";
             SqlParameter[] parameters = {
-                new SqlParameter("@orderID", orderID)
-            };
+        new SqlParameter("@orderID", orderID)
+    };
 
-            return MapOrdersFromQuery(query, parameters).FirstOrDefault();
+            // Keep your existing logic
+            Order order = MapOrdersFromQuery(query, parameters).FirstOrDefault();
+
+            // 🔧 Add only this line to fetch order items
+            if (order != null)
+            {
+                order.OrderItems = GetOrderItemsForOrder(orderID); // ✅ New helper
+            }
+
+            return order;
         }
+
+        private List<OrderItem> GetOrderItemsForOrder(int orderID)
+        {
+            var items = new List<OrderItem>();
+
+            string query = @"
+        SELECT oi.*, mi.item_name, mi.description, mi.price, mi.VATpercent, mi.category, mi.stockQuantity
+        FROM OrderItem oi
+        JOIN MenuItem mi ON oi.itemID = mi.itemID
+        WHERE oi.orderID = @orderID";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@orderID", orderID);
+                connection.Open();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var menuItem = new MenuItem
+                        {
+                            ItemID = (int)reader["itemID"],
+                            Item_name = reader["item_name"].ToString(),
+                            Description = reader["description"].ToString(),
+                            Price = (decimal)reader["price"],
+                            VATPercent = (decimal)reader["VATpercent"],
+                            Category = reader["category"].ToString(),
+                            StockQuantity = (int)reader["stockQuantity"]
+                        };
+
+                        var orderItem = new OrderItem
+                        (
+                            itemID: menuItem.ItemID,
+                            menuItem: menuItem,
+                            includeDate: (DateTime)reader["includeDate"],
+                            status: Enum.Parse<Status>(reader["status"].ToString()),
+                            quantity: (int)reader["quantity"]
+                        );
+
+                        items.Add(orderItem);
+                    }
+                }
+            }
+
+            return items;
+        }
+
+
+
+        public void UpdateOrderItems(Order order)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                foreach (var orderItem in order.OrderItems)
+                {
+                    string query = @"
+                IF EXISTS (
+                    SELECT 1 FROM OrderItem WHERE orderID = @orderID AND itemID = @itemID
+                )
+                BEGIN
+                    UPDATE OrderItem
+SET quantity = @quantity
+
+                    WHERE orderID = @orderID AND itemID = @itemID
+                END
+                ELSE
+                BEGIN
+                    INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity)
+                    VALUES (@orderID, @itemID, @includeDate, @status, @quantity)
+                END";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@orderID", order.OrderID);
+                        command.Parameters.AddWithValue("@itemID", orderItem.ItemID);
+                        command.Parameters.AddWithValue("@includeDate", orderItem.IncludeDate);
+                        command.Parameters.AddWithValue("@status", orderItem.Status.ToString());
+                        command.Parameters.AddWithValue("@quantity", orderItem.Quantity);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+        private List<OrderItem> GetOrderItemsByOrderId(int orderId)
+        {
+            List<OrderItem> items = new List<OrderItem>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                string query = @"
+            SELECT oi.*, mi.*
+            FROM OrderItem oi
+            JOIN MenuItem mi ON oi.itemID = mi.itemID
+            WHERE oi.orderID = @orderID";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@orderID", orderId);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            MenuItem menuItem = new MenuItem
+                            {
+                                ItemID = (int)reader["itemID"],
+                                Item_name = reader["item_name"].ToString(),
+                                Description = reader["description"].ToString(),
+                                Price = (decimal)reader["price"],
+                                VATPercent = (decimal)reader["VATpercent"],
+                                Category = reader["category"].ToString(),
+                                StockQuantity = (int)reader["stockQuantity"]
+                            };
+
+                            OrderItem orderItem = new OrderItem(
+                                itemID: (int)reader["itemID"],
+                                menuItem: menuItem,
+                                includeDate: (DateTime)reader["includeDate"],
+                                status: Enum.Parse<Status>(reader["status"].ToString()),
+                                quantity: (int)reader["quantity"]
+                            );
+
+                            items.Add(orderItem);
+                        }
+                    }
+                }
+            }
+
+            return items;
+        }
+
 
         //Private helper to insert only
         private int InsertNewOrder(int tableId, Employee employee)
@@ -46,9 +193,9 @@ namespace Chapeau.Repositories
                 connection.Open();
 
                 string query = @"
-            INSERT INTO [Order] (employeeID, tableID, orderTime)
-            VALUES (@employeeID, @tableID, @orderTime);
-            SELECT CAST(SCOPE_IDENTITY() AS int);";
+                               INSERT INTO [Order] (employeeID, tableID, orderTime)
+                               VALUES (@employeeID, @tableID, @orderTime);
+                               SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -89,8 +236,6 @@ namespace Chapeau.Repositories
                         int employeeId = Convert.ToInt32(reader["employeeID"]);
                         int tableId = Convert.ToInt32(reader["tableID"]);
                         DateTime orderTime = Convert.ToDateTime(reader["ordertime"]);
-                        bool isServed = Convert.ToBoolean(reader["isServed"]);
-
                         Employee employee = _employeeRepository.GetEmployeeByID(employeeId);
                         Table table = GetTableById(tableId);
 
@@ -99,8 +244,7 @@ namespace Chapeau.Repositories
                             employee: employee,
                             table: table,
                             orderTime: orderTime,
-                            isServed: isServed,
-                            orderItems: new List<OrderItem>() // Add if needed later
+                           orderItems: GetOrderItemsByOrderId(orderId)
                         ));
                     }
                 }

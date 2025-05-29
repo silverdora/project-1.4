@@ -48,7 +48,7 @@ namespace Chapeau.Repositories
         public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
         {
             string query = @"SELECT mi.*
-                             FROM MenuItem mi
+                            FROM MenuItem mi
                             JOIN MenuCard mc ON mi.cardID = mc.icardID
                             WHERE mc.card_name = @card AND mi.category = @category";
 
