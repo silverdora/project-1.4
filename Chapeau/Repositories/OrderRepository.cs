@@ -66,7 +66,6 @@ namespace Chapeau.Repositories
                     }
                 }
             }
-
             return exists;
         }
         public void InsertOrderItem(int orderID, OrderItem item)
