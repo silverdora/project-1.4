@@ -6,7 +6,10 @@ namespace Chapeau.Repositories.Interfaces
     {
         Order TakeNewOrder(int tableId, Employee employee);
         Order GetOrderByID(int orderID);
-        void UpdateOrderItems(Order order);
+        bool OrderItemExists(int orderID, int itemID);
+        void InsertOrderItem(int orderID, OrderItem item);
+        void UpdateOrderItem(int orderID, OrderItem item);
+
 
     }
 }

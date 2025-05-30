@@ -22,7 +22,7 @@ namespace Chapeau.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddItem(int orderID, int itemID, int quantity, int tableID)
+        public IActionResult AddItem(int orderID, int itemID, int quantity, int tableID, string? card, string? category)
         {
             // Simulated employee – replace with logged-in user later
             Employee currentEmployee = new Employee
@@ -43,7 +43,13 @@ namespace Chapeau.Controllers
             _orderService.AddSingleItemToOrder(orderID, itemID, quantity);
 
             // Redirect back to MenuItem with updated orderID and tableID
-            return RedirectToAction("Index", "MenuItem", new { orderID = orderID, tableID = tableID });
+            return RedirectToAction("Index", "MenuItem", new
+            {
+                orderID = orderID,
+                tableID = tableID,
+                card = card,
+                category = category
+            });
         }
 
 

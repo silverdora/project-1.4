@@ -25,8 +25,6 @@
                 return StockQuantity > 0 && StockQuantity <= 10;
             }
         }
-
-
         
 
     }

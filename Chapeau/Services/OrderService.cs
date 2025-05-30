@@ -21,12 +21,14 @@ namespace Chapeau.Services
         {
             return _orderRepository.TakeNewOrder(tableId, employee);
         }
-       
+
         public Order GetOrderById(int orderID)
         {
-           return _orderRepository.GetOrderByID(orderID);
+            return _orderRepository.GetOrderByID(orderID);
         }
 
+
+        //add item to an existing order
         public void AddSingleItemToOrder(int orderID, int itemID, int quantity)
         {
             Order order = _orderRepository.GetOrderByID(orderID);
@@ -35,57 +37,37 @@ namespace Chapeau.Services
                 throw new Exception($"Order with ID {orderID} not found.");
             }
 
-            List<MenuItem> allItems = _menuItemRepository.GetMenuItems();
-            MenuItem item = null;
-
-            // Find the menu item by ID
-            foreach (MenuItem mi in allItems)
-            {
-                if (mi.ItemID == itemID)
-                {
-                    item = mi;
-                    break;
-                }
-            }
+            //calling an item by ID
+            MenuItem item = _menuItemRepository.GetMenuItemByID(itemID);
 
             if (item == null)
             {
                 throw new Exception("Menu item not found.");
             }
 
-            // Check if the item already exists in the order
-            OrderItem existingItem = null;
-            foreach (OrderItem oi in order.OrderItems)
-            {
-                if (oi.ItemID == itemID)
-                {
-                    existingItem = oi;
-                    break;
-                }
-            }
 
-            if (existingItem != null)
+            OrderItem newItem = new OrderItem(
+            itemID,
+            item,
+            DateTime.Now,
+            Status.New,
+            quantity);
+
+            AddOrUpdateOrderItem(order, newItem);
+        }
+
+        public void AddOrUpdateOrderItem(Order order, OrderItem newItem)
+        {
+            bool exists = _orderRepository.OrderItemExists(order.OrderID, newItem.ItemID);
+
+            if (exists)
             {
-                existingItem.Quantity += quantity; // ✅ Use passed quantity
+                _orderRepository.UpdateOrderItem(order.OrderID, newItem);
             }
             else
             {
-                OrderItem newItem = new OrderItem(
-                    itemID,
-                    item,
-                    DateTime.Now,
-                    Status.New,
-                    quantity // ✅ Use passed quantity
-                );
-                order.OrderItems.Add(newItem);
+                _orderRepository.InsertOrderItem(order.OrderID, newItem);
             }
-
-            _orderRepository.UpdateOrderItems(order);
-        }
-
-        public void UpdateOrderItems(Order order)
-        {
-            _orderRepository.UpdateOrderItems(order);
         }
 
     }

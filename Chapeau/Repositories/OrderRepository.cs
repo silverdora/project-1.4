@@ -29,31 +29,86 @@ namespace Chapeau.Repositories
         public Order GetOrderByID(int orderID)
         {
             string query = "SELECT * FROM [Order] WHERE orderID = @orderID";
-            SqlParameter[] parameters = {
-        new SqlParameter("@orderID", orderID)
-    };
+            SqlParameter[] parameters = {new SqlParameter("@orderID", orderID)  };
 
-            // Keep your existing logic
+            
             Order order = MapOrdersFromQuery(query, parameters).FirstOrDefault();
-
-            // 🔧 Add only this line to fetch order items
+                       
             if (order != null)
             {
-                order.OrderItems = GetOrderItemsForOrder(orderID); // ✅ New helper
+                order.OrderItems = GetOrderItemsForOrder(orderID); 
             }
 
             return order;
         }
+       
+        public bool OrderItemExists(int orderID, int itemID)
+        {
+            bool exists = false;
 
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT * FROM OrderItem WHERE orderID = @orderID AND itemID = @itemID";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@orderID", orderID);
+                    command.Parameters.AddWithValue("@itemID", itemID);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read()) // If we can read one row, it exists
+                        {
+                            exists = true;
+                        }
+                    }
+                }
+            }
+
+            return exists;
+        }
+        public void InsertOrderItem(int orderID, OrderItem item)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = "INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity) VALUES (@orderID, @itemID, @includeDate, @status, @quantity)";
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@orderID", orderID);
+            command.Parameters.AddWithValue("@itemID", item.ItemID);
+            command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
+            command.Parameters.AddWithValue("@status", item.Status.ToString());
+            command.Parameters.AddWithValue("@quantity", item.Quantity);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void UpdateOrderItem(int orderID, OrderItem item)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            string query = "UPDATE OrderItem SET quantity = @quantity WHERE orderID = @orderID AND itemID = @itemID";
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@orderID", orderID);
+            command.Parameters.AddWithValue("@itemID", item.ItemID);
+            command.Parameters.AddWithValue("@quantity", item.Quantity);
+
+            command.ExecuteNonQuery();
+        }
         private List<OrderItem> GetOrderItemsForOrder(int orderID)
         {
             var items = new List<OrderItem>();
 
             string query = @"
-        SELECT oi.*, mi.item_name, mi.description, mi.price, mi.VATpercent, mi.category, mi.stockQuantity
-        FROM OrderItem oi
-        JOIN MenuItem mi ON oi.itemID = mi.itemID
-        WHERE oi.orderID = @orderID";
+                           SELECT oi.*, mi.item_name, mi.description, mi.price, mi.VATpercent, mi.category, mi.stockQuantity
+                           FROM OrderItem oi
+                           JOIN MenuItem mi ON oi.itemID = mi.itemID
+                           WHERE oi.orderID = @orderID";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -93,45 +148,6 @@ namespace Chapeau.Repositories
             return items;
         }
 
-
-
-        public void UpdateOrderItems(Order order)
-        {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                foreach (var orderItem in order.OrderItems)
-                {
-                    string query = @"
-                IF EXISTS (
-                    SELECT 1 FROM OrderItem WHERE orderID = @orderID AND itemID = @itemID
-                )
-                BEGIN
-                    UPDATE OrderItem
-SET quantity = @quantity
-
-                    WHERE orderID = @orderID AND itemID = @itemID
-                END
-                ELSE
-                BEGIN
-                    INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity)
-                    VALUES (@orderID, @itemID, @includeDate, @status, @quantity)
-                END";
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@orderID", order.OrderID);
-                        command.Parameters.AddWithValue("@itemID", orderItem.ItemID);
-                        command.Parameters.AddWithValue("@includeDate", orderItem.IncludeDate);
-                        command.Parameters.AddWithValue("@status", orderItem.Status.ToString());
-                        command.Parameters.AddWithValue("@quantity", orderItem.Quantity);
-
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-        }
         private List<OrderItem> GetOrderItemsByOrderId(int orderId)
         {
             List<OrderItem> items = new List<OrderItem>();
@@ -141,10 +157,10 @@ SET quantity = @quantity
                 connection.Open();
 
                 string query = @"
-            SELECT oi.*, mi.*
-            FROM OrderItem oi
-            JOIN MenuItem mi ON oi.itemID = mi.itemID
-            WHERE oi.orderID = @orderID";
+                                SELECT oi.*, mi.*
+                                FROM OrderItem oi
+                                JOIN MenuItem mi ON oi.itemID = mi.itemID
+                                WHERE oi.orderID = @orderID";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {

@@ -8,7 +8,7 @@ namespace Chapeau.Services
         Order TakeNewOrder(int tableId, Employee employee);
         Order GetOrderById(int orderID);
         void AddSingleItemToOrder(int orderID, int itemID, int quantity);
-        void UpdateOrderItems(Order order);
+        void AddOrUpdateOrderItem(Order order, OrderItem newItem);
 
     }
 }
