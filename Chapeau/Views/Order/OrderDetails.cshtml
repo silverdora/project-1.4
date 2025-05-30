@@ -1,0 +1,30 @@
+﻿@model Chapeau.ViewModels.OrderDetailsViewModel
+
+<h2>Order Details</h2>
+<p><strong>Table:</strong> @Model.TableNumber</p>
+<p><strong>Employee:</strong> @Model.EmployeeName</p>
+<p><strong>Order Time:</strong> @Model.OrderTime</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.MenuItem.Item_name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Status</td>
+            </tr>
+        }
+    </tbody>
+    <form asp-controller="MenuItem" asp-action="Index" method="get">
+        <input type="hidden" name="orderID" value="@Model.OrderID" />
+        <button type="submit" class="btn btn-secondary">Back to Menu</button>
+    </form>
+</table>

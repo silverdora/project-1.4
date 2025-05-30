@@ -36,4 +36,10 @@
             <span class="text-muted small">No Order</span>
         }
     </div>
-</button>
+    <div class="table-actions mt-2 text-center">
+        <form asp-controller="Order" asp-action="TakeOrder" method="post">
+            <input type="hidden" name="tableId" value="@Model.TableId" />
+            <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
+        </form>
+    </div>
+</div>

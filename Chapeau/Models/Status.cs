@@ -2,11 +2,11 @@
 namespace Chapeau.Models
 {
 	public enum Status
-	{	
-		All,
-		Ordered,
+	{
+		All,// need to be removed 
+		New,// ordered
         InProgress,
-		ReadyToBeServed,
+		Ready,//readyToServe
 		Served,
     }
 

@@ -1,5 +1,6 @@
-﻿@model List<Chapeau.Models.MenuItem>
+﻿@model Chapeau.ViewModels.MenuSelectionViewModel
 
+<h2>Menu Selection</h2>
 
 
     <<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">
@@ -8,81 +9,145 @@
         <!-- Card Filter -->
         <select name="card" id="selectedCard" class="form-select" style=" width: auto;" onchange="this.form.submit()">
             <!-- onchange = dropdown -->
+<!-- DEBUG: remove after testing -->
+<p style="color: red;">
+	DEBUG: TableID = @Model.TableID, OrderID = @Model.OrderID, Card = @Model.SelectedCard, Category = @Model.SelectedCategory
+</p>
 
-            <option value="">-- All Cards --</option>
-            @foreach (MenuCard card in ViewBag.Cards)
-            {
-                <option value="@card" selected="@(ViewBag.SelectedCard != null && card.Equals(ViewBag.SelectedCard) ? "selected" : null)">
-                    @card
-                </option>
-            }
-        </select>
-        </div>
+<!-- Card Buttons -->
+<div class="mb-3">
+	@{
+		var cardNames = new[] { "Lunch", "Dinner", "Drinks" };
+	}
 
-        <!-- Category Filter -->
-        <div style="width: 150px;">
-        <select name="category" id="selectedCategory" class="form-select" style=" width: auto;" onchange="this.form.submit()">
-            <option value="">-- All Categories --</option>
-            @foreach (MenuCategory category in ViewBag.Categories)
-            {
-                <option value="@category" selected="@(ViewBag.SelectedCategory != null && category.Equals(ViewBag.SelectedCategory) ? "selected" : null)">
-                    @category
-                </option>
-            }
-        </select>
-        </div>
-    </div>
+	<!-- "All" card -->
+	<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
+		<input type="hidden" name="tableID" value="@Model.TableID" />
+		<input type="hidden" name="orderID" value="@Model.OrderID" />
+		<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == null ? "active" : "")">
+			All
+		</button>
+	</form>
+
+	@foreach (var card in cardNames)
+	{
+		<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
+			<input type="hidden" name="card" value="@card" />
+			<input type="hidden" name="tableID" value="@Model.TableID" />
+			<input type="hidden" name="orderID" value="@Model.OrderID" />
+			<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == card ? "active" : "")">
+				@card
+			</button>
+		</form>
+	}
+</div>
+
+<!-- Category Buttons -->
+@if (!string.IsNullOrWhiteSpace(Model.SelectedCard))
+{
+	List<string> categoriesInItems = new List<string>();
+
+	foreach (var item in Model.Items)
+	{
+		if (!categoriesInItems.Contains(item.Category))
+		{
+			categoriesInItems.Add(item.Category);
+		}
+	}
+
+	<div class="mb-3">
+		<a asp-controller="MenuItem" asp-action="Index"
+		   asp-route-card="@Model.SelectedCard"
+		   asp-route-tableID="@Model.TableID"
+		   asp-route-orderID="@Model.OrderID"
+		   class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == null ? "active" : "")">
+			All
+		</a>
+
+		@foreach (var category in categoriesInItems)
+		{
+			<a asp-controller="MenuItem" asp-action="Index"
+			   asp-route-card="@Model.SelectedCard"
+			   asp-route-category="@category"
+			   asp-route-tableID="@Model.TableID"
+			   asp-route-orderID="@Model.OrderID"
+			   class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == category ? "active" : "")">
+				@category
+			</a>
+		}
+	</div>
+}
+
+<!-- View Order Button -->
+<form asp-controller="Order" asp-action="OrderDetails" method="get">
+	<input type="hidden" name="id" value="@Model.OrderID" />
+	<input type="hidden" name="tableID" value="@Model.TableID" />
+	<button type="submit">View Order Details</button>
 </form>
 
+<!-- Menu Table -->
+<h3>Menu Items</h3>
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+	<p>No items found for the selected filters.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Item Name</th>
+				<th>Description</th>
+				<th>Price</th>
+				<th>Category</th>
+				<th>Stock</th>
+				<th>Add</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.Items)
+			{
+				<tr>
+					<td>@item.Item_name</td>
+					<td>@item.Description</td>
+					<td>@item.Price.ToString("C")</td>
+					<td>@item.Category</td>
+					<td>
+						@{
+							var message = item.StockQuantity switch
+							{
+								0 => "Out of stock",
+								<= 10 => $"Low ({item.StockQuantity})",
+								_ => $"In stock ({item.StockQuantity})"
+							};
 
-<h2>Menu Items</h2>
+							var color = item.StockQuantity == 0 ? "red"
+							: item.StockQuantity <= 10 ? "orange"
+							: "green";
+						}
 
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Stock</th>
-        </tr>
-    </thead>
-    <tbody>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Item_name</td>
-                <td>@item.Description</td>
-                <td>@item.Price.ToString("C")</td> 
-                <td>@item.Category</td>
-                <td>
-                    @{
-                        string message;
-                        string color;
-
-                        if (item.StockQuantity == 0)
-                        {
-                            message = "Out of stock";
-                            color = "red";
-                        }
-                        else if (item.StockQuantity <= 10)
-                        {
-                            message = $"Low ({item.StockQuantity})";
-                            color = "orange";
-                        }
-                        else
-                        {
-                            message = $"In stock ({item.StockQuantity})";
-                            color = "green";
-                        }
-                    }
-
-                    <span style="color:@color;">@message</span>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+						<span style="color:@color;">@message</span>
+					</td>
+					<td>
+						@if (item.StockQuantity > 0)
+						{
+							<form asp-controller="Order" asp-action="AddItem" method="post">
+								<input type="hidden" name="orderID" value="@Model.OrderID" />
+								<input type="hidden" name="itemID" value="@item.ItemID" />
+								<input type="hidden" name="tableID" value="@Model.TableID" />
+								<input type="hidden" name="card" value="@Model.SelectedCard" />
+								<input type="hidden" name="category" value="@Model.SelectedCategory" />
+								<input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" style="width: 60px;" />
+								<button type="submit">Add</button>
+							</form>
+						}
+						else
+						{
+							<span style="color: gray;">N/A</span>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
