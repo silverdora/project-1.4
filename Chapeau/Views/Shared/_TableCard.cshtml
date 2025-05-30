@@ -1,5 +1,8 @@
 ﻿@model Chapeau.Models.Table
-
+@{
+    @*Get the currently logged-in employee's ID from the session(int? cause session can expire). *@
+    int? employeeId = Context.Session.GetInt32("EmployeeID");
+}
 <div class="restaurant-table @(Model.IsOccupied ? "occupied" : "free")">
     <div class="table-top">
         <span>Table @Model.TableNumber</span>
@@ -36,6 +39,7 @@
     <div class="table-actions mt-2 text-center">
         <form asp-controller="Order" asp-action="TakeOrder" method="post">
             <input type="hidden" name="tableId" value="@Model.TableId" />
+            <input type="hidden" name="employeeId" value="@employeeId" />
             <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
         </form>
     </div>

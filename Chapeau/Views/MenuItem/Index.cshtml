@@ -125,13 +125,9 @@ else
 						@if (item.StockQuantity > 0)
 						{
 							<form asp-controller="Order" asp-action="AddItem" method="post">
-								<input type="hidden" name="orderID" value="@Model.OrderID" />
-								<input type="hidden" name="itemID" value="@item.ItemID" />
-								<input type="hidden" name="tableID" value="@Model.TableID" />
-								<input type="hidden" name="card" value="@Model.SelectedCard" />
-								<input type="hidden" name="category" value="@Model.SelectedCategory" />
+								<input type="hidden" name="menuItemId" value="@item.ItemID" />
 								<input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" style="width: 60px;" />
-								<button type="submit">Add</button>
+								<button type="submit" class="btn btn-sm btn-primary">Add</button>
 							</form>
 						}
 						else
