@@ -1,17 +1,17 @@
 ﻿using System;
-using Chapeau.Models;
+using Chapeau.Models.ViewModels;
 
-namespace Chapeau.ViewModels
+namespace Chapeau.Models.ViewModels
 {
-	public class RunningOrdersViewModel
-	{
-		public List<Order> NewOrders;
+    public class RunningOrdersViewModel
+    {
+        public List<Order> NewOrders;
         public List<Order> InProgessOrders;
         public List<Order> ReadyOrders;
         //public Employee Employee;
         public RunningOrdersViewModel()
-		{
-		}
+        {
+        }
 
         public RunningOrdersViewModel(List<Order> newOrders, List<Order> inProgessOrders, List<Order> readyOrders)
         {

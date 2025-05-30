@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Repositories\" />
     <Folder Include="Services\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="Views\RunningOrders\" />
   </ItemGroup>
   <ItemGroup>
@@ -30,13 +29,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HelperMethods\" />
-    <Compile Remove="ViewModels\**" />
-    <Content Remove="ViewModels\**" />
-    <EmbeddedResource Remove="ViewModels\**" />
-    <None Remove="ViewModels\**" />
+    <Compile Remove="Models\ViewModels\**" />
+    <Content Remove="Models\ViewModels\**" />
+    <EmbeddedResource Remove="Models\ViewModels\**" />
+    <None Remove="Models\ViewModels\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
-    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="Models\ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="Models\ViewModels\RunningOrdersViewModel.cs" />
+    <Compile Include="Models\ViewModels\TableOrderViewModel.cs" />
   </ItemGroup>
 </Project>

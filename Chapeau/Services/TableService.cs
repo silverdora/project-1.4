@@ -1,4 +1,5 @@
 ﻿using Chapeau.Models;
+using Chapeau.Models.ViewModels;
 using Chapeau.Repository;
 using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
@@ -20,6 +21,32 @@ namespace Chapeau.Service
         public List<Table> GetTablesWithOrderStatus()
         {
             return _tableRepo.GetTablesWithOrderStatus();
+        }
+        public List<TableOrderViewModel> GetTableOverview()
+        {
+            //return _tableRepo.GetTableOverview();
+            return _tableRepo.GetTableOrderViewModels();
+
+        }
+
+
+        public void SetTableOccupiedStatus(int tableId, bool isOccupied)
+        {
+            _tableRepo.UpdateTableOccupiedStatus(tableId, isOccupied);
+        }
+
+        public bool TrySetTableFree(int tableId)
+        {
+            if (_tableRepo.HasUnservedOrders(tableId))
+                return false;
+
+            _tableRepo.UpdateTableOccupiedStatus(tableId, false);
+            return true;
+        }
+
+        public void MarkOrderAsServed(int tableId)
+        {
+            _tableRepo.MarkReadyOrdersAsServed(tableId);
         }
 
 
