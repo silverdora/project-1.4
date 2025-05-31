@@ -9,6 +9,7 @@ namespace Chapeau.Repositories.Interfaces
         List<MenuItem> GetMenuItemsByCard(string cardName);
         List<MenuItem> GetMenuItemsByCategory(string categoryName);
         List<MenuItem> GetMenuItemsByCardAndCategory(string cardName, string categoryName);
+        void ReduceStock(int itemId, int amount);
 
     }
 }

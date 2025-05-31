@@ -1,5 +1,12 @@
 ﻿@model List<Chapeau.Models.Table>
 
+<!-- This is used to display the message only once after after triggering the button submit order and redirect to table overview-->
+@if (TempData["OrderSuccess"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["OrderSuccess"]
+    </div>
+}
 <h2 class="text-center mb-4">Restaurant Seating Overview</h2>
 
 <div class="container">

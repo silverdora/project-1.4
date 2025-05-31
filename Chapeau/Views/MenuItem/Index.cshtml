@@ -1,11 +1,13 @@
 ﻿@model Chapeau.ViewModels.MenuSelectionViewModel
 
 <h2>Menu Selection</h2>
-
-<!-- DEBUG: remove after testing -->
-<p style="color: red;">
-	DEBUG: TableID = @Model.TableID, OrderID = @Model.OrderID, Card = @Model.SelectedCard, Category = @Model.SelectedCategory
-</p>
+<!-- To display a message confirming every item while is being added -->
+@if (TempData["AddedMessage"] != null)
+{
+	<div class="alert alert-success" role="alert">
+		@TempData["AddedMessage"]
+	</div>
+}
 
 <!-- Card Buttons -->
 <div class="mb-3">
@@ -126,8 +128,10 @@ else
 						{
 							<form asp-controller="Order" asp-action="AddItem" method="post">
 								<input type="hidden" name="menuItemId" value="@item.ItemID" />
-								<input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" style="width: 60px;" />
-								<button type="submit" class="btn btn-sm btn-primary">Add</button>
+								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />
+								<input type="hidden" name="orderId" value="@Model.OrderID" />
+								<input type="hidden" name="tableId" value="@Model.TableID" />
+								<button type="submit">Add</button>
 							</form>
 						}
 						else

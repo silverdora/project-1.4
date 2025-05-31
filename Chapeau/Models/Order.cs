@@ -10,14 +10,17 @@
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         //new attibute from teacher's recomendation
-        public bool IsReadyToPay { get; set; }
-        public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isReadyToPay, List<OrderItem> orderItems)
+        public bool IsReadyToPay { get; set; } =false;
+        public bool IsPaid { get; set; } = false;
+        public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isServed, List<OrderItem> orderItems)
         {
             OrderID = orderID;
             Employee = employee;
             Table = table;
             OrderTime = orderTime;
-            IsReadyToPay = isReadyToPay;
+            IsServed = isServed;
+            //IsReadyToPay = isReadyToPay;
+            //IsPaid = isPaid;
             OrderItems = orderItems;
         }
         //parameterless ctor

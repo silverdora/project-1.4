@@ -33,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewModels\MenuSelectionViewModel.cs" />
-    <Compile Include="ViewModels\OrderDetailsViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
     <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
   </ItemGroup>

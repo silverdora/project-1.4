@@ -32,6 +32,8 @@ public class Program
 
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); 
+
 
 
         builder.Services.AddSession(options =>
@@ -46,8 +48,8 @@ public class Program
         builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
-        builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
-        builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+        builder.Services.AddScoped<IMenuItemService, MenuItemService>();
+        builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 
         builder.Services.AddSingleton<IRunningOrdersService, RunningOrdersService>();
         builder.Services.AddSingleton<IRunningOrdersRepository, RunningOrdersRepository>();

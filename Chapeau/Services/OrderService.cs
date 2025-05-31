@@ -10,7 +10,7 @@ namespace Chapeau.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IMenuItemRepository _menuItemRepository;// I don't think I need to keep this 
+        private readonly IMenuItemRepository _menuItemRepository;
         private readonly IOrderItemRepository _orderItemRepository;
 
         public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, IOrderItemRepository orderItemRepository)
@@ -27,6 +27,7 @@ namespace Chapeau.Services
         // stores the selected menu item into the session list.
         public void AddItemToSessionSelection(int menuItemId, int quantity, ISession session)
         {
+            // Retrieve the current list from session (or create a new one if it doesn't exist)
             List<OrderItem> selectedItems = session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
             if (selectedItems == null)
             {
@@ -57,7 +58,6 @@ namespace Chapeau.Services
             session.SetObjectAsJson("SelectedItems", selectedItems);
         }
 
-
         // Inserts the items from session into the database, using OrderItemRepository.
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
         {
@@ -76,69 +76,7 @@ namespace Chapeau.Services
         public void ClearSelectedItemsFromSession(ISession session)
         {
             session.Remove("SelectedItems");
-        }
-
-        //public void AddItemsToOrder(int orderId, List<OrderItem> items)
-        //{
-        //    foreach (OrderItem item in items)
-        //    {
-        //        item.OrderID = orderId;
-        //        _orderItemRepository.Insert(item);
-        //    }
-        //}
-
-        //public Order TakeNewOrder(int tableId, Employee employee)
-        //{
-        //    return _orderRepository.TakeNewOrder(tableId, employee);
-        //}
-
-        //public Order GetOrderById(int orderID)
-        //{
-        //    return _orderRepository.GetOrderByID(orderID);
-        //}
-
-
-        ////add item to an existing order
-        //public void AddSingleItemToOrder(int orderID, int itemID, int quantity)
-        //{
-        //    Order order = _orderRepository.GetOrderByID(orderID);
-        //    if (order == null)
-        //    {
-        //        throw new Exception($"Order with ID {orderID} not found.");
-        //    }
-
-        //    //calling an item by ID
-        //    MenuItem item = _menuItemRepository.GetMenuItemByID(itemID);
-
-        //    if (item == null)
-        //    {
-        //        throw new Exception("Menu item not found.");
-        //    }
-
-
-        //    OrderItem newItem = new OrderItem(
-        //    itemID,
-        //    item,
-        //    DateTime.Now,
-        //    Status.New,
-        //    quantity);
-
-        //    AddOrUpdateOrderItem(order, newItem);
-        //}
-
-        //public void AddOrUpdateOrderItem(Order order, OrderItem newItem)
-        //{
-        //    bool exists = _orderRepository.OrderItemExists(order.OrderID, newItem.ItemID);
-
-        //    if (exists)
-        //    {
-        //        _orderRepository.UpdateOrderItem(order.OrderID, newItem);
-        //    }
-        //    else
-        //    {
-        //        _orderRepository.InsertOrderItem(order.OrderID, newItem);
-        //    }
-        //}
+        }       
 
     }
 }

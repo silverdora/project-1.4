@@ -45,7 +45,7 @@
                                             if (Model.Status == Status.New)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                    <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                    <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
                                                     <input hidden name="status" value="InProgress" />
                                                     <button type="submit" class="btn btn-primary">Prepare</button>
                                                 </form>
@@ -59,7 +59,7 @@
                                             else if (Model.Status == Status.Ready)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                    <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                    <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
                                                     <input hidden name="status" value="Served" />
                                                     <button type="submit" class="btn btn-primary">Close</button>
                                                 </form>

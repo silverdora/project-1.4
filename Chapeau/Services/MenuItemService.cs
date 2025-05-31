@@ -36,6 +36,15 @@ namespace Chapeau.Services
                 return _menuItemRepository.GetMenuItems();
             }
         }
+        public MenuItem GetMenuItemByID(int itemID)
+        {
+            return _menuItemRepository.GetMenuItemByID(itemID);
+        }
+
+        public void ReduceStock(int itemId, int amount)
+        {
+            _menuItemRepository.ReduceStock(itemId, amount);
+        }
     }
 
 }

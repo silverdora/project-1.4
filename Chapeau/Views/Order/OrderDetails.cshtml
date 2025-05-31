@@ -1,8 +1,8 @@
-﻿@model Chapeau.ViewModels.OrderDetailsViewModel
+﻿@model List<Chapeau.Models.OrderItem>
 
 <h2>Order Details</h2>
 
-@if (Model == null || Model.Items == null || Model.Items.Count == 0)
+@if (Model == null || Model.Count == 0)
 {
     <p>No items selected yet.</p>
 }
@@ -18,7 +18,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Items)
+            @foreach (var item in Model)
             {
                 <tr>
                     <td>@item.MenuItem.Item_name</td>
@@ -31,8 +31,15 @@ else
     </table>
 
     <!-- Button to submit items to DB -->
-    <form asp-controller="Order" asp-action="AddItemsToOrder" method="post">
-        <input type="hidden" name="orderId" value="@Model.OrderID" />
+    <form asp-controller="Order" asp-action="SubmitOrder" method="post">
+        <input type="hidden" name="orderId" value="@TempData["CurrentOrderId"]" />
         <button type="submit" class="btn btn-success">Submit Order to Kitchen</button>
     </form>
+
+    <a asp-controller="MenuItem" asp-action="Index"
+       asp-route-orderId="@TempData["CurrentOrderId"]"
+       asp-route-tableId="@TempData["CurrentTableId"]"
+       class="btn btn-secondary">
+        ← Back to Menu
+    </a>
 }

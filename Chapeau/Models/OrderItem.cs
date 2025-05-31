@@ -4,12 +4,12 @@
     {
         public int OrderID { get; set; }
         public MenuItem MenuItem { get; set; }
-        public DateTime OrderDateTime { get; set; }
+        public DateTime IncludeDate { get; set; }//change to OrderDateTime
         public TimeSpan WaitingTime
         {
             get
             {
-                return DateTime.Now - OrderDateTime;
+                return DateTime.Now - IncludeDate;
             }
         }
 
@@ -18,10 +18,10 @@
 
         // parameterless constructor
         public OrderItem() { }
-        public OrderItem(MenuItem menuItem, DateTime orderDateTime, Status status, int quantity)
+        public OrderItem(MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
             MenuItem = menuItem;
-            OrderDateTime = orderDateTime;
+            IncludeDate = includeDate;
             Status = status;
             Quantity = quantity;
         }

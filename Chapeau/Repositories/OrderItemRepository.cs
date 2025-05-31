@@ -24,7 +24,7 @@ namespace Chapeau.Repositories
             {
                 command.Parameters.AddWithValue("@orderID", item.OrderID);
                 command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemID);
-                command.Parameters.AddWithValue("@includeDate", item.OrderDateTime);
+                command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
                 command.Parameters.AddWithValue("@status", item.Status.ToString());
                 command.Parameters.AddWithValue("@quantity", item.Quantity);
 

@@ -10,6 +10,8 @@ namespace Chapeau.Services
 
         //List<MenuItem> GetMenuItemsByCardAndCategory(string? card, string? category);
         List<MenuItem> GetFilteredMenuItems(string? card, string? category);
+        MenuItem GetMenuItemByID(int itemID);
+        void ReduceStock(int itemId, int amount);
 
     }
 }
