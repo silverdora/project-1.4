@@ -10,6 +10,7 @@ namespace Chapeau.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMenuItemService _menuItemService;
+       
 
         public OrderController(IOrderService orderService, IMenuItemService menuItemService)
         {
@@ -28,65 +29,105 @@ namespace Chapeau.Controllers
                 IsServed = false
             };
 
-            orderService.InsertOrder(newOrder); // Save to DB
+            _orderService.InsertOrder(newOrder); // Save to DB
 
             TempData["CurrentOrderId"] = newOrder.OrderID; // Store order ID for future use
-            return RedirectToAction("SelectItems");
+            return RedirectToAction("SelectItems", new { orderId = newOrder.OrderID, tableId = tableId });
         }
-        public IActionResult SelectItems()
-        {
-            List<MenuItem> menuItems = _menuItemService.GetMenuItems();
-            return View(menuItems);
-        }
+        //public IActionResult SelectItems()
+        //{
+        //    List<MenuItem> menuItems = _menuItemService.GetMenuItems();
+        //    return View(menuItems);
+        //}
 
         [HttpPost]
-        public IActionResult AddItem(int menuItemId, int quantity)
+        public IActionResult AddItemToSelection(int menuItemId, int quantity)
         {
-            _orderService.AddItem(menuItemId, quantity, HttpContext.Session);
+            _orderService.AddItemToSessionSelection(menuItemId, quantity, HttpContext.Session);
             return RedirectToAction("Index", "MenuItem");
+            //return RedirectToAction("SelectItems", new { orderId = orderId });
         }
-
-
-
-
-
-
-
-
-
-
-       // public IActionResult SelectItems()
-        {
-            // display all menu items with buttons
-            return View(menuItemService.GetAll());
-        }
-        //Add item to selection (session list)
-        [HttpPost]
-      //  public IActionResult AddItem(int menuItemId)
-        {
-            orderService.AddItemToSessionSelection(menuItemId, HttpContext.Session);
-            return RedirectToAction("SelectItems");
-        }
-
-        //Show selected items
         public IActionResult OrderDetails()
         {
-            var items = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            return View(items);
+            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+            if (selectedItems == null)
+            {
+                selectedItems = new List<OrderItem>();
+            }
+
+            return View(selectedItems);
         }
 
-        //Confirm and add to database
+       
         [HttpPost]
-        public IActionResult AddItemsToOrder()
+        public IActionResult SubmitOrder(int orderId)
         {
-            int orderId = (int)TempData["CurrentOrderId"];
-            var items = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
 
-            orderService.AddItemsToOrder(orderId, items);
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                _orderService.AddItemsToOrder(orderId, selectedItems);
 
-            HttpContext.Session.Remove("SelectedItems");
-            return RedirectToAction("Tables");
+                // Clear session after saving to DB
+                HttpContext.Session.Remove("SelectedItems");
+            }
+
+            return RedirectToAction("Tables", "Table");
         }
+
+        //[HttpPost]
+        //public IActionResult AddItemsToOrder(int orderId)
+        //{
+        //    List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+
+        //    if (selectedItems != null && selectedItems.Count > 0)
+        //    {
+        //        _orderService.AddItemsToOrder(orderId, selectedItems);
+        //        HttpContext.Session.Remove("SelectedItems"); // clear after submitting
+        //    }
+
+        //    return RedirectToAction("Tables", "Table"); // or wherever you go next
+        //}
+
+
+
+
+
+
+
+
+      // // public IActionResult SelectItems()
+      //  {
+      //      // display all menu items with buttons
+      //      return View(menuItemService.GetAll());
+      //  }
+      //  //Add item to selection (session list)
+      //  [HttpPost]
+      ////  public IActionResult AddItem(int menuItemId)
+      //  {
+      //      orderService.AddItemToSessionSelection(menuItemId, HttpContext.Session);
+      //      return RedirectToAction("SelectItems");
+      //  }
+
+      //  //Show selected items
+      //  public IActionResult OrderDetails()
+      //  {
+      //      var items = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+      //      return View(items);
+      //  }
+
+      //  //Confirm and add to database
+      //  [HttpPost]
+      //  public IActionResult AddItemsToOrder()
+      //  {
+      //      int orderId = (int)TempData["CurrentOrderId"];
+      //      var items = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+
+      //      orderService.AddItemsToOrder(orderId, items);
+
+      //      HttpContext.Session.Remove("SelectedItems");
+      //      return RedirectToAction("Tables");
+      //  }
 
         //public IActionResult TakeOrder(int tableId)
         //{

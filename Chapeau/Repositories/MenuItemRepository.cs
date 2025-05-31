@@ -23,9 +23,9 @@ namespace Chapeau.Repositories
         public MenuItem GetMenuItemByID(int itemID)
         {
             string query = "SELECT * FROM MenuItem WHERE itemID = @itemID";
-            SqlParameter param = new SqlParameter("@itemID", itemID);
+            SqlParameter parameter = new SqlParameter("@itemID", itemID);
 
-            List<MenuItem> result = ExecuteQueryMapMenuItems(query, param);
+            List<MenuItem> result = ExecuteQueryMapMenuItems(query, parameter);
 
             foreach (var item in result)
             {

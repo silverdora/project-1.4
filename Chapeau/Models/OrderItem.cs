@@ -16,6 +16,8 @@
         public Status Status { get; set; }
         public int Quantity { get; set; }
 
+        // parameterless constructor
+        public OrderItem() { }
         public OrderItem(MenuItem menuItem, DateTime orderDateTime, Status status, int quantity)
         {
             MenuItem = menuItem;
@@ -23,6 +25,7 @@
             Status = status;
             Quantity = quantity;
         }
+     
     }
 }
 

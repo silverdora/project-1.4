@@ -3,24 +3,28 @@ using Chapeau.Services.Interfaces;
 using Chapeau.Repositories.Interfaces;
 using Chapeau.Repositories;
 using Chapeau.HelperMethods;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Chapeau.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IMenuItemRepository _menuItemRepository;
+        private readonly IMenuItemRepository _menuItemRepository;// I don't think I need to keep this 
+        private readonly IOrderItemRepository _orderItemRepository;
 
-
-        public OrderService(IOrderRepository orderRepository)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, IOrderItemRepository orderItemRepository)
         {
             _orderRepository = orderRepository;
-            
+            _menuItemRepository = menuItemRepository;
+            _orderItemRepository = orderItemRepository;
         }
         public void InsertOrder(Order order)
         {
-            _orderRepository.Insert(order);
+            _orderRepository.InsertOrder(order);
         }
+
+        // stores the selected menu item into the session list.
         public void AddItemToSessionSelection(int menuItemId, int quantity, ISession session)
         {
             List<OrderItem> selectedItems = session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
@@ -29,10 +33,7 @@ namespace Chapeau.Services
                 selectedItems = new List<OrderItem>();
             }
 
-            MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-
             OrderItem existingItem = null;
-
             foreach (OrderItem item in selectedItems)
             {
                 if (item.MenuItem.ItemID == menuItemId)
@@ -48,6 +49,7 @@ namespace Chapeau.Services
             }
             else
             {
+                MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
                 OrderItem newItem = new OrderItem(menuItem, DateTime.Now, Status.New, quantity);
                 selectedItems.Add(newItem);
             }
@@ -55,6 +57,8 @@ namespace Chapeau.Services
             session.SetObjectAsJson("SelectedItems", selectedItems);
         }
 
+
+        // Inserts the items from session into the database, using OrderItemRepository.
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
         {
             foreach (var item in items)
@@ -64,6 +68,24 @@ namespace Chapeau.Services
             }
         }
 
+        public List<OrderItem> GetSelectedItemsFromSession(ISession session)
+        {
+            return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
+        }
+
+        public void ClearSelectedItemsFromSession(ISession session)
+        {
+            session.Remove("SelectedItems");
+        }
+
+        //public void AddItemsToOrder(int orderId, List<OrderItem> items)
+        //{
+        //    foreach (OrderItem item in items)
+        //    {
+        //        item.OrderID = orderId;
+        //        _orderItemRepository.Insert(item);
+        //    }
+        //}
 
         //public Order TakeNewOrder(int tableId, Employee employee)
         //{

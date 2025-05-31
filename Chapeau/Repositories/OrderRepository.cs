@@ -19,7 +19,7 @@ namespace Chapeau.Repositories
             _employeeRepository = employeeRepository;
         }
 
-        public void Insert(Order order)
+        public void InsertOrder(Order order)
         {
             string query = "INSERT INTO [Order] (employeeID, tableID, orderTime, isServed) " +
                            "VALUES (@employeeID, @tableID, @orderTime, @isServed); " +

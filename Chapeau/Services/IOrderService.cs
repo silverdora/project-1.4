@@ -5,10 +5,17 @@ namespace Chapeau.Services
 {
     public interface IOrderService
     {
-        Order TakeNewOrder(int tableId, Employee employee);
-        Order GetOrderById(int orderID);
-        void AddSingleItemToOrder(int orderID, int itemID, int quantity);
-        void AddOrUpdateOrderItem(Order order, OrderItem newItem);
+        //Order TakeNewOrder(int tableId, Employee employee);
+        //Order GetOrderById(int orderID);
+        //void AddSingleItemToOrder(int orderID, int itemID, int quantity);
+        //void AddOrUpdateOrderItem(Order order, OrderItem newItem);
+        void InsertOrder(Order order);
+
+        void AddItemToSessionSelection(int menuItemId, int quantity, ISession session);
+
+        List<OrderItem> GetSelectedItemsFromSession(ISession session);
+
+        void AddItemsToOrder(int orderId, List<OrderItem> items);
 
     }
 }
