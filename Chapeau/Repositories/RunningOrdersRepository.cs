@@ -153,10 +153,10 @@ namespace Chapeau.Repositories
             Table table = GetTableByID(tableID);
 
             DateTime orderTime = (DateTime)reader["orderTime"];
-            bool isServed = true;
+            //bool isServed = true;
             List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId);
 
-            return new Order(orderId, employee, table, orderTime, isServed, orderItems);
+            return new Order(orderId, employee, table, orderTime, orderItems);
         }
 
         private Employee GetEmployeeByID (int id)
@@ -257,7 +257,7 @@ namespace Chapeau.Repositories
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
-            
+            //string notes = (string)reader["notes"];
 
             return new OrderItem(itemID, menuItem, includeDate, status, quantity);
         }
@@ -295,7 +295,7 @@ namespace Chapeau.Repositories
                 Description = reader["description"].ToString(),
                 Price = (decimal)reader["price"],
                 VATPercent = (decimal)reader["VATpercent"],
-                Category = reader["category"].ToString(),
+                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), (string)reader["category"], true),
                 StockQuantity = (int)reader["stockQuantity"]
             };
         }

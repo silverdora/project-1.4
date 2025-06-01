@@ -12,123 +12,160 @@
 <div class="col-6">
     <form asp-action="Filtered" method="get">
         <div class="form-group">
-            <label for="type">Choose order statuss:</label>
-            <select class="form-control" id="type" name="status">
-                @*<option value="All">All</option>*@
+            <label for="type">Choose order status:</label>
+            <select class="form-control mb-1" id="type" name="status">
                 <option value="New">New</option>
                 <option value="InProgress">In Progress</option>
                 <option value="Ready">Ready</option>
             </select>
         </div>
-        <button class="btn btn-primary" type="submit">Open</button>
+        <button class="btn btn-primary mb-2" type="submit">Open</button>
     </form>
 </div>
 
-<h5>New</h5>
-<div class="row row-cols-1 row-cols-md-2 g-4">
-    <div class="col">
-        @{
-            foreach (Order order in Model.NewOrders)
-            {
-                <li class="list-group-item">
-                    @{
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h6 class="card-title">@order.Employee.employeeName</h6>
-                                <p class="card-text">table #@order.Table.TableNumber</p>
-                                <ul class="list-group list-group-flush">
-                                    @{
-                                        foreach (OrderItem orderItem in order.OrderItems)
-                                        {
-                                            <p><em>@orderItem.MenuItem.Item_name</em></p>
-                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                            <br />
-                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                            <br />
-                                            <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                <input hidden name="itemID" value="@orderItem.ItemID" />
-                                                <input hidden name="status" value="InProgress" />
-                                                <button type="submit" class="btn btn-primary">Prepare</button>
-                                            </form>
-                                        }
-                                    }
-                                </ul>
-                            </div>
+<div class="mb-4">
+    <h4>New</h4>
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            @{
+                foreach (Order order in Model.NewOrders)
+                {
+                    <div class="card m-2" style="width: 24rem; padding: 0">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
+                            <p class="card-text mb-0">@order.Employee.employeeName</p>
+                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
                         </div>
-                    }
-                </li>
-            }
-        }
-
-    </div>
-</div>
-<h5>Being prepared</h5>
-<div class="row">
-    <div class="col col-sm-6">
-        @{
-            foreach (Order order in Model.InProgessOrders)
-            {
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">@order.Employee.employeeName</h6>
-                        <p class="card-text">table #@order.Table.TableNumber</p>
-                        <ul class="list-group list-group-flush">
+                        <div class="card-body">
                             @{
-                                foreach (OrderItem orderItem in order.OrderItems)
+                                foreach (MenuCategory course in Model.NewOrdersByCourse[order.OrderID])
                                 {
-                                    <p><em>@orderItem.MenuItem.Item_name</em></p>
-                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                    <br />
-                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                    <br />
-                                    <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                        <input hidden name="itemID" value="@orderItem.ItemID" />
-                                        <input hidden name="status" value="Ready" />
-                                        <button type="submit" class="btn btn-primary">Ready</button>
-                                    </form>
+                                    <strong>@course</strong>
+                                    <ul class="list-group list-group-flush">
+
+                                        @foreach (OrderItem orderItem in order.OrderItems)
+                                            if (orderItem.MenuItem.Category == course)
+                                            {
+                                                <li class="list-group-item">
+                                                    <div class=" d-flex justify-content-between align-items-center">
+                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
+                                                        <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                            <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                            <input hidden name="status" value="InProgress" />
+                                                            <span type="submit" class="badge bg-primary rounded-pill">Prepare</span>
+                                                        </form>
+                                                    </div>
+                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                                    <br />
+                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                                    <br />
+                                                </li>
+                                            }
+                                    </ul>
                                 }
                             }
-                        </ul>
+                        </div>
                     </div>
-                </div>
+                }
             }
-        }
+        </div>
     </div>
 </div>
-<h5>Ready to be served</h5>
-<div class="row row-cols-1 row-cols-md-2 g-4">
-    <div class="col">
-        @{
-            foreach (Order order in Model.ReadyOrders)
-            {
-                <li class="list-group-item">
-                    @{
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h6 class="card-title">@order.Employee.employeeName</h6>
-                                <p class="card-text">table #@order.Table.TableNumber</p>
-                                <ul class="list-group list-group-flush">
-                                    @{
-                                        foreach (OrderItem orderItem in order.OrderItems)
-                                        {
-                                            <p><em>@orderItem.MenuItem.Item_name</em></p>
-                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                            <br />
-                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                            <br />
-                                            <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                <input hidden name="itemID" value="@orderItem.ItemID" />
-                                                <input hidden name="status" value="Served" />
-                                                <button type="submit" class="btn btn-primary">Close</button>
-                                            </form>
-                                        }
-                                    }
-                                </ul>
-                            </div>
+
+<div class="mb-4">
+    <h4>Being prepared</h4>
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            @{
+                foreach (Order order in Model.InProgessOrders)
+                {
+                    <div class="card m-2" style="width: 24rem; padding: 0">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
+                            <p class="card-text mb-0">@order.Employee.employeeName</p>
+                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
                         </div>
-                    }
-                </li>
+                        <div class="card-body">
+                            @{
+                                foreach (MenuCategory course in Model.PreparingOrdersByCourse[order.OrderID])
+                                {
+                                    <strong>@course</strong>
+                                    <ul class="list-group list-group-flush">
+
+                                        @foreach (OrderItem orderItem in order.OrderItems)
+                                            if (orderItem.MenuItem.Category == course)
+                                            {
+                                                <li class="list-group-item">
+                                                    <div class=" d-flex justify-content-between align-items-center">
+                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
+                                                        <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                            <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                            <input hidden name="status" value="ReadyToBeServed" />
+                                                            <span type="submit" class="badge bg-primary rounded-pill">Ready to be served</span>
+                                                        </form>
+                                                    </div>
+                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                                    <br />
+                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                                    <br />
+                                                </li>
+                                            }
+                                    </ul>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
             }
-        }
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h4>Ready to be served</h4>
+    <div class="container">
+        <div class="row row d-flex align-items-start">
+            @{
+                foreach (Order order in Model.ReadyOrders)
+                {
+                    <div class="card m-2" style="width: 24rem; padding: 0">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
+                            <p class="card-text mb-0">@order.Employee.employeeName</p>
+                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
+                        </div>
+                        <div class="card-body">
+                            @{
+                                foreach (MenuCategory course in Model.ReadyOrdersByCourse[order.OrderID])
+                                {
+                                    <strong>@course</strong>
+                                    <ul class="list-group list-group-flush">
+
+                                        @foreach (OrderItem orderItem in order.OrderItems)
+                                            if (orderItem.MenuItem.Category == course)
+                                            {
+                                                <li class="list-group-item">
+                                                    <div class=" d-flex justify-content-between align-items-center">
+                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
+                                                        <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                            <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                            <input hidden name="status" value="Served" />
+                                                            <button type="submit" class="badge bg-primary rounded-pill">Close</button>
+                                                        </form>
+                                                    </div>
+                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                                    <br />
+                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                                    <br />
+                                                </li>
+                                            }
+                                    </ul>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>

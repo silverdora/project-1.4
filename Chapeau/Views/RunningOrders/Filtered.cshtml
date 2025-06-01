@@ -42,7 +42,7 @@
                                             <p class="card-text"><em>@orderItem.MenuItem.Item_name</em></p>
                                             <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small><br />
                                             <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small><br />
-                                            if (Model.Status == Status.New)
+                                            if (Model.Status == Status.Ordered)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
                                                     <input hidden name="itemID" value="@orderItem.ItemID" />
@@ -55,8 +55,13 @@
                                                 {
                                                     <button asp-action="ChangeOrderStatus" class="btn btn-primary">Ready</button>
                                                 }
+                                                <form action="/RunningOrders/ChangeOrderStatus" method="post">
+                                                    <input hidden name="itemID" value="@orderItem.ItemID" />
+                                                    <input hidden name="status" value="ReadyToBeServed" />
+                                                    <button type="submit" class="btn btn-primary">Ready to be served</button>
+                                                </form>
                                             }
-                                            else if (Model.Status == Status.Ready)
+                                            else if (Model.Status == Status.ReadyToBeServed)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
                                                     <input hidden name="itemID" value="@orderItem.ItemID" />

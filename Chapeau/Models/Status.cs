@@ -4,9 +4,9 @@ namespace Chapeau.Models
 	public enum Status
 	{
 		//All,
-		New,
+		Ordered,
 		InProgress,
-		Ready,
+		ReadyToBeServed,
 		Served,
 		//Completed
 	}

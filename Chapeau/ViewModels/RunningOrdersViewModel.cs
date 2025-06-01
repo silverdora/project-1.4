@@ -9,11 +9,11 @@ namespace Chapeau.ViewModels
         public List<Order> InProgessOrders;
         public List<Order> ReadyOrders;
 
-        Dictionary<int, List<MenuCategory>> NewOrdersByCourse;
+        public Dictionary<int, List<MenuCategory>> NewOrdersByCourse;
 
-        Dictionary<int, List<MenuCategory>> PreparingOrdersByCourse;
+        public Dictionary<int, List<MenuCategory>> PreparingOrdersByCourse;
 
-        Dictionary<int, List<MenuCategory>> ReadyOrdersByCourse;
+        public Dictionary<int, List<MenuCategory>> ReadyOrdersByCourse;
 
         public Employee Employee;
 

@@ -2,9 +2,9 @@
 {
     public class OrderItem
     {
-        public int OrderID { get; set; }
+        //public int OrderID { get; set; }
         public MenuItem MenuItem { get; set; }
-        public int ItemID { get; set; }
+        public int ItemID { get; set; } //is used to change status
         public DateTime IncludeDate { get; set; }
         public TimeSpan WaitingTime
         {
@@ -13,11 +13,9 @@
                 return DateTime.Now - IncludeDate;
             }
         }
-
         public Status Status { get; set; }
         public int Quantity { get; set; }
-        //public MenuCategory Course { get; set; }
-
+        //public string Notes { get; set; }
         public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
             ItemID = itemID;
@@ -25,7 +23,7 @@
             IncludeDate = includeDate;
             Status = status;
             Quantity = quantity;
-            //Course = course;
+            //Notes = notes;
         }
     }
 }

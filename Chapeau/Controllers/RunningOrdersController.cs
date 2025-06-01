@@ -36,13 +36,13 @@ namespace Chapeau.Controllers
 
             if (loggedInEmployee.Role == Role.Bar)
             {
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
                 Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
 
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
                 Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
 
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.ReadyToBeServed);
                 Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
 
                 //store data in the running orders ViewModel
@@ -53,13 +53,13 @@ namespace Chapeau.Controllers
             
             else if (loggedInEmployee.Role == Role.Kitchen)
             {
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
                 Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
 
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
                 Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
 
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.ReadyToBeServed);
                 Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
                 //store data in the running orders ViewModel
                 RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders, newOrdersByCourse, preparingOrdersByCourse, readyOrdersByCourse, loggedInEmployee);
