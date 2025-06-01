@@ -8,6 +8,7 @@ namespace Chapeau.Services
     public class DummyOrderService: IDummyOrderService
     {
         private readonly IDummyOrderRepository _orderRepository;
+        private static List<Order> _orders = new List<Order>();
 
         public DummyOrderService(IDummyOrderRepository orderRepository)
         {
@@ -26,13 +27,15 @@ namespace Chapeau.Services
 
         public void AddOrder(Order order)
         {
-            _orderRepository.AddOrder(order);
+            order.OrderID = _orders.Count + 1; // auto-increment ID
+            _orders.Add(order);
         }
 
         public void UpdateOrderStatus(int orderId, Status status)
         {
             _orderRepository.UpdateOrderStatus(orderId, status);
         }
+
     }
 
 }

@@ -16,6 +16,10 @@
 
         public Status Status { get; set; }
         public int Quantity { get; set; }
+        public OrderItem()
+        {
+
+        }
 
         public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {

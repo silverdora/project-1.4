@@ -12,12 +12,14 @@ namespace Chapeau.Controllers
         private readonly IDummyOrderService _dummyOrderService;
         private readonly IEmployeeService _employeeService;  // To get employees
         private readonly ITableService _tableService;
+        private readonly IMenuItemService _menuItemService;
 
-        public DummyOrderController(IDummyOrderService dummyOrderService, IEmployeeService employeeService, ITableService tableService)
+        public DummyOrderController(IDummyOrderService dummyOrderService, IEmployeeService employeeService, ITableService tableService, IMenuItemService menuItemService)
         {
             _dummyOrderService = dummyOrderService;
             _employeeService = employeeService;
             _tableService = tableService;
+            _menuItemService = menuItemService;
         }
 
         // GET: /DummyOrder/Index
@@ -40,11 +42,11 @@ namespace Chapeau.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Prepare dropdown data in ViewBag or ViewModel
             ViewBag.Employees = _employeeService.GetAllEmployee();
             ViewBag.Tables = _tableService.GetAllTables();
+            ViewBag.MenuItems = _menuItemService.GetAllMenuItems();
 
-            return View();
+            return View(new Order { OrderItems = new List<OrderItem>() });
         }
 
         [HttpPost]
@@ -53,16 +55,32 @@ namespace Chapeau.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Load full Employee and Table objects
+                order.Employee = _employeeService.GetAllEmployee()
+                    .FirstOrDefault(e => e.employeeID == order.Employee.employeeID);
+                order.Table = _tableService.GetAllTables()
+                    .FirstOrDefault(t => t.TableNumber == order.Table.TableNumber);
+
+                // For each OrderItem, load the full MenuItem and set IncludeDate & Status
+                foreach (var oi in order.OrderItems)
+                {
+                    oi.MenuItem = _menuItemService.GetAllMenuItems()
+                        .FirstOrDefault(mi => mi.ItemID == oi.ItemID);
+                    oi.IncludeDate = DateTime.Now;
+                    oi.Status = Status.InProgress; // or appropriate default
+                }
+
                 _dummyOrderService.AddOrder(order);
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // If validation fails, repopulate dropdowns and return view
+            // If model invalid, reload dropdowns
             ViewBag.Employees = _employeeService.GetAllEmployee();
             ViewBag.Tables = _tableService.GetAllTables();
+            ViewBag.MenuItems = _menuItemService.GetAllMenuItems();
             return View(order);
         }
     }
+}
 
-}
-}

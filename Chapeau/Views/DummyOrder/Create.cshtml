@@ -5,22 +5,72 @@
 }
 @model Chapeau.Models.Order
 
+@{
+    var menuItems = ViewBag.MenuItems as List<Chapeau.Models.MenuItem>;
+}
+
 <h2>Create Order</h2>
 
 <form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="OrderTime"></label>
-        <input asp-for="OrderTime" class="form-control" />
-        <span asp-validation-for="OrderTime" class="text-danger"></span>
+    <!-- Employee and Table fields here -->
+
+    <div id="order-items-container">
+        <h4>Order Items</h4>
+
+        <div class="order-item-row mb-2">
+            <select name="OrderItems[0].ItemID" class="form-select d-inline-block w-auto">
+                <option value="">-- Select Menu Item --</option>
+                @foreach (var item in menuItems)
+                {
+                    <option value="@item.ItemID">@item.Item_name - @item.Price.ToString("C")</option>
+                }
+            </select>
+            <input type="number" name="OrderItems[0].Quantity" class="form-control d-inline-block w-auto ms-2" value="1" min="1" />
+        </div>
     </div>
 
-    <!-- Add fields for Employee, Table, IsServed, etc. -->
-
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="button" id="add-item-btn" class="btn btn-secondary mb-3">Add Another Item</button>
+    <button type="submit" class="btn btn-primary">Create Order</button>
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        let itemIndex = 1;
+        const menuItems = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(menuItems));
+
+        document.getElementById("add-item-btn").addEventListener("click", function () {
+            const container = document.getElementById("order-items-container");
+            const newRow = document.createElement("div");
+            newRow.classList.add("order-item-row", "mb-2");
+
+            const select = document.createElement("select");
+            select.name = `OrderItems[${itemIndex}].ItemID`;
+            select.classList.add("form-select", "d-inline-block", "w-auto");
+
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.text = "-- Select Menu Item --";
+            select.appendChild(defaultOption);
+
+            menuItems.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.ItemID;
+                option.text = `${item.Item_name} - ${item.Price.toFixed(2)}`;
+                select.appendChild(option);
+            });
+
+            const qtyInput = document.createElement("input");
+            qtyInput.type = "number";
+            qtyInput.name = `OrderItems[${itemIndex}].Quantity`;
+            qtyInput.value = 1;
+            qtyInput.min = 1;
+            qtyInput.classList.add("form-control", "d-inline-block", "w-auto", "ms-2");
+
+            newRow.appendChild(select);
+            newRow.appendChild(qtyInput);
+
+            container.appendChild(newRow);
+            itemIndex++;
+        });
+    </script>
 }

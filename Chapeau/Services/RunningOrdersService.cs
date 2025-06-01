@@ -41,15 +41,7 @@ namespace Chapeau.Services
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
 
-        public Order GetOrderById(int orderId)
-        {
-            return _runningOrdersRepository.GetOrderById(orderId);
-        }
-
-        public void MarkOrderAsCompleted(int orderId)
-        {
-            _runningOrdersRepository.MarkOrderAsCompleted(orderId);
-        }
+      
 
 
 

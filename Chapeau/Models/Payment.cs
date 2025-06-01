@@ -15,15 +15,6 @@
         public decimal lowVATAmount { get; set; }
         public decimal highVATAmount { get; set; }
 
-        // ADDITIONAL PROPERTIES FOR VIEWING ORDER
-        public Table Table { get; set; } // Includes table number
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
-        public decimal TotalAmount => OrderItems.Sum(i => i.MenuItem.Price * i.Quantity);
-
-
-
-
 
         public Payment()
         {

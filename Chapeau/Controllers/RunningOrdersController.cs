@@ -109,17 +109,7 @@ namespace Chapeau.Controllers
             //go back 
             return RedirectToAction("Index");
         }
-        [HttpGet]
-        public IActionResult Details(int id)
-        {
-            Order? order = _runningOrdersService.GetOrderById(id);
-            if (order == null)
-            {
-                return NotFound(); // Optional handling
-            }
-
-            return View(order); // Create a view for this
-        }
+       
 
     }
 }

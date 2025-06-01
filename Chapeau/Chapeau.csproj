@@ -30,6 +30,7 @@
     <None Remove="ViewModels\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\OrderViewModel.cs" />
     <Compile Include="ViewModels\PaymentViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
     <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />

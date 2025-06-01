@@ -33,6 +33,9 @@ public class Program
         builder.Services.AddScoped<IDummyOrderRepository, DummyOrderRepository>();
         builder.Services.AddScoped<IDummyOrderService, DummyOrderService>();
 
+        builder.Services.AddScoped<IMenuItemService, MenuItemService>();
+
+
 
 
         builder.Services.AddSession(options =>
