@@ -4,12 +4,9 @@ namespace Chapeau.Repositories.Interfaces
 {
     public interface IRunningOrdersRepository
     {
-        //OrderItem GetOrderItemByID(int id);
-        List<Order> GetAllBarOrders();
-        List<Order> GetAllKitchenOrders();
         List<Order> GetBarOrdersByStatus(Status status);
         List<Order> GetKitchenOrdersByStatus(Status status);
-        void ChangeOrderStatus(int itemID, Status status);
+        void ChangeOrderStatus(int orderID, int itemID, Status status);
     }
 }
 

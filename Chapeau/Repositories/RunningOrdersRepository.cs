@@ -20,18 +20,19 @@ namespace Chapeau.Repositories
 
         
 
-        public void ChangeOrderStatus(int itemID, Status status)
+        public void ChangeOrderStatus(int orderID, int itemID, Status status)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = $"UPDATE OrderItem " +
                     $"SET status = @status " +
-                    $"WHERE orderID = @Id";
+                    $"WHERE orderID = @orderId AND itemID = @itemId";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 // Preventing SQL injections
-                command.Parameters.AddWithValue("@Id", itemID);
+                command.Parameters.AddWithValue("@orderId", orderID);
+                command.Parameters.AddWithValue("@itemId", itemID);
                 command.Parameters.AddWithValue("@status", status.ToString());
 
                 command.Connection.Open();
@@ -40,56 +41,8 @@ namespace Chapeau.Repositories
                 {
                     throw new Exception("Changing status failed!");
                 }
-            }
-        }
 
-        
-
-        public List<Order> GetAllBarOrders()
-        {
-            List<Order> orders = new List<Order>();
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT * " +
-                    "FROM [Order] " +
-                    "WHERE orderID IN ( " +
-                    "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Drink' AND [status] != 'Completed') " +
-                    "ORDER BY orderTime; ";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader);
-                    orders.Add(order);
-                }
-                reader.Close();
             }
-            return orders;
-        }
-        public List<Order> GetAllKitchenOrders()
-        {
-            List<Order> orders = new List<Order>();
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT * " +
-                    "FROM [Order] " +
-                    "WHERE orderID IN ( " +
-                    "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Dish' AND [status] != 'Completed') " +
-                    "ORDER BY orderTime; ";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader);
-                    orders.Add(order);
-                }
-                reader.Close();
-            }
-            return orders;
         }
 
         public List<Order> GetBarOrdersByStatus(Status status)
@@ -109,7 +62,7 @@ namespace Chapeau.Repositories
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader);
+                    Order order = ReadOrder(reader, status);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -122,7 +75,7 @@ namespace Chapeau.Repositories
             List<Order> orders = new List<Order>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * " +
+                string query = "SELECT *" +
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
@@ -134,7 +87,7 @@ namespace Chapeau.Repositories
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader);
+                    Order order = ReadOrder(reader, status);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -142,7 +95,7 @@ namespace Chapeau.Repositories
             return orders;
         }
 
-        private Order ReadOrder(SqlDataReader reader)
+        private Order ReadOrder(SqlDataReader reader, Status status)
         {
             int orderId = (int)reader["orderID"];
 
@@ -154,7 +107,7 @@ namespace Chapeau.Repositories
 
             DateTime orderTime = (DateTime)reader["orderTime"];
             //bool isServed = true;
-            List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId);
+            List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status);
 
             return new Order(orderId, employee, table, orderTime, orderItems);
         }
@@ -224,17 +177,17 @@ namespace Chapeau.Repositories
             return new Table(tableID, tableNumber, isOccupied);
         }
 
-        private List<OrderItem> GetOrderItemsByOrderID(int id)
+        private List<OrderItem> GetOrderItemsByOrderID(int id, Status status)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
                 string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
                     "FROM OrderItem " +
-                    "WHERE orderID = @Id; ";
+                    "WHERE orderID = @Id and [status] = @status; ";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", id);
-
+                command.Parameters.AddWithValue("@status", status.ToString());
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 

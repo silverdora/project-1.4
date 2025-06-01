@@ -112,12 +112,9 @@ namespace Chapeau.Controllers
         }
 
         [HttpPost]
-        public IActionResult ChangeOrderStatus(int itemID, Status status)
+        public IActionResult ChangeOrderItemStatus(int orderID, int itemID, Status status)
         {
-            _runningOrdersService.ChangeOrderStatus(itemID, status);
-
-            
-
+            _runningOrdersService.ChangeOrderStatus(orderID, itemID, status);
             //go back 
             return RedirectToAction("Index");
         }
