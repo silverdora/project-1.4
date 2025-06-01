@@ -1,7 +1,7 @@
 ﻿using System;
-using Chapeau.Models.ViewModels;
+using Chapeau.Models;
 
-namespace Chapeau.Models.ViewModels
+namespace Chapeau.ViewModels
 {
     public class FilteredOrdersViewModel
     {

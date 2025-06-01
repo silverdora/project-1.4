@@ -1,6 +1,8 @@
 ﻿//using Chapeau.Models;
 
-namespace Chapeau.Models.ViewModels
+using Chapeau.Models;
+
+namespace Chapeau.ViewModels
 {
     public class TableOrderViewModel
     {
@@ -10,7 +12,7 @@ namespace Chapeau.Models.ViewModels
 
         public Status? OrderStatus { get; set; }
 
-        public bool CanMarkAsServed => OrderStatus == Status.ReadyToBeServed;
+        public bool CanMarkAsServed => OrderStatus == Status.Ready;
         public bool CanFreeTable => IsOccupied && OrderStatus == null;
     }
 

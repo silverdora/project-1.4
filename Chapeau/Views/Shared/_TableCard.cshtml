@@ -1,4 +1,9 @@
-﻿@model Chapeau.Models.ViewModels.TableOrderViewModel
+﻿@model TableOrderViewModel
+@using Chapeau.ViewModels
+
+﻿
+
+
 
 <button onclick="openTableModal(@Model.TableId, '@Model.IsOccupied'.toLowerCase(), '@Model.OrderStatus?.ToString()')"
         class="restaurant-table @(Model.IsOccupied ? "occupied" : "free")"
@@ -21,7 +26,7 @@
                     <span class="badge bg-warning text-dark">Being Prepared</span>
                     ;
                     break;
-                case Chapeau.Models.Status.ReadyToBeServed:
+                case Chapeau.Models.Status.Ready:
                     <span class="badge bg-success">Ready to Serve</span>
                     ;
                     break;

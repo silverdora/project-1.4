@@ -1,8 +1,8 @@
 ﻿using Chapeau.Models;
-using Chapeau.Models.ViewModels;
 using Chapeau.Repository;
 using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
+using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace Chapeau.Service

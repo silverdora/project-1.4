@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Chapeau.Models;
-using Chapeau.Models.ViewModels;
 using Chapeau.Services;
+using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using static NuGet.Packaging.PackagingConstants;
@@ -50,7 +50,7 @@ namespace Chapeau.Controllers
             //}
 
             //List<Order> orders = _runningOrdersService.GetAllKitchenOrders();
-            List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
+            List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
             List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
             List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Served);
             //store data in the running orders ViewModel
@@ -82,7 +82,7 @@ namespace Chapeau.Controllers
         {
 			if (status == Status.All)
 			{
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
                 List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Served);
 

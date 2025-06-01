@@ -1,5 +1,5 @@
 ﻿using Chapeau.Models;
-using Chapeau.Models.ViewModels;
+using Chapeau.ViewModels;
 using System.Collections.Generic;
 
 

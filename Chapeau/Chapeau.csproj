@@ -29,14 +29,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HelperMethods\" />
-    <Compile Remove="Models\ViewModels\**" />
-    <Content Remove="Models\ViewModels\**" />
-    <EmbeddedResource Remove="Models\ViewModels\**" />
-    <None Remove="Models\ViewModels\**" />
+    <Compile Remove="ViewModels\**" />
+    <Content Remove="ViewModels\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="ViewModels\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\ViewModels\FilteredOrdersViewModel.cs" />
-    <Compile Include="Models\ViewModels\RunningOrdersViewModel.cs" />
-    <Compile Include="Models\ViewModels\TableOrderViewModel.cs" />
+    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="ViewModels\MenuSelectionViewModel - Copy.cs" />
+    <Compile Include="ViewModels\OrderDetailsViewModel.cs" />
+    <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
+    <Compile Include="ViewModels\TableOrderViewModel.cs" />
   </ItemGroup>
 </Project>
