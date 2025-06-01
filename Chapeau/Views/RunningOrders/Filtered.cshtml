@@ -7,20 +7,20 @@
 
 <h5>@Model.Status orders</h5>
 
-<a class="btn btn-primary" href="/RunningOrders/Index">Back to all</a>
+@*<a class="btn btn-primary" href="/RunningOrders/Index">Back to all</a>*@
 
 <div class="col-6">
     <form asp-action="Filtered" method="get">
         <div class="form-group">
-            <label for="type">Filter by status:</label>
+            <label for="type">Choose order status:</label>
             <select class="form-control" id="type" name="status">
-                <option value="All">All</option>
+                @*<option value="All">All</option>*@
                 <option value="New">New</option>
                 <option value="InProgress">In Progress</option>
                 <option value="Ready">Ready</option>
             </select>
         </div>
-        <button class="btn btn-primary" type="submit">Filter</button>
+        <button class="btn btn-primary" type="submit">Open</button>
     </form>
 </div>
 
@@ -40,12 +40,16 @@
                                     <li class="list-group-item">
                                         @{
                                             <p class="card-text"><em>@orderItem.MenuItem.Item_name</em></p>
-                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small><br />
-                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small><br />
-                                            if (Model.Status == Status.New)
+                                            <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+
+                                            <br />
+                                            <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+
+                                            <br />
+                                            if (Model.Status == Status.Ordered)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                    <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
+                                                    <input hidden name="itemID" value="@orderItem.ItemID" />
                                                     <input hidden name="status" value="InProgress" />
                                                     <button type="submit" class="btn btn-primary">Prepare</button>
                                                 </form>
@@ -59,19 +63,15 @@
                                             else if (Model.Status == Status.Ready)
                                             {
                                                 <form action="/RunningOrders/ChangeOrderStatus" method="post">
-                                                    <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
+                                                    <input hidden name="itemID" value="@orderItem.ItemID" />
                                                     <input hidden name="status" value="Served" />
                                                     <button type="submit" class="btn btn-primary">Close</button>
                                                 </form>
                                             }
-
                                         }
                                     </li>
                                 }
                             }
-
-
-
                         </ul>
                     </div>
                 </div>
@@ -79,3 +79,4 @@
         }
     </div>
 </div>
+

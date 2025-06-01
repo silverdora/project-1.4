@@ -51,7 +51,7 @@ namespace Chapeau.Services
             else
             {
                 MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-                OrderItem newItem = new OrderItem(menuItem, DateTime.Now, Status.New, quantity);
+                OrderItem newItem = new OrderItem(menuItem, DateTime.Now, Status.Ordered, quantity);
                 selectedItems.Add(newItem);
             }
 
@@ -73,10 +73,10 @@ namespace Chapeau.Services
             return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
         }
 
-        public void ClearSelectedItemsFromSession(ISession session)
-        {
-            session.Remove("SelectedItems");
-        }       
+        //public void ClearSelectedItemsFromSession(ISession session)
+        //{
+        //    session.Remove("SelectedItems");
+        //}       
 
     }
 }

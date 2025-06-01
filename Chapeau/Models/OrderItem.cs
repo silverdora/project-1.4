@@ -15,6 +15,7 @@
 
         public Status Status { get; set; }
         public int Quantity { get; set; }
+        public int ItemID { get; set; }
 
         // parameterless constructor
         public OrderItem() { }

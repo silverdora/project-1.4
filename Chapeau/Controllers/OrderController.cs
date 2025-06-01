@@ -39,11 +39,11 @@ namespace Chapeau.Controllers
 
             _orderService.InsertOrder(newOrder);
 
-            // ✅ Store in session (NOT TempData)
+            //Store in session (NOT TempData)
             HttpContext.Session.SetInt32("CurrentOrderId", newOrder.OrderID);
             HttpContext.Session.SetInt32("CurrentTableId", tableId);
 
-            // ✅ Redirect to MenuItem with valid IDs
+            //Redirect to MenuItem with valid IDs
             return RedirectToAction("Index", "MenuItem", new
             {
                 orderId = newOrder.OrderID,
