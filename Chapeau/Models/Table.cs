@@ -15,5 +15,6 @@ namespace Chapeau.Models
             TableNumber = tableNumber;
             IsOccupied = isOccupied;
         }
+
     }
 }

@@ -2,23 +2,28 @@
 using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+
 
 namespace Chapeau.Service
 {
     public class TableService : ITableService
     {
-   
-             private  ITableRepository _tableRepo;
+        private readonly ITableRepository _tableRepository;
 
-            public TableService(ITableRepository tableRepo)
-            {
-                _tableRepo = tableRepo;
-            }
+        public TableService(ITableRepository tableRepository)
+        {
+            _tableRepository = tableRepository;
+        }
 
-            public List<Table> GetAllTables() => _tableRepo.GetAllTables();
-}
+        public List<Table> GetAllTables() => _tableRepository.GetAllTables();
+
+        public void MarkTableFreeByOrder(int orderId)
+        {
+            _tableRepository.MarkTableFreeByOrder(orderId);
+        }
     }
-
+}
 
 
 

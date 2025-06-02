@@ -6,5 +6,7 @@ namespace Chapeau.Service.Interface
     {
         List<Table> GetAllTables();
 
+        void MarkTableFreeByOrder(int orderId);
+
     }
 }

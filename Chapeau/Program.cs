@@ -60,6 +60,9 @@ public class Program
 
         builder.Services.AddScoped<DummyOrderService>();
         builder.Services.AddScoped<TableService>();
+        builder.Services.AddScoped<ITableRepository, TableRepository>();
+        builder.Services.AddScoped<ITableService, TableService>();
+
 
         builder.Services.AddScoped<IRunningOrdersService, RunningOrdersService>();
         builder.Services.AddScoped<IRunningOrdersRepository, RunningOrdersRepository>();

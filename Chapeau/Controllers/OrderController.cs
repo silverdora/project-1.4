@@ -55,8 +55,14 @@ namespace Chapeau.Controllers
             _orderService.MarkOrderAsPaid(model.OrderID);
 
             ViewBag.Message = "Order successfully finished!";
-            return View("FinishOrderConfirmation");
+            return View("Confirmation");
         }
+
+        public IActionResult Confirmation()
+        {
+            return View("~/Views/DummyOrder/Confirmation.cshtml");
+        }
+
 
     }
 
