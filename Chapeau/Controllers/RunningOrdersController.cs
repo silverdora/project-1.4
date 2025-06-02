@@ -42,9 +42,6 @@ namespace Chapeau.Controllers
                 List<Order> preparingOrders = _runningOrdersService.GetBarOrdersByStatus(Status.InProgress);
                 Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
 
-                List<Order> readyOrders = _runningOrdersService.GetBarOrdersByStatus(Status.ReadyToBeServed);
-                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
-
                 //store data in the running orders ViewModel
                 RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
                 //pass data to view
@@ -60,9 +57,6 @@ namespace Chapeau.Controllers
 
                 List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
                 Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
-
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.ReadyToBeServed);
-                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
 
 
                 //store data in the running orders ViewModel
@@ -120,6 +114,7 @@ namespace Chapeau.Controllers
         public IActionResult ChangeOrderItemStatus(int orderID, int itemID, Status status)
         {
             _runningOrdersService.ChangeOrderStatus(orderID, itemID, status);
+            TempData["StatusChangeMessage"] = "Status has been changed.";
             //go back
             if (status == Status.Served)
             {
@@ -132,7 +127,8 @@ namespace Chapeau.Controllers
         public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
         {
             _runningOrdersService.ChangeAllOrderItemsStatus(orderID, currentStatus, newStatus);
-            //go back 
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
             if (newStatus == Status.Served)
             {
                 return RedirectToAction("ReadyToBeServed");

@@ -10,8 +10,11 @@
     <a class="btn btn-light" href="/RunningOrders/Index">Running Orders</a>
     <a class="btn btn-dark" href="/RunningOrders/ReadyToBeServed">Ready To Be Served Orders</a>
 </div>
-<a class="btn btn-primary" href="/RunningOrders/Index">Refresh</a>
-
+<a class="btn btn-primary mb-2" href="/RunningOrders/ReadyToBeServed">Refresh</a>
+@if (TempData["StatusChangeMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
+}
 <div class="mb-4">
     <div class="container">
         <div class="row row d-flex align-items-start">

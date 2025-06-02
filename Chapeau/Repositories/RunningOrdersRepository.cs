@@ -76,7 +76,7 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Drink' AND [status] = '@status') " +
+                    "WHERE item_type = 'Drink' AND [status] = @status) " +
                     "ORDER BY orderTime;";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@status", status.ToString());
