@@ -1,77 +1,124 @@
 ﻿using Chapeau.Models;
 using Chapeau.Services;
-using Chapeau.ViewModels;
+using Chapeau.HelperMethods;
 using Microsoft.AspNetCore.Mvc;
+using Chapeau.Models.Extensions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Chapeau.Controllers
 {
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
+        private readonly IMenuItemService _menuItemService;
+       
 
-        public OrderController(IOrderService orderService)
+        public OrderController(IOrderService orderService, IMenuItemService menuItemService)
         {
             _orderService = orderService;
+            _menuItemService = menuItemService;
         }
 
         [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
-            // Just pass tableId forward, do not create order yet
-            return RedirectToAction("Index", "MenuItem", new { tableID = tableId });
-        }
+            Employee? employee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
 
-        [HttpPost]
-        public IActionResult AddItem(int orderID, int itemID, int quantity, int tableID, string? card, string? category)
-        {
-            // Simulated employee – replace with logged-in user later
-            Employee currentEmployee = new Employee
+            if (employee == null)
+                return RedirectToAction("Login", "Employee");
+
+            Order newOrder = new Order
             {
-                employeeID = 1,
-                employeeName = "Test",
-                Role = Role.Server
+                Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table
+                Employee = employee,
+                OrderTime = DateTime.Now,
+                IsServed = false,
+                IsPaid = false,
+                IsReadyToPay = false
             };
 
-            // Create a new order if orderID is 0
-            if (orderID == 0)
-            {
-                Order newOrder = _orderService.TakeNewOrder(tableID, currentEmployee);
-                orderID = newOrder.OrderID;
-            }
+            _orderService.InsertOrder(newOrder);
 
-            // Add the item to the order
-            _orderService.AddSingleItemToOrder(orderID, itemID, quantity);
+            //Store in session (NOT TempData)
+            HttpContext.Session.SetInt32("CurrentOrderId", newOrder.OrderID);
+            HttpContext.Session.SetInt32("CurrentTableId", tableId);
 
-            // Redirect back to MenuItem with updated orderID and tableID
+            //Redirect to MenuItem with valid IDs
             return RedirectToAction("Index", "MenuItem", new
             {
-                orderID = orderID,
-                tableID = tableID,
-                card = card,
-                category = category
-            });
+                orderId = newOrder.OrderID,
+                tableId = tableId
+            });            
         }
-
-
-        public IActionResult OrderDetails(int id)
+       
+        [HttpPost]
+        public IActionResult AddItem(int menuItemId, int quantity)
         {
-            var order = _orderService.GetOrderById(id);
+            int? orderId = HttpContext.Session.GetInt32("CurrentOrderId");
+            int? tableId = HttpContext.Session.GetInt32("CurrentTableId");
 
-            if (order == null)
+            if (orderId == null || tableId == null)
             {
-                return NotFound(); 
+                TempData["Error"] = "No active order found. Please start a new order.";
+                return RedirectToAction("Tables", "Table");
             }
 
-            var viewModel = new OrderDetailsViewModel
-            {
-                OrderID = order.OrderID,
-                EmployeeName = order.Employee.employeeName,
-                TableNumber = order.Table.TableNumber,
-                OrderTime = order.OrderTime,
-                Items = order.OrderItems
-            };
+            _orderService.AddItemToSessionSelection(menuItemId, quantity, HttpContext.Session);
 
-            return View(viewModel);
-        }      
+            MenuItem item = _menuItemService.GetMenuItemByID(menuItemId);
+            TempData["AddedMessage"] = $"{quantity} × \"{item.Item_name}\" added successfully!";
+
+            return RedirectToAction("Index", "MenuItem", new
+            {
+                orderId = orderId.Value,
+                tableId = tableId.Value
+            });
+        }
+        [HttpGet]
+        public IActionResult OrderDetails()
+        {            
+
+            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+            if (selectedItems == null)
+            {
+                selectedItems = new List<OrderItem>();
+            }
+
+            return View(selectedItems);
+        }
+       
+        [HttpPost]
+        public IActionResult SubmitOrder()
+        {
+            int? orderId = HttpContext.Session.GetInt32("CurrentOrderId");
+
+            if (orderId == null)
+            {
+                TempData["OrderError"] = "No active order found.";
+                return RedirectToAction("Overview", "Restaurant");
+            }
+
+            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+
+            if (selectedItems != null && selectedItems.Count > 0)
+            {
+                _orderService.AddItemsToOrder(orderId.Value, selectedItems);
+
+                foreach (var item in selectedItems)
+                {
+                    _menuItemService.ReduceStock(item.MenuItem.ItemID, item.Quantity);
+                }
+
+                HttpContext.Session.Remove("SelectedItems");
+
+                // Optional: Clear current order/table
+                HttpContext.Session.Remove("CurrentOrderId");
+                HttpContext.Session.Remove("CurrentTableId");
+
+                TempData["OrderSuccess"] = "The order was submitted successfully!";
+            }
+
+            return RedirectToAction("Overview", "Restaurant");
+        }
     }
 }

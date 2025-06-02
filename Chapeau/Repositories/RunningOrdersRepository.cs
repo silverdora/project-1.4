@@ -156,7 +156,7 @@ namespace Chapeau.Repositories
             bool isServed = true;
             List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId);
 
-            return new Order(orderId, employee, table, orderTime, orderItems);
+            return new Order(orderId, employee, table, orderTime,isServed, orderItems);//IsServed still exists until now
         }
 
         private Employee GetEmployeeByID (int id)
@@ -261,7 +261,7 @@ namespace Chapeau.Repositories
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
 
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity);
+            return new OrderItem(menuItem, includeDate, status, quantity); //I had to remove ItemID as it's now we are only using menyItem (MATHEUS)
         }
 
         public MenuItem GetMenuItemByID(int id)

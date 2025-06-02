@@ -23,9 +23,9 @@ namespace Chapeau.Repositories
         public MenuItem GetMenuItemByID(int itemID)
         {
             string query = "SELECT * FROM MenuItem WHERE itemID = @itemID";
-            SqlParameter param = new SqlParameter("@itemID", itemID);
+            SqlParameter parameter = new SqlParameter("@itemID", itemID);
 
-            List<MenuItem> result = ExecuteQueryMapMenuItems(query, param);
+            List<MenuItem> result = ExecuteQueryMapMenuItems(query, parameter);
 
             foreach (var item in result)
             {
@@ -71,8 +71,21 @@ namespace Chapeau.Repositories
 
             return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);
         }
+        //method to reduce stock based in item order request
+        public void ReduceStock(int itemId, int amount)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@itemId", itemId);
+                command.Parameters.AddWithValue("@amount", amount);
 
-        // Shared helper
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+        // Shared helper methods
         private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
         {
             List<MenuItem> items = new List<MenuItem>();

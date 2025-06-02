@@ -1,30 +1,45 @@
-﻿@model Chapeau.ViewModels.OrderDetailsViewModel
+﻿@model List<Chapeau.Models.OrderItem>
 
 <h2>Order Details</h2>
-<p><strong>Table:</strong> @Model.TableNumber</p>
-<p><strong>Employee:</strong> @Model.EmployeeName</p>
-<p><strong>Order Time:</strong> @Model.OrderTime</p>
 
-<table>
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
+@if (Model == null || Model.Count == 0)
+{
+    <p>No items selected yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@item.MenuItem.Item_name</td>
-                <td>@item.Quantity</td>
-                <td>@item.Status</td>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Status</th>
+                <th>Waiting Time</th>
             </tr>
-        }
-    </tbody>
-    <form asp-controller="MenuItem" asp-action="Index" method="get">
-        <input type="hidden" name="orderID" value="@Model.OrderID" />
-        <button type="submit" class="btn btn-secondary">Back to Menu</button>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MenuItem.Item_name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Status</td>
+                    <td>@item.WaitingTime.Minutes min</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Button to submit items to DB -->
+    <form asp-controller="Order" asp-action="SubmitOrder" method="post">
+        <input type="hidden" name="orderId" value="@TempData["CurrentOrderId"]" />
+        <button type="submit" class="btn btn-success">Submit Order to Kitchen</button>
     </form>
-</table>
+
+    <a asp-controller="MenuItem" asp-action="Index"
+       asp-route-orderId="@TempData["CurrentOrderId"]"
+       asp-route-tableId="@TempData["CurrentTableId"]"
+       class="btn btn-secondary">
+        ← Back to Menu
+    </a>
+}

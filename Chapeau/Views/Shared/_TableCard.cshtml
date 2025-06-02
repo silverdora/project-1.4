@@ -44,6 +44,7 @@
     <div class="table-actions mt-2 text-center">
         <form asp-controller="Order" asp-action="TakeOrder" method="post">
             <input type="hidden" name="tableId" value="@Model.TableId" />
+            <input type="hidden" name="employeeId" value="@employeeId" />
             <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
         </form>
     </div>

@@ -1,10 +1,13 @@
 ﻿@model Chapeau.ViewModels.MenuSelectionViewModel  
 
-<h2>Menu Selection</h2>  
-
-<form method="get" asp-controller="MenuItem" asp-action="Index" class="mb-3">  
-   <div class="d-flex gap-3">  
-       <div style="width: 150px;">  
+<h2>Menu Selection</h2>
+<!-- To display a message confirming every item while is being added -->
+@if (TempData["AddedMessage"] != null)
+{
+	<div class="alert alert-success" role="alert">
+		@TempData["AddedMessage"]
+	</div>
+}
 
            <!-- Card Filter -->  
            <select name="card" id="selectedCard" class="form-select" style="width: auto;" onchange="this.form.submit()">  
@@ -154,3 +157,68 @@
        </div>  
    </div>  
 </form>
+
+<!-- Menu Table -->
+<h3>Menu Items</h3>
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+	<p>No items found for the selected filters.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Item Name</th>
+				<th>Description</th>
+				<th>Price</th>
+				<th>Category</th>
+				<th>Stock</th>
+				<th>Add</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.Items)
+			{
+				<tr>
+					<td>@item.Item_name</td>
+					<td>@item.Description</td>
+					<td>@item.Price.ToString("C")</td>
+					<td>@item.Category</td>
+					<td>
+						@{
+							var message = item.StockQuantity switch
+							{
+								0 => "Out of stock",
+								<= 10 => $"Low ({item.StockQuantity})",
+								_ => $"In stock ({item.StockQuantity})"
+							};
+
+							var color = item.StockQuantity == 0 ? "red"
+							: item.StockQuantity <= 10 ? "orange"
+							: "green";
+						}
+
+						<span style="color:@color;">@message</span>
+					</td>
+					<td>
+						@if (item.StockQuantity > 0)
+						{
+							<form asp-controller="Order" asp-action="AddItem" method="post">
+								<input type="hidden" name="menuItemId" value="@item.ItemID" />
+								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />
+								<input type="hidden" name="orderId" value="@Model.OrderID" />
+								<input type="hidden" name="tableId" value="@Model.TableID" />
+								<button type="submit">Add</button>
+							</form>
+						}
+						else
+						{
+							<span style="color: gray;">N/A</span>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

@@ -2,6 +2,8 @@
 using Chapeau.Services.Interfaces;
 using Chapeau.Repositories.Interfaces;
 using Chapeau.Repositories;
+using Chapeau.HelperMethods;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Chapeau.Services
 {
@@ -9,66 +11,72 @@ namespace Chapeau.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMenuItemRepository _menuItemRepository;
+        private readonly IOrderItemRepository _orderItemRepository;
 
-
-        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository)
+        public OrderService(IOrderRepository orderRepository, IMenuItemRepository menuItemRepository, IOrderItemRepository orderItemRepository)
         {
             _orderRepository = orderRepository;
             _menuItemRepository = menuItemRepository;
+            _orderItemRepository = orderItemRepository;
+        }
+        public void InsertOrder(Order order)
+        {
+            _orderRepository.InsertOrder(order);
         }
 
-        public Order TakeNewOrder(int tableId, Employee employee)
+        // stores the selected menu item into the session list.
+        public void AddItemToSessionSelection(int menuItemId, int quantity, ISession session)
         {
-            return _orderRepository.TakeNewOrder(tableId, employee);
-        }
-
-        public Order GetOrderById(int orderID)
-        {
-            return _orderRepository.GetOrderByID(orderID);
-        }
-
-
-        //add item to an existing order
-        public void AddSingleItemToOrder(int orderID, int itemID, int quantity)
-        {
-            Order order = _orderRepository.GetOrderByID(orderID);
-            if (order == null)
+            // Retrieve the current list from session (or create a new one if it doesn't exist)
+            List<OrderItem> selectedItems = session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+            if (selectedItems == null)
             {
-                throw new Exception($"Order with ID {orderID} not found.");
+                selectedItems = new List<OrderItem>();
             }
 
-            //calling an item by ID
-            MenuItem item = _menuItemRepository.GetMenuItemByID(itemID);
-
-            if (item == null)
+            OrderItem existingItem = null;
+            foreach (OrderItem item in selectedItems)
             {
-                throw new Exception("Menu item not found.");
+                if (item.MenuItem.ItemID == menuItemId)
+                {
+                    existingItem = item;
+                    break;
+                }
             }
 
-
-            OrderItem newItem = new OrderItem(
-            itemID,
-            item,
-            DateTime.Now,
-            Status.New,
-            quantity);
-
-            AddOrUpdateOrderItem(order, newItem);
-        }
-
-        public void AddOrUpdateOrderItem(Order order, OrderItem newItem)
-        {
-            bool exists = _orderRepository.OrderItemExists(order.OrderID, newItem.ItemID);
-
-            if (exists)
+            if (existingItem != null)
             {
-                _orderRepository.UpdateOrderItem(order.OrderID, newItem);
+                existingItem.Quantity += quantity;
             }
             else
             {
-                _orderRepository.InsertOrderItem(order.OrderID, newItem);
+                MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
+                OrderItem newItem = new OrderItem(menuItem, DateTime.Now, Status.Ordered, quantity);
+                selectedItems.Add(newItem);
+            }
+
+            session.SetObjectAsJson("SelectedItems", selectedItems);
+        }
+
+        // Inserts the items from session into the database, using OrderItemRepository.
+        public void AddItemsToOrder(int orderId, List<OrderItem> items)
+        {
+            foreach (var item in items)
+            {
+                item.OrderID = orderId;
+                _orderItemRepository.Insert(item);
             }
         }
+
+        public List<OrderItem> GetSelectedItemsFromSession(ISession session)
+        {
+            return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
+        }
+
+        //public void ClearSelectedItemsFromSession(ISession session)
+        //{
+        //    session.Remove("SelectedItems");
+        //}       
 
     }
 }

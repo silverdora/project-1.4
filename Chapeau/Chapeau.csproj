@@ -15,8 +15,6 @@
     <None Remove="Views\RunningOrders\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
     <Folder Include="Views\RunningOrders\" />
   </ItemGroup>
   <ItemGroup>
@@ -28,17 +26,14 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="HelperMethods\" />
     <Compile Remove="ViewModels\**" />
     <Content Remove="ViewModels\**" />
     <EmbeddedResource Remove="ViewModels\**" />
     <None Remove="ViewModels\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
-    <Compile Include="ViewModels\MenuSelectionViewModel - Copy.cs" />
-    <Compile Include="ViewModels\OrderDetailsViewModel.cs" />
+    <Compile Include="ViewModels\MenuSelectionViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
-    <Compile Include="ViewModels\TableOrderViewModel.cs" />
+    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
   </ItemGroup>
 </Project>
