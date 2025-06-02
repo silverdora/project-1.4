@@ -110,7 +110,7 @@ namespace Chapeau.Repositories
                                 Description = reader["description"].ToString(),
                                 Price = (decimal)reader["price"],
                                 VATPercent = (decimal)reader["VATpercent"],
-                                Category = reader["category"].ToString(),
+                                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), (string)reader["category"], true),
                                 StockQuantity = (int)reader["stockQuantity"]
                             });
                         }

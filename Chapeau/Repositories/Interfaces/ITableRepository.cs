@@ -9,6 +9,7 @@ namespace Chapeau.Repository.Interface
         List<Table> GetAllTables();
         List<Table> GetTablesWithOrderStatus();
 
+        void MarkTableFreeByOrder(int orderId);
 
     }
 }

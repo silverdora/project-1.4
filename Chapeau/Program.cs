@@ -34,6 +34,15 @@ public class Program
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); 
 
+      
+        builder.Services.AddScoped<DummyOrderRepository>();
+        builder.Services.AddScoped<DummyOrderService>();
+
+
+
+        builder.Services.AddScoped<IMenuItemService, MenuItemService>();
+
+
 
 
         builder.Services.AddSession(options =>
@@ -44,15 +53,24 @@ public class Program
         });
 
         // Register application services
-        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+    
         builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
         builder.Services.AddScoped<IMenuItemService, MenuItemService>();
         builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 
-        builder.Services.AddSingleton<IRunningOrdersService, RunningOrdersService>();
-        builder.Services.AddSingleton<IRunningOrdersRepository, RunningOrdersRepository>();
+        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+        builder.Services.AddScoped<DummyOrderService>();
+        builder.Services.AddScoped<TableService>();
+        builder.Services.AddScoped<ITableRepository, TableRepository>();
+        builder.Services.AddScoped<ITableService, TableService>();
+
+
+        builder.Services.AddScoped<IRunningOrdersService, RunningOrdersService>();
+        builder.Services.AddScoped<IRunningOrdersRepository, RunningOrdersRepository>();
+
 
         // Add configuration access
         string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
