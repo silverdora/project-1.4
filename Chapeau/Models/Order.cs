@@ -19,7 +19,7 @@ namespace Chapeau.Models
         }
 
 
-        public Order(int orderID, Employee employee, Table table, DateTime orderTime, bool isServed, List<OrderItem> orderItems)
+        public Order(int orderID, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems)
         {
             OrderID = orderID;
             Employee = employee;

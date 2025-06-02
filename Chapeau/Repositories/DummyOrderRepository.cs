@@ -47,9 +47,8 @@ namespace Chapeau.Repositories
                             {
                                 OrderID = reader.GetInt32(0),
                                 Table = new Table { TableNumber = reader.GetInt32(1) },
-                                IsServed = reader.GetBoolean(2),
                                 OrderTime = reader.GetDateTime(3),
-                                Status = reader.GetBoolean(4) ? Status.Served : Status.New,
+                                Status = reader.GetBoolean(4) ? Status.Served : Status.Ordered,
                                 OrderItems = new List<OrderItem>()
                             };
                         }
@@ -64,7 +63,6 @@ namespace Chapeau.Repositories
 
                         OrderItem item = new OrderItem
                         {
-                            OrderID = order.OrderID,
                             ItemID = reader.GetInt32(5),
                             Quantity = reader.GetInt32(6),
                             IncludeDate = reader.GetDateTime(7),
@@ -112,7 +110,6 @@ namespace Chapeau.Repositories
                             {
                                 OrderID = orderId,
                                 OrderTime = Convert.ToDateTime(reader["OrderTime"]),
-                                IsServed = Convert.ToBoolean(reader["IsServed"]),
                                 OrderItems = new List<OrderItem>()
                             };
                         }
