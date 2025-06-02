@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Chapeau.Models;
+using Chapeau.Models.Extensions;
+using Chapeau.Service.Interface;
 using Chapeau.Services;
 using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -12,108 +14,127 @@ namespace Chapeau.Controllers
     public class RunningOrdersController : Controller
     {
         private readonly IRunningOrdersService _runningOrdersService;
+        private readonly IEmployeeService _employeeService;
 
-        public RunningOrdersController(IRunningOrdersService runningOrdersService)
+        public RunningOrdersController(IRunningOrdersService runningOrdersService, IEmployeeService employeeService)
         {
             _runningOrdersService = runningOrdersService;
+            _employeeService = employeeService;
+
         }
 
         //for the time when log in implementation is not available, only kitchen orders are displayed
         [HttpGet]
         public IActionResult Index()
         {
-            //user needs to be logged in
-            //Employee? employee = HttpContext.Session.GetObject<Employee>("LoggedInUser");
-            //if (employee == null)
-            //{
-            //    throw new Exception("no access");
-            //}
-
-            ////get Employee object via employees repository
-            //Employee? employee = _usersService.GetUserById(employee.employeeID);
-
-
-
-            //get all orders
-            //List<Order>? orders = new List<Order>();
-            //if (employee.Role == Enumerations.Role.Bar)
-            //{
-            //    orders = _runningOrdersService.GetAllBarOrders();
-            //}
-            //else if (employee.Role == Enumerations.Role.Kitchen)
-            //{
-            //    orders = _runningOrdersService.GetAllKitchenOrders();
-            //}
-            //else
-            //{
-            //    throw new Exception("no access");
-            //}
-
-            //List<Order> orders = _runningOrdersService.GetAllKitchenOrders();
-            List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
-            List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
-            List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
-            //store data in the running orders ViewModel
-            RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
-
-            //pass data to view
-            return View(runningOrdersViewModel);
-        }
-
-
-
-        //      [HttpGet]
-        //public IActionResult Filtered(Status status)
-        //{
-        //          if (status == Status.All)
-        //          {
-        //              var orders = _runningOrdersService.GetAllBarOrders();
-        //              return View("Index", orders);
-        //          }
-        //          else
-        //          {
-        //              var orders = _runningOrdersService.GetBarOrdersByStatus(status);
-        //              return View("Filtered", orders);
-        //          }
-        //      }
-
-        [HttpGet]
-        public IActionResult Filtered(Status status)
-        {
-            if (status == Status.All)
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
             {
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.New);
-                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ready);
-
-                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, readyOrders);
-
-                //pass data to view
-                return View("Index", runningOrdersViewModel);
+                throw new Exception("no user");
             }
+
+            if (loggedInEmployee.Role == Role.Bar)
+            {
+                List<Order> newOrders = _runningOrdersService.GetBarOrdersByStatus(Status.Ordered);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
+
+                List<Order> preparingOrders = _runningOrdersService.GetBarOrdersByStatus(Status.InProgress);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
+
+                //store data in the running orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+
+
+            else if (loggedInEmployee.Role == Role.Kitchen)
+            {
+
+                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
+
+                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
+
+
+                //store data in the running orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+
             else
             {
-                List<Order> orders = _runningOrdersService.GetKitchenOrdersByStatus(status);
-                FilteredOrdersViewModel filteredOrdersViewModel = new FilteredOrdersViewModel(orders, status);
-                return View(filteredOrdersViewModel);
+                throw new Exception("no access");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ReadyToBeServed()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no user");
+            }
+
+            if (loggedInEmployee.Role == Role.Bar)
+            {
+                List<Order> readyOrders = _runningOrdersService.GetBarOrdersByStatus(Status.ReadyToBeServed);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
+
+                //store data in the ready orders ViewModel
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, readyOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(toBeServedOrdersViewModel);
+            }
+
+
+            else if (loggedInEmployee.Role == Role.Kitchen)
+            {
+                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.ReadyToBeServed);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
+
+                //store data in the ready orders ViewModel
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, readyOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(toBeServedOrdersViewModel);
+            }
+
+            else
+            {
+                throw new Exception("no access");
             }
         }
 
         [HttpPost]
-        public IActionResult ChangeOrderStatus(int itemID, Status status)
+        public IActionResult ChangeOrderItemStatus(int orderID, int itemID, Status status)
         {
-            _runningOrdersService.ChangeOrderStatus(itemID, status);
-
-
-
-            //go back 
+            _runningOrdersService.ChangeOrderStatus(orderID, itemID, status);
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            //go back
+            if (status == Status.Served)
+            {
+                return RedirectToAction("ReadyToBeServed");
+            }
             return RedirectToAction("Index");
         }
-       
 
+        [HttpPost]
+        public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            _runningOrdersService.ChangeAllOrderItemsStatus(orderID, currentStatus, newStatus);
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("ReadyToBeServed");
+            }
+            return RedirectToAction("Index");
+        }
     }
 }
-
-      
-
 

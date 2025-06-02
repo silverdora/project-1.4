@@ -7,17 +7,19 @@ namespace Chapeau.ViewModels
 	{
 		public List<Order> NewOrders;
         public List<Order> InProgessOrders;
-        public List<Order> ReadyOrders;
-        //public Employee Employee;
-        public RunningOrdersViewModel()
-		{
-		}
 
-        public RunningOrdersViewModel(List<Order> newOrders, List<Order> inProgessOrders, List<Order> readyOrders)
+        public Dictionary<int, List<MenuCategory>> NewOrdersByCourse;
+        public Dictionary<int, List<MenuCategory>> PreparingOrdersByCourse;
+
+        public Employee Employee;
+
+        public RunningOrdersViewModel(List<Order> newOrders, List<Order> inProgessOrders, Dictionary<int, List<MenuCategory>> newOrdersByCourse, Dictionary<int, List<MenuCategory>> preparingOrdersByCourse, Employee employee)
         {
             NewOrders = newOrders;
             InProgessOrders = inProgessOrders;
-            ReadyOrders = readyOrders;
+            NewOrdersByCourse = newOrdersByCourse;
+            PreparingOrdersByCourse = preparingOrdersByCourse;
+            Employee = employee;
         }
     }
 }
