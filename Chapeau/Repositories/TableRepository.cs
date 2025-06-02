@@ -81,18 +81,20 @@ namespace Chapeau.Repository
 
         public List<TableOrderViewModel> GetTableOverview()
         {
-            List<TableOrderViewModel> tableOverview = new List<TableOrderViewModel>();
+            var tableOverview = new List<TableOrderViewModel>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-            SELECT t.tableID, t.table_number, t.isOccupied,
-                   MAX(oi.status) AS OrderStatus
+            SELECT 
+                t.tableID, t.table_number, t.isOccupied,
+                MAX(CASE WHEN mi.category = 'Drinks' THEN oi.status END) AS DrinkStatus,
+                MAX(CASE WHEN mi.category <> 'Drinks' THEN oi.status END) AS FoodStatus
             FROM [Table] t
             LEFT JOIN [Order] o ON t.tableID = o.tableID
             LEFT JOIN [OrderItem] oi ON o.orderID = oi.orderID
-            GROUP BY t.tableID, t.table_number, t.isOccupied
-        ";
+            LEFT JOIN [MenuItem] mi ON oi.itemID = mi.itemID
+            GROUP BY t.tableID, t.table_number, t.isOccupied";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 conn.Open();
@@ -105,10 +107,12 @@ namespace Chapeau.Repository
                         TableId = Convert.ToInt32(reader["tableID"]),
                         TableNumber = Convert.ToInt32(reader["table_number"]),
                         IsOccupied = Convert.ToBoolean(reader["isOccupied"]),
-                        OrderStatus = reader["OrderStatus"] != DBNull.Value &&
-                                      Enum.TryParse<Status>(reader["OrderStatus"].ToString(), out var status)
-                                      ? status
-                                      : (Status?)null
+                        DrinkStatus = reader["DrinkStatus"] != DBNull.Value && Enum.TryParse(reader["DrinkStatus"].ToString(), out Status drinkStatus)
+                            ? drinkStatus
+                            : (Status?)null,
+                        FoodStatus = reader["FoodStatus"] != DBNull.Value && Enum.TryParse(reader["FoodStatus"].ToString(), out Status foodStatus)
+                            ? foodStatus
+                            : (Status?)null
                     };
 
                     tableOverview.Add(viewModel);
@@ -125,13 +129,15 @@ namespace Chapeau.Repository
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-            SELECT t.tableID, t.table_number, t.isOccupied,
-                   MAX(oi.status) AS OrderStatus
+            SELECT 
+                t.tableID, t.table_number, t.isOccupied,
+                MAX(CASE WHEN mi.category = 'Drinks' THEN oi.status END) AS DrinkStatus,
+                MAX(CASE WHEN mi.category <> 'Drinks' THEN oi.status END) AS FoodStatus
             FROM [Table] t
             LEFT JOIN [Order] o ON t.tableID = o.tableID
             LEFT JOIN [OrderItem] oi ON o.orderID = oi.orderID
-            GROUP BY t.tableID, t.table_number, t.isOccupied
-        ";
+            LEFT JOIN [MenuItem] mi ON oi.itemID = mi.itemID
+            GROUP BY t.tableID, t.table_number, t.isOccupied";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 conn.Open();
@@ -144,10 +150,8 @@ namespace Chapeau.Repository
                         TableId = Convert.ToInt32(reader["tableID"]),
                         TableNumber = Convert.ToInt32(reader["table_number"]),
                         IsOccupied = Convert.ToBoolean(reader["isOccupied"]),
-                        OrderStatus = reader["OrderStatus"] != DBNull.Value
-                            && Enum.TryParse(reader["OrderStatus"].ToString(), out Status status)
-                            ? status
-                            : (Status?)null
+                        DrinkStatus = reader["DrinkStatus"] != DBNull.Value && Enum.TryParse(reader["DrinkStatus"].ToString(), out Status drinkStatus) ? drinkStatus : (Status?)null,
+                        FoodStatus = reader["FoodStatus"] != DBNull.Value && Enum.TryParse(reader["FoodStatus"].ToString(), out Status foodStatus) ? foodStatus : (Status?)null
                     };
 
                     viewModels.Add(viewModel);

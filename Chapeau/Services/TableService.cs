@@ -24,10 +24,9 @@ namespace Chapeau.Service
         }
         public List<TableOrderViewModel> GetTableOverview()
         {
-            //return _tableRepo.GetTableOverview();
             return _tableRepo.GetTableOrderViewModels();
-
         }
+
 
 
         public void SetTableOccupiedStatus(int tableId, bool isOccupied)

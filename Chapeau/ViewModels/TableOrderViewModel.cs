@@ -1,6 +1,4 @@
-﻿//using Chapeau.Models;
-
-using Chapeau.Models;
+﻿using Chapeau.Models;
 
 namespace Chapeau.ViewModels
 {
@@ -10,10 +8,13 @@ namespace Chapeau.ViewModels
         public int TableNumber { get; set; }
         public bool IsOccupied { get; set; }
 
-        public Status? OrderStatus { get; set; }
+        public Status? FoodStatus { get; set; }
+        public Status? DrinkStatus { get; set; }
 
-        public bool CanMarkAsServed => OrderStatus == Status.Ready;
-        public bool CanFreeTable => IsOccupied && OrderStatus == null;
+        public bool HasFoodOrder => FoodStatus.HasValue;
+        public bool HasDrinkOrder => DrinkStatus.HasValue;
+
+        public bool CanMarkAsServed => FoodStatus == Status.Ready || DrinkStatus == Status.Ready;
+        public bool CanFreeTable => IsOccupied && !HasFoodOrder && !HasDrinkOrder;
     }
-
 }
