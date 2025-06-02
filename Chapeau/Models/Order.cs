@@ -8,6 +8,7 @@
         public DateTime OrderTime { get; set; }//important for bar/kitchen
         public bool IsServed { get; set; }//need to remove
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public string? Notes { get; set; }//missing implementation
 
         //new attibute from teacher's recomendation
         public bool IsReadyToPay { get; set; } =false;

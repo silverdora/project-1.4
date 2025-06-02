@@ -29,7 +29,7 @@ namespace Chapeau.Controllers
 
             Order newOrder = new Order
             {
-                Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table
+                Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table (I was having an error)
                 Employee = employee,
                 OrderTime = DateTime.Now,
                 IsServed = false,
@@ -39,16 +39,11 @@ namespace Chapeau.Controllers
 
             _orderService.InsertOrder(newOrder);
 
-            //Store in session (NOT TempData)
+            //Store in session
             HttpContext.Session.SetInt32("CurrentOrderId", newOrder.OrderID);
             HttpContext.Session.SetInt32("CurrentTableId", tableId);
 
-            //Redirect to MenuItem with valid IDs
-            return RedirectToAction("Index", "MenuItem", new
-            {
-                orderId = newOrder.OrderID,
-                tableId = tableId
-            });            
+            return RedirectToAction("Index", "MenuItem");             
         }
        
         [HttpPost]
@@ -60,7 +55,7 @@ namespace Chapeau.Controllers
             if (orderId == null || tableId == null)
             {
                 TempData["Error"] = "No active order found. Please start a new order.";
-                return RedirectToAction("Tables", "Table");
+                return RedirectToAction("Index", "MenuItem");
             }
 
             _orderService.AddItemToSessionSelection(menuItemId, quantity, HttpContext.Session);
@@ -68,22 +63,14 @@ namespace Chapeau.Controllers
             MenuItem item = _menuItemService.GetMenuItemByID(menuItemId);
             TempData["AddedMessage"] = $"{quantity} × \"{item.Item_name}\" added successfully!";
 
-            return RedirectToAction("Index", "MenuItem", new
-            {
-                orderId = orderId.Value,
-                tableId = tableId.Value
-            });
+            return RedirectToAction("Index", "MenuItem");
         }
         [HttpGet]
         public IActionResult OrderDetails()
         {            
 
             List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            if (selectedItems == null)
-            {
-                selectedItems = new List<OrderItem>();
-            }
-
+            
             return View(selectedItems);
         }
        
@@ -108,10 +95,8 @@ namespace Chapeau.Controllers
                 {
                     _menuItemService.ReduceStock(item.MenuItem.ItemID, item.Quantity);
                 }
-
+                // clearing order/table data to be able to start a new one 
                 HttpContext.Session.Remove("SelectedItems");
-
-                // Optional: Clear current order/table
                 HttpContext.Session.Remove("CurrentOrderId");
                 HttpContext.Session.Remove("CurrentTableId");
 
