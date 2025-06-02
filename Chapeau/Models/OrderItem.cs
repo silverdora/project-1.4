@@ -15,15 +15,14 @@
         }
         public Status Status { get; set; }
         public int Quantity { get; set; }
-<<<<<<< HEAD
         public OrderItem()
         {
 
         }
 
-=======
+
         //public string Notes { get; set; }
->>>>>>> dev
+
         public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
         {
             ItemID = itemID;

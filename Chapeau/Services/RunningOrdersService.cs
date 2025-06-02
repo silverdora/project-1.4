@@ -35,13 +35,6 @@ namespace Chapeau.Services
         {
             return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
         }
-<<<<<<< HEAD
-
-      
-
-
-
-=======
         public Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> orders)
         {
             Dictionary<int, List<MenuCategory>> categoriesByOrderId = new Dictionary<int, List<MenuCategory>>();
@@ -73,7 +66,6 @@ namespace Chapeau.Services
             }
             return categoriesByOrderId;
         }
->>>>>>> dev
     }
 
     // Add your other methods (like GetCompleteOrderForTable) here as well
