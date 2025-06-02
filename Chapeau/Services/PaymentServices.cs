@@ -1,12 +1,16 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
 using Chapeau.Services.Interfaces;
+using Chapeau.ViewModels;
+using Microsoft.Data.SqlClient; 
+
 
 namespace Chapeau.Services
 {
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
+        private readonly string _connectionString;
 
         public PaymentService(IPaymentRepository paymentRepository)
         {
@@ -35,6 +39,29 @@ namespace Chapeau.Services
             _paymentRepository.AddPayment(payment);
             // or _paymentRepository.UpdatePayment(payment); if you have update logic
         }
+
+        public void SavePayment(FinishOrderViewModel model)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"INSERT INTO Payment (orderID, paymentType, amountPaid, tipAmount, paymentDAte, lowVatAmount, highVATAmount)
+                         VALUES (@orderID, @paymentType, @amountPaid, @tipAmount, @paymentDate, @lowVatAmount, @highVATAmount)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@orderID", model.OrderID);
+                    cmd.Parameters.AddWithValue("@paymentType", model.PaymentType);
+                    cmd.Parameters.AddWithValue("@amountPaid", model.AmountPaid);
+                    cmd.Parameters.AddWithValue("@tipAmount", model.TipAmount);
+                    cmd.Parameters.AddWithValue("@paymentDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@lowVatAmount", model.LowVatAmount);
+                    cmd.Parameters.AddWithValue("@highVATAmount", model.HighVatAmount);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
 
 
 

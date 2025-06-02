@@ -1,4 +1,5 @@
 ﻿using Chapeau.Models;
+using Chapeau.ViewModels;
 
 namespace Chapeau.Services.Interfaces
 {
@@ -6,9 +7,9 @@ namespace Chapeau.Services.Interfaces
     {
         List<Payment> GetAllPayments(int orderID);
         void AddPayment(Payment payment);
-
         void CompletePayment(int id);
         void CompletePayment(Payment payment);
-        // ...
+        void SavePayment(FinishOrderViewModel model);
+
     }
 }

@@ -30,6 +30,7 @@ public class Program
         builder.Services.AddScoped<ITableRepository, TableRepository>();
         builder.Services.AddScoped<ITableService, TableService>();
 
+      
         builder.Services.AddScoped<DummyOrderRepository>();
         builder.Services.AddScoped<DummyOrderService>();
 
@@ -48,12 +49,17 @@ public class Program
         });
 
         // Register application services
-        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+    
         builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
         builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
         builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+
+        builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+        builder.Services.AddScoped<DummyOrderService>();
+        builder.Services.AddScoped<TableService>();
 
         builder.Services.AddScoped<IRunningOrdersService, RunningOrdersService>();
         builder.Services.AddScoped<IRunningOrdersRepository, RunningOrdersRepository>();
