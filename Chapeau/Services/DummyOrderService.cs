@@ -1,42 +1,45 @@
-﻿using Chapeau.Models;
+﻿using Chapeau.ViewModels;
 using Chapeau.Repositories;
-using Chapeau.Repositories.Interfaces;
-using Chapeau.Services.Interfaces;
 
 namespace Chapeau.Services
 {
-    public class DummyOrderService: IDummyOrderService
+    public class DummyOrderService
     {
-        private readonly IDummyOrderRepository _orderRepository;
-        private static List<Order> _orders = new List<Order>();
+        private readonly DummyOrderRepository _repo;
 
-        public DummyOrderService(IDummyOrderRepository orderRepository)
+        public DummyOrderService(IConfiguration configuration)
         {
-            _orderRepository = orderRepository;
+            _repo = new DummyOrderRepository(configuration);
         }
 
-        public IEnumerable<Order> GetAllOrders()
+        public OrderSummaryViewModel GetOrderSummary(int tableId)
         {
-            return _orderRepository.GetAllOrders();
-        }
+            var order = _repo.GetActiveOrderByTable(tableId);
+            if (order == null)
+                return null;
 
-        public Order GetOrderById(int id)
-        {
-            return _orderRepository.GetOrderById(id);
-        }
+            var groupedItems = order.OrderItems
+                .GroupBy(i => i.MenuItem.Item_name)
+                .Select(g => new OrderItemViewModel
+                {
+                    ItemName = g.Key,
+                    Quantity = g.Sum(i => i.Quantity),
+                    UnitPrice = g.First().MenuItem.Price,
+                    VATRate = g.First().MenuItem.VATPercent
+                }).ToList();
 
-        public void AddOrder(Order order)
-        {
-            order.OrderID = _orders.Count + 1; // auto-increment ID
-            _orders.Add(order);
-        }
+            decimal total = groupedItems.Sum(i => i.TotalPrice);
+            decimal lowVAT = groupedItems.Where(i => i.VATRate == 9).Sum(i => i.TotalPrice * 0.09m);
+            decimal highVAT = groupedItems.Where(i => i.VATRate == 21).Sum(i => i.TotalPrice * 0.21m);
 
-        public void UpdateOrderStatus(int orderId, Status status)
-        {
-            _orderRepository.UpdateOrderStatus(orderId, status);
+            return new OrderSummaryViewModel
+            {
+                TableNumber = tableId,
+                Items = groupedItems,
+                TotalAmount = total,
+                LowVAT = lowVAT,
+                HighVAT = highVAT
+            };
         }
-
     }
-
 }
-

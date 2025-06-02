@@ -6,19 +6,18 @@ using Chapeau.Models;
 using Chapeau.Services;
 
 using Microsoft.AspNetCore.Mvc;
+using Chapeau.ViewModels;
 
 namespace Chapeau.Controllers
 {
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        private readonly IRunningOrdersService _orderService; //// Make sure this is injected
-
         // ✅ Use ONE constructor
-        public PaymentController(IPaymentService paymentService, IRunningOrdersService orderService)
+        public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
-            _orderService = orderService;
+           
         }
 
         public ActionResult Index()
@@ -26,8 +25,8 @@ namespace Chapeau.Controllers
             var payments = _paymentService.GetAllPayments(1); // Use your real service method
             return View(payments);
         }
-        
+     
     }
 }
 
-        // Show the complete order of a table to the waiter
+ 
