@@ -83,6 +83,60 @@ namespace Chapeau.Repositories
 
             return order;
         }
+        public Order GetOrderById(int orderId)
+        {
+            Order order = null;
 
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                SELECT o.OrderID, o.OrderTime, o.IsServed, 
+                       oi.ItemID, oi.Quantity, 
+                       m.Item_name, m.Price
+                FROM [Order] o
+                JOIN OrderItem oi ON o.OrderID = oi.OrderID
+                JOIN MenuItem m ON oi.ItemID = m.ItemID
+                WHERE o.OrderID = @orderId";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@orderId", orderId);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (order == null)
+                        {
+                            order = new Order
+                            {
+                                OrderID = orderId,
+                                OrderTime = Convert.ToDateTime(reader["OrderTime"]),
+                                IsServed = Convert.ToBoolean(reader["IsServed"]),
+                                OrderItems = new List<OrderItem>()
+                            };
+                        }
+
+                        var orderItem = new OrderItem
+                        {
+                            Quantity = Convert.ToInt32(reader["Quantity"]),
+                            MenuItem = new MenuItem
+                            {
+                                ItemID = Convert.ToInt32(reader["ItemID"]),
+                                Item_name = reader["Item_name"].ToString(),
+                                Price = Convert.ToDecimal(reader["Price"])
+                            }
+                        };
+
+                        order.OrderItems.Add(orderItem);
+                    }
+                }
+            }
+
+            return order;
+        }
     }
+
+
 }
+

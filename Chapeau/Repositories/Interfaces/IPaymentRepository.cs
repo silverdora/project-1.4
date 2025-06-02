@@ -7,6 +7,8 @@ namespace Chapeau.Repositories.Interfaces
         void AddPayment(Payment payment);
         List<Payment> GetAllPayments();
         void MarkPaymentComplete(int paymentId);
+
+        void Add(Payment payment);
         // ... other methods you need
 
 

@@ -62,7 +62,52 @@ namespace Chapeau.Controllers
         {
             return View("~/Views/DummyOrder/Confirmation.cshtml");
         }
+        [HttpGet]
+        public IActionResult SplitBill(int orderId, int numberOfPeople = 2)
+        {
+            // Retrieve total order amount from your order service
+            decimal totalAmount = _orderService.GetOrderTotal(orderId);
 
+            // Initialize payments list based on numberOfPeople
+            var payments = new List<IndividualPayment>();
+            for (int i = 0; i < numberOfPeople; i++)
+            {
+                payments.Add(new IndividualPayment
+                {
+                    // Default equal split
+                    AmountPaid = Math.Round(totalAmount / numberOfPeople, 2)
+                });
+            }
+
+            var model = new SplitPaymentViewModel
+            {
+                OrderID = orderId,
+                TotalAmount = totalAmount,
+                NumberOfPeople = numberOfPeople,
+                Payments = payments
+            };
+
+            return View("~/Views/DummyOrder/SplitBill.cshtml", model);
+        }
+
+        [HttpPost]
+        public IActionResult SplitBill(SplitPaymentViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/DummyOrder/SplitBill.cshtml", model);
+
+            // Optional: Validate sum of AmountPaid >= TotalAmount
+
+            // Save each individual payment via your payment service
+            foreach (var payment in model.Payments)
+            {
+                _paymentService.SaveIndividualPayment(model.OrderID, payment.AmountPaid, payment.TipAmount, payment.PaymentType, payment.Feedback);
+            }
+
+            _orderService.MarkOrderAsPaid(model.OrderID);
+
+            return View("~/Views/DummyOrder/Confirmation.cshtml");
+        }
 
     }
 

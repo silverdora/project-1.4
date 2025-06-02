@@ -31,10 +31,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewModels\FinishOrderViewModel.cs" />
+    <Compile Include="ViewModels\IndividualPayment.cs" />
     <Compile Include="ViewModels\OrderItemViewModel.cs" />
     <Compile Include="ViewModels\OrderSummaryViewModel.cs" />
     <Compile Include="ViewModels\PaymentViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
     <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="ViewModels\SplitPaymentViewModel.cs" />
   </ItemGroup>
 </Project>

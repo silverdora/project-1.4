@@ -2,6 +2,7 @@
 using Chapeau.Repositories;
 
 using Microsoft.Data.SqlClient;
+using Chapeau.Models;
 
 
 namespace Chapeau.Services
@@ -71,5 +72,21 @@ namespace Chapeau.Services
                 }
             }
         }
+        public Order GetOrderById(int orderId)
+        {
+            return _repo.GetOrderById(orderId);
+        }
+
+        public decimal GetOrderTotal(int orderId)
+        {
+            var order = GetOrderById(orderId);
+            if (order == null || order.OrderItems == null || order.OrderItems.Count == 0)
+                return 0;
+
+            return order.OrderItems.Sum(item => item.MenuItem.Price * item.Quantity);
+        }
+
+
+
     }
 }

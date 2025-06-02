@@ -11,5 +11,7 @@ namespace Chapeau.Services.Interfaces
         void CompletePayment(Payment payment);
         void SavePayment(FinishOrderViewModel model);
 
+        void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback);
+
     }
 }

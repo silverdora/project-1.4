@@ -83,5 +83,28 @@ namespace Chapeau.Repositories
                 cmd.ExecuteNonQuery();
             }
         }
+        public void Add(Payment payment)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+            INSERT INTO Payments (orderID, amountPaid, tipAmount, paymentType, Feedback, paymentDAte)
+            VALUES (@orderID, @amountPaid, @tipAmount, @paymentType, @Feedback, @paymentDAte)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OrderID", payment.orderID);
+                    cmd.Parameters.AddWithValue("@AmountPaid", payment.amountPaid);
+                    cmd.Parameters.AddWithValue("@TipAmount", payment.tipAmount);
+                    cmd.Parameters.AddWithValue("@PaymentType", payment.paymentType);
+                    cmd.Parameters.AddWithValue("@Feedback", string.IsNullOrEmpty(payment.Feedback) ? DBNull.Value : (object)payment.Feedback);
+                    cmd.Parameters.AddWithValue("@PaymentDate", payment.paymentDAte);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }

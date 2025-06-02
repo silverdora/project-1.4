@@ -9,6 +9,8 @@
         public decimal tipAmount { get; set; }
         public DateTime paymentDAte { get; set; }
 
+        public string Feedback { get; set; }
+
         // VAT amounts that are stored in your database
         public decimal lowVatAmount { get; set; }  // Match with DB field: lowVatAmount
         public decimal highVATAmount { get; set; } // Match with DB field: highVATAmount
