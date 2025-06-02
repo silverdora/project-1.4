@@ -41,10 +41,32 @@ namespace Chapeau.Repositories
                 {
                     throw new Exception("Changing status failed!");
                 }
-
             }
         }
 
+        public void ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"UPDATE OrderItem " +
+                    $"SET [status] = @newStatus " +
+                    $"WHERE orderID = @orderId AND [status] = @currentStatus";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                // Preventing SQL injections
+                command.Parameters.AddWithValue("@orderId", orderID);
+                command.Parameters.AddWithValue("@newStatus", newStatus.ToString());
+                command.Parameters.AddWithValue("@currentStatus", currentStatus.ToString());
+
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                {
+                    throw new Exception("Changing status failed!");
+                }
+            }
+        }
         public List<Order> GetBarOrdersByStatus(Status status)
         {
             List<Order> orders = new List<Order>();

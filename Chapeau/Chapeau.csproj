@@ -37,6 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
-    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="ViewModels\ReadyToBeServedOrdersViewModel.cs" />
   </ItemGroup>
 </Project>

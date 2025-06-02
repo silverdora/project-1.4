@@ -18,7 +18,10 @@ namespace Chapeau.Services
             _runningOrdersRepository.ChangeOrderStatus(orderID, itemID, status);
         }
 
-        
+        public void ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            _runningOrdersRepository.ChangeAllOrderItemsStatus(orderID, currentStatus, newStatus);
+        }
 
         public List<Order> GetBarOrdersByStatus(Status status)
         {
