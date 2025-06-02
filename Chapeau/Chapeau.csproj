@@ -15,12 +15,6 @@
     <None Remove="Views\RunningOrders\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Views\RunningOrders\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
@@ -36,7 +30,13 @@
     <None Remove="ViewModels\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewModels\FinishOrderViewModel.cs" />
+    <Compile Include="ViewModels\IndividualPayment.cs" />
+    <Compile Include="ViewModels\OrderItemViewModel.cs" />
+    <Compile Include="ViewModels\OrderSummaryViewModel.cs" />
+    <Compile Include="ViewModels\PaymentViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
+    <Compile Include="ViewModels\SplitPaymentViewModel.cs" />
     <Compile Include="ViewModels\ReadyToBeServedOrdersViewModel.cs" />
   </ItemGroup>
 </Project>

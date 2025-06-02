@@ -8,7 +8,6 @@ namespace Chapeau.Models
 		InProgress,
 		ReadyToBeServed,
 		Served,
-		//Completed
 	}
 }
 

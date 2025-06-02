@@ -1,6 +1,7 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repository.Interface;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace Chapeau.Repository
 {
@@ -38,6 +39,22 @@ namespace Chapeau.Repository
 
             return tables;
         }
+        public void MarkTableFreeByOrder(int orderId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = @"
+                UPDATE [Table]
+                SET IsOccupied = 0
+                WHERE TableID = (SELECT TableID FROM [Order] WHERE OrderID = @orderId)";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@orderId", orderId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }
-

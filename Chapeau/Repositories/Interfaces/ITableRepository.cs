@@ -7,6 +7,7 @@ namespace Chapeau.Repository.Interface
     public interface ITableRepository
     {
         List<Table> GetAllTables();
+        void MarkTableFreeByOrder(int orderId);
 
     }
 }
