@@ -14,7 +14,7 @@ namespace Chapeau.ViewModels
         public bool HasFoodOrder => FoodStatus.HasValue;
         public bool HasDrinkOrder => DrinkStatus.HasValue;
 
-        public bool CanMarkAsServed => FoodStatus == Status.Ready || DrinkStatus == Status.Ready;
-        public bool CanFreeTable => IsOccupied && !HasFoodOrder && !HasDrinkOrder;
+        //public bool CanMarkAsServed => FoodStatus == Status.Ready || DrinkStatus == Status.Ready;
+        //public bool CanFreeTable => IsOccupied && !HasFoodOrder && !HasDrinkOrder;
     }
 }

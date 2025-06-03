@@ -18,6 +18,7 @@ namespace Chapeau.Repository.Interface
 
 
 
+        void MarkTableFreeByOrder(int orderId);
 
     }
 }

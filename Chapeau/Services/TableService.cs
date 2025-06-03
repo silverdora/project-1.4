@@ -4,54 +4,58 @@ using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
 using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+
 
 namespace Chapeau.Service
 {
     public class TableService : ITableService
     {
+        private readonly ITableRepository _tableRepository;
 
-        private ITableRepository _tableRepo;
-
-        public TableService(ITableRepository tableRepo)
+        public TableService(ITableRepository tableRepository)
         {
-            _tableRepo = tableRepo;
+            _tableRepository = tableRepository;
         }
 
-        public List<Table> GetAllTables() => _tableRepo.GetAllTables();
+        public List<Table> GetAllTables() => _tableRepository.GetAllTables();
+        
         public List<Table> GetTablesWithOrderStatus()
         {
-            return _tableRepo.GetTablesWithOrderStatus();
+            return _tableRepository.GetTablesWithOrderStatus();
         }
         public List<TableOrderViewModel> GetTableOverview()
         {
-            return _tableRepo.GetTableOrderViewModels();
+            return _tableRepository.GetTableOrderViewModels();
         }
 
 
 
         public void SetTableOccupiedStatus(int tableId, bool isOccupied)
         {
-            _tableRepo.UpdateTableOccupiedStatus(tableId, isOccupied);
+            _tableRepository.UpdateTableOccupiedStatus(tableId, isOccupied);
         }
 
         public bool TrySetTableFree(int tableId)
         {
-            if (_tableRepo.HasUnservedOrders(tableId))
+            if (_tableRepository.HasUnservedOrders(tableId))
                 return false;
 
-            _tableRepo.UpdateTableOccupiedStatus(tableId, false);
+            _tableRepository.UpdateTableOccupiedStatus(tableId, false);
             return true;
         }
 
         public void MarkOrderAsServed(int tableId)
         {
-            _tableRepo.MarkReadyOrdersAsServed(tableId);
+            _tableRepository.MarkReadyOrdersAsServed(tableId);
         }
 
-
+        public void MarkTableFreeByOrder(int orderId)
+        {
+            _tableRepository.MarkTableFreeByOrder(orderId);
+        }
     }
 }
-
 
 
 

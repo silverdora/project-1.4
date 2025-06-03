@@ -1,0 +1,51 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Chapeau.ViewModels.SplitPaymentViewModel
+
+<h2>Split Bill Equally</h2>
+
+<form asp-action="SplitBill" method="post">
+    <input type="hidden" asp-for="OrderID" />
+
+    <div>
+        <label>Total Amount: @Model.TotalAmount.ToString("C")</label>
+    </div>
+
+    <div>
+        <label>Number of People:</label>
+        <input asp-for="NumberOfPeople" type="number" min="1" max="20" />
+        <button type="submit" formaction="@Url.Action("SplitBill", new { orderId = Model.OrderID })">Update</button>
+    </div>
+
+    <hr />
+
+    @for (int i = 0; i < Model.NumberOfPeople; i++)
+    {
+        <fieldset>
+            <legend>Person @(i + 1)</legend>
+
+            <label>Amount Paid (€):</label>
+            <input asp-for="Payments[@i].AmountPaid" type="number" step="0.01" required />
+
+            <label>Tip (€):</label>
+            <input asp-for="Payments[@i].TipAmount" type="number" step="0.01" />
+
+            <label>Payment Type:</label>
+            <select asp-for="Payments[@i].PaymentType" required>
+                <option value="">-- Select --</option>
+                <option>Cash</option>
+                <option>Debit Card</option>
+                <option>Credit Card</option>
+            </select>
+
+            <label>Feedback (optional):</label>
+            <textarea asp-for="Payments[@i].Feedback"></textarea>
+        </fieldset>
+        <hr />
+    }
+
+    <a href="@Url.Action("Confirmation", "Order")" class="btn btn-primary">Confirm Payment</a>
+</form>

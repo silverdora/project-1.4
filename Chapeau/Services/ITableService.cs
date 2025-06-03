@@ -14,5 +14,7 @@ namespace Chapeau.Service.Interface
         void MarkOrderAsServed(int tableId);
 
 
+        void MarkTableFreeByOrder(int orderId);
+
     }
 }

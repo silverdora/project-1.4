@@ -1,0 +1,41 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Chapeau.ViewModels.OrderSummaryViewModel
+
+<h2>Order for Table @Model.TableNumber</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ItemName</td>
+                <td>@item.Quantity</td>
+                <td>€@item.UnitPrice</td>
+                <td>€@item.TotalPrice</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><strong>Total:</strong> €@Model.TotalAmount</p>
+<p><strong>Low VAT (9%):</strong> €@Model.LowVAT</p>
+<p><strong>High VAT (21%):</strong> €@Model.HighVAT</p>
+
+<a asp-controller="Order" asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-success">
+    Finish Order
+</a>
+
+
+

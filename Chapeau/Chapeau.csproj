@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ViewModels\**" />
@@ -34,8 +33,14 @@
   <ItemGroup>
     <Compile Include="ViewModels\MenuSelectionViewModel.cs" />
     <Compile Include="ViewModels\OrderDetailsViewModel.cs" />
+    <Compile Include="ViewModels\FinishOrderViewModel.cs" />
+    <Compile Include="ViewModels\IndividualPayment.cs" />
+    <Compile Include="ViewModels\OrderItemViewModel.cs" />
+    <Compile Include="ViewModels\OrderSummaryViewModel.cs" />
+    <Compile Include="ViewModels\PaymentViewModel.cs" />
     <Compile Include="ViewModels\RunningOrdersViewModel.cs" />
-    <Compile Include="ViewModels\FilteredOrdersViewModel.cs" />
+    <Compile Include="ViewModels\SplitPaymentViewModel.cs" />
+    <Compile Include="ViewModels\ReadyToBeServedOrdersViewModel.cs" />
     <Compile Include="ViewModels\TableOrderViewModel.cs" />
   </ItemGroup>
 </Project>

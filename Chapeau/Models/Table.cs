@@ -19,5 +19,6 @@ namespace Chapeau.Models
             IsOccupied = isOccupied;
             OrderStatus = orderStatus;
         }
+
     }
 }

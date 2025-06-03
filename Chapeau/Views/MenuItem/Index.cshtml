@@ -46,9 +46,9 @@
 
 	foreach (var item in Model.Items)
 	{
-		if (!categoriesInItems.Contains(item.Category))
+		if (!categoriesInItems.Contains(item.Category.ToString()))
 		{
-			categoriesInItems.Add(item.Category);
+			categoriesInItems.Add(item.Category.ToString());
 		}
 	}
 
@@ -130,9 +130,7 @@ else
 						{
 							<form asp-controller="Order" asp-action="AddItem" method="post">
 								<input type="hidden" name="menuItemId" value="@item.ItemID" />
-								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />
-								<input type="hidden" name="orderId" value="@Model.OrderID" />
-								<input type="hidden" name="tableId" value="@Model.TableID" />
+								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />								
 								<button type="submit">Add</button>
 							</form>
 						}
