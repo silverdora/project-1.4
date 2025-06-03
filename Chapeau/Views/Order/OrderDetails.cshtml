@@ -33,7 +33,7 @@ else
     <!-- Button to submit items to DB -->
     <form asp-controller="Order" asp-action="SubmitOrder" method="post">
         <input type="hidden" name="orderId" value="@TempData["CurrentOrderId"]" />
-        <button type="submit" class="btn btn-success">Submit Order to Kitchen</button>
+        <button type="submit" class="btn btn-success">Submit Order</button>
     </form>
 
     <a asp-controller="MenuItem" asp-action="Index"
