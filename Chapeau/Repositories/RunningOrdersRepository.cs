@@ -85,7 +85,7 @@ namespace Chapeau.Repositories
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader, status);
+                    Order order = ReadOrder(reader, status, "Drink");
                     orders.Add(order);
                 }
                 reader.Close();
@@ -110,7 +110,7 @@ namespace Chapeau.Repositories
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader, status);
+                    Order order = ReadOrder(reader, status, "Dish");
                     orders.Add(order);
                 }
                 reader.Close();
@@ -118,7 +118,7 @@ namespace Chapeau.Repositories
             return orders;
         }
 
-        private Order ReadOrder(SqlDataReader reader, Status status)
+        private Order ReadOrder(SqlDataReader reader, Status status, string type)
         {
             int orderId = (int)reader["orderID"];
 
@@ -130,7 +130,7 @@ namespace Chapeau.Repositories
 
             DateTime orderTime = (DateTime)reader["orderTime"];
             //bool isServed = true;
-            List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status);
+            List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status, type);
 
             return new Order(orderId, employee, table, orderTime, orderItems);
 
@@ -209,17 +209,18 @@ namespace Chapeau.Repositories
             return new Table(tableID, tableNumber, isOccupied, orderStatus);   // Mo for sprint 2
         }
 
-        private List<OrderItem> GetOrderItemsByOrderID(int id, Status status)
+        private List<OrderItem> GetOrderItemsByOrderID(int id, Status status, string type)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
                 string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
-                    "FROM OrderItem " +
-                    "WHERE orderID = @Id and [status] = @status; ";
+                    "FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
+                    "WHERE orderID = @Id and [status] = @status and item_type = @type; ";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@Id", id);
                 command.Parameters.AddWithValue("@status", status.ToString());
+                command.Parameters.AddWithValue("@type", type);
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
 
