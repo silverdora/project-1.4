@@ -15,22 +15,21 @@
         }
         public Status Status { get; set; }
         public int Quantity { get; set; }
+        public string? Comment { get; set; }
         public OrderItem()
         {
 
         }
+        
 
-
-        //public string Notes { get; set; }
-
-        public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity)
+        public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity, string? comment)
         {
             ItemID = itemID;
             MenuItem = menuItem;
             IncludeDate = includeDate;
             Status = status;
             Quantity = quantity;
-            //Notes = notes;
+            Comment = comment;
         }
     }
 }

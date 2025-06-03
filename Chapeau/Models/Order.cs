@@ -8,7 +8,6 @@ namespace Chapeau.Models
         public Employee Employee { get; set; }
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
-        //public bool IsServed { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public string? Notes { get; set; }
         
@@ -26,7 +25,6 @@ namespace Chapeau.Models
             Employee = employee;
             Table = table;
             OrderTime = orderTime;
-            //IsServed = isServed;
             OrderItems = orderItems;
         }
 

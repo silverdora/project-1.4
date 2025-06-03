@@ -47,6 +47,16 @@
                                                             <button type="submit" class="btn btn-primary btn-sm">Close</button>
                                                         </form>
                                                     </div>
+                                                    <small>
+                                                        Notes:
+                                                        @{
+                                                            if (orderItem.Comment != null)
+                                                            {
+                                                                @orderItem.Comment
+                                                            }
+                                                        }
+                                                    </small>
+                                                    <br />
                                                     <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
                                                     <br />
                                                     <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
