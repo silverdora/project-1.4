@@ -1,4 +1,8 @@
-﻿@model Chapeau.Models.Table
+﻿@model TableOrderViewModel
+@using Chapeau.ViewModels
+
+﻿
+
 @{
     @*Get the currently logged-in employee's ID from the session(int? cause session can expire). *@
     int? employeeId = Context.Session.GetInt32("EmployeeID");
@@ -12,29 +16,19 @@
             @(Model.IsOccupied ? "Occupied" : "Free")
         </span>
         <br />
-        @if (Model.IsOccupied && Model.OrderStatus.HasValue)
+
+        @if (Model.FoodStatus.HasValue)
         {
-            switch (Model.OrderStatus.Value)
-            {
-                case Chapeau.Models.Status.InProgress:
-                    <span class="badge bg-warning text-dark">Being Prepared</span>
-                    ;
-                    break;
-                case Chapeau.Models.Status.ReadyToBeServed:
-                    <span class="badge bg-success">Ready to Serve</span>
-                    ;
-                    break;
-                case Chapeau.Models.Status.Served:
-                    <span class="badge bg-secondary">Served</span>
-                    ;
-                    break;
-            }
+            <span class="badge bg-info">Food: @Model.FoodStatus.Value</span>
         }
-        else if (Model.IsOccupied)
+        @if (Model.DrinkStatus.HasValue)
+        {
+            <span class="badge bg-warning text-dark">Drinks: @Model.DrinkStatus.Value</span>
+        }
+        @if (Model.IsOccupied && !Model.FoodStatus.HasValue && !Model.DrinkStatus.HasValue)
         {
             <span class="text-muted small">No Order</span>
         }
-
     </div>
     <div class="table-actions mt-2 text-center">
         <form asp-controller="Order" asp-action="TakeOrder" method="post">

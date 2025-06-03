@@ -1,4 +1,5 @@
-﻿@model List<Chapeau.Models.Table>
+﻿@model List<TableOrderViewModel>
+@using Chapeau.ViewModels
 
 <!-- This is used to display the message only once after after triggering the button submit order and redirect to table overview-->
 @if (TempData["OrderSuccess"] != null)
@@ -8,6 +9,21 @@
     </div>
 }
 <h2 class="text-center mb-4">Restaurant Seating Overview</h2>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <div class="container">
     <div class="d-flex justify-content-end mb-3">
@@ -25,3 +41,53 @@
         }
     </div>
 </div>
+
+<!-- ✅ Table Action Modal -->
+<div class="modal fade" id="tableActionModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Table Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Modal Trigger Script -->
+<script>
+    function openTableModal(tableId, isOccupied, orderStatus) {
+        const body = document.getElementById("modalBody");
+        let html = `<p><strong>Table #${tableId}</strong></p>`;
+
+        if (isOccupied === "true") {
+            html += `<form method="post" action="/Restaurant/SetFree?tableId=${tableId}">
+                        <button type="submit" class="btn btn-outline-danger w-100 mb-2">Mark as Free</button>
+                     </form>`;
+        } else {
+            html += `<form method="post" action="/Restaurant/SetOccupied?tableId=${tableId}">
+                        <button type="submit" class="btn btn-outline-success w-100 mb-2">Mark as Occupied</button>
+                     </form>`;
+        }
+
+        if (orderStatus && orderStatus.toLowerCase() === "ready") {
+            html += `<form method="post" action="/Restaurant/MarkOrderServed?tableId=${tableId}">
+                        <button type="submit" class="btn btn-outline-primary w-100">Mark Order as Served</button>
+                     </form>`;
+        }
+
+        body.innerHTML = html;
+
+        const modal = new bootstrap.Modal(document.getElementById("tableActionModal"));
+        modal.show();
+    }
+</script>
+<script>
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => new bootstrap.Alert(alert).close());
+    }, 3000);
+</script>
