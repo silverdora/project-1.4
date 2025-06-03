@@ -3,8 +3,8 @@
     public enum MenuCard //as enum starts with 0 and in my database lunch = 1
     {
         Lunch = 1,
-        Diner =2,
-        Drinks=3
+        Dinner = 2,
+        Drinks = 3
     }
 
     public enum MenuCategory

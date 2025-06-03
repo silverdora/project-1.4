@@ -1,0 +1,46 @@
+﻿@model Chapeau.Models.Table
+@{
+    @*Get the currently logged-in employee's ID from the session(int? cause session can expire). *@
+    int? employeeId = Context.Session.GetInt32("EmployeeID");
+}
+<div class="restaurant-table @(Model.IsOccupied ? "occupied" : "free")">
+    <div class="table-top">
+        <span>Table @Model.TableNumber</span>
+    </div>
+    <div class="table-status">
+        <span class="badge @(Model.IsOccupied ? "bg-danger" : "bg-success")">
+            @(Model.IsOccupied ? "Occupied" : "Free")
+        </span>
+        <br />
+        @if (Model.IsOccupied && Model.OrderStatus.HasValue)
+        {
+            switch (Model.OrderStatus.Value)
+            {
+                case Chapeau.Models.Status.InProgress:
+                    <span class="badge bg-warning text-dark">Being Prepared</span>
+                    ;
+                    break;
+                case Chapeau.Models.Status.ReadyToBeServed:
+                    <span class="badge bg-success">Ready to Serve</span>
+                    ;
+                    break;
+                case Chapeau.Models.Status.Served:
+                    <span class="badge bg-secondary">Served</span>
+                    ;
+                    break;
+            }
+        }
+        else if (Model.IsOccupied)
+        {
+            <span class="text-muted small">No Order</span>
+        }
+
+    </div>
+    <div class="table-actions mt-2 text-center">
+        <form asp-controller="Order" asp-action="TakeOrder" method="post">
+            <input type="hidden" name="tableId" value="@Model.TableId" />
+            <input type="hidden" name="employeeId" value="@employeeId" />
+            <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
+        </form>
+    </div>
+</div>

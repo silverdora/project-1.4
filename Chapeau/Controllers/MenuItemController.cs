@@ -1,7 +1,8 @@
 ﻿using Chapeau.Models;
 using Chapeau.Services;
 using Microsoft.AspNetCore.Mvc;
-using Chapeau.Repositories;    
+using Chapeau.Repositories;
+using Chapeau.ViewModels;
 
 namespace Chapeau.Controllers
 {
@@ -14,40 +15,20 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-        public IActionResult Index(MenuCard? card, MenuCategory? category)
+        public IActionResult Index(string? card, string? category, int? orderID, int? tableID)
         {
-            List<MenuItem> items = new List<MenuItem>();
+            var filteredItems = _menuItemService.GetFilteredMenuItems(card, category);
 
-            // Both filters selected
-            if (card != null && category != null)
+            var viewModel = new MenuSelectionViewModel
             {
-                items = _menuItemService.GetMenuItemsByCardAndCategory(card.Value, category.Value);
-            }
-            // card selected
-            else if (card != null)
-            {
-                items = _menuItemService.GetMenuItemsByCard(card.Value);
-            }
-            //  category selected
-            else if (category != null)
-            {
-                items = _menuItemService.GetMenuItemsByCategory(category.Value);
-            }
-            //No filters
-            else
-            {
-                items = _menuItemService.GetAllMenuItems();
-            }
+                SelectedCard = card,
+                SelectedCategory = category,
+                Items = filteredItems,
+                OrderID = orderID ?? 0,
+                TableID = tableID ?? 0
+            };
 
-            // to remember the user's selected filter values
-            ViewBag.SelectedCard = card;
-            ViewBag.SelectedCategory = category;
-
-            //to make the dropdown based on the enum values
-            ViewBag.Cards = Enum.GetValues(typeof(MenuCard));
-            ViewBag.Categories = Enum.GetValues(typeof(MenuCategory));
-
-            return View(items);
+            return View(viewModel);
         }
-    }   
+    }
 }

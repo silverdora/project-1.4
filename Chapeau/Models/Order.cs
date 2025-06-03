@@ -10,6 +10,7 @@ namespace Chapeau.Models
         public DateTime OrderTime { get; set; }
         //public bool IsServed { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public string? Notes { get; set; }
         
 
         public Status Status { get; set; }

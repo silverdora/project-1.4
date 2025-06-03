@@ -30,6 +30,10 @@ public class Program
         builder.Services.AddScoped<ITableRepository, TableRepository>();
         builder.Services.AddScoped<ITableService, TableService>();
 
+        builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); 
+
       
         builder.Services.AddScoped<DummyOrderRepository>();
         builder.Services.AddScoped<DummyOrderService>();
@@ -53,8 +57,8 @@ public class Program
         builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 
-        builder.Services.AddSingleton<IMenuItemService, MenuItemService>();
-        builder.Services.AddSingleton<IMenuItemRepository, MenuItemRepository>();
+        builder.Services.AddScoped<IMenuItemService, MenuItemService>();
+        builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 
         builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 

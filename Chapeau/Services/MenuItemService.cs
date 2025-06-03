@@ -11,26 +11,40 @@ namespace Chapeau.Services
         {
             _menuItemRepository = menuItemRepository;
         }
-      
-        public List<MenuItem> GetAllMenuItems()
+
+        public List<MenuItem> GetMenuItems()
         {
-            return _menuItemRepository.GetAllMenuItems();
+            return _menuItemRepository.GetMenuItems();
         }
 
-        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
+        public List<MenuItem> GetFilteredMenuItems(string? card, string? category)
         {
-            return _menuItemRepository.GetMenuItemsByCard(card);
+            if (!string.IsNullOrWhiteSpace(card) && !string.IsNullOrWhiteSpace(category))
+            {
+                return _menuItemRepository.GetMenuItemsByCardAndCategory(card, category);
+            }
+            else if (!string.IsNullOrWhiteSpace(card))
+            {
+                return _menuItemRepository.GetMenuItemsByCard(card);
+            }
+            else if (!string.IsNullOrWhiteSpace(category))
+            {
+                return _menuItemRepository.GetMenuItemsByCategory(category);
+            }
+            else
+            {
+                return _menuItemRepository.GetMenuItems();
+            }
+        }
+        public MenuItem GetMenuItemByID(int itemID)
+        {
+            return _menuItemRepository.GetMenuItemByID(itemID);
         }
 
-        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
+        public void ReduceStock(int itemId, int amount)
         {
-            return _menuItemRepository.GetMenuItemsByCategory(category);
+            _menuItemRepository.ReduceStock(itemId, amount);
         }
-
-        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
-        {
-            return _menuItemRepository.GetMenuItemsByCardAndCategory(card, category);
-        }
-
     }
+
 }

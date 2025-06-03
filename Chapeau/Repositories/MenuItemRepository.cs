@@ -16,51 +16,76 @@ namespace Chapeau.Repositories
         }
 
         // Get all menu items
-        public List<MenuItem> GetAllMenuItems()
+        public List<MenuItem> GetMenuItems()
         {
             return ExecuteQueryMapMenuItems("SELECT * FROM MenuItem");
         }
-
-        // Get items by card
-        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
+        public MenuItem GetMenuItemByID(int itemID)
         {
-            string query = @"SELECT mi.*
-                             FROM MenuItem mi
-                             JOIN MenuCard mc ON mi.cardID = mc.icardID
-                             WHERE mc.card_name = @card";
+            string query = "SELECT * FROM MenuItem WHERE itemID = @itemID";
+            SqlParameter parameter = new SqlParameter("@itemID", itemID);
 
-            var cardName = card.ToString(); // converting enum to string for SQL 
+            List<MenuItem> result = ExecuteQueryMapMenuItems(query, parameter);
 
-            SqlParameter cardParameter = new SqlParameter("@card", cardName);//to replace @card in the query
+            foreach (var item in result)
+            {
+                return item; // return the first one
+            }
+            return null; // if list is empty
+
+        }
+
+        // Get items by card name (e.g., "Lunch", "Dinner", "Drinks")
+        public List<MenuItem> GetMenuItemsByCard(string cardName)
+        {
+            string query = @"
+                SELECT mi.*
+                FROM MenuItem mi
+                JOIN MenuCard mc ON mi.cardID = mc.icardID
+                WHERE mc.card_name = @card";
+
+            SqlParameter cardParameter = new SqlParameter("@card", cardName);
             return ExecuteQueryMapMenuItems(query, cardParameter);
         }
 
-        // Get items by category
-        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
+        // Get items by category (e.g., "Starters")
+        public List<MenuItem> GetMenuItemsByCategory(string categoryName)
         {
             string query = "SELECT * FROM MenuItem WHERE category = @category";
-            string categoryName = category.ToString(); // converting enum to string for SQL 
 
-            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);//to replace @category in the query
-            return ExecuteQueryMapMenuItems(query, categoryParameter);  
+            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
+            return ExecuteQueryMapMenuItems(query, categoryParameter);
         }
 
-        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
+        //Get items by both card and category
+        public List<MenuItem> GetMenuItemsByCardAndCategory(string cardName, string categoryName)
         {
-            string query = @"SELECT mi.*
-                             FROM MenuItem mi
-                            JOIN MenuCard mc ON mi.cardID = mc.icardID
-                            WHERE mc.card_name = @card AND mi.category = @category";
+            string query = @"
+                SELECT mi.*
+                FROM MenuItem mi
+                JOIN MenuCard mc ON mi.cardID = mc.icardID
+                WHERE mc.card_name = @card AND mi.category = @category";
 
-            //SQL parameters
-            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
-            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
+            SqlParameter cardParameter = new SqlParameter("@card", cardName);
+            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
 
-            return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);    // Call the helper method with both parameters
+            return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);
         }
+        //method to reduce stock based in item order request
+        public void ReduceStock(int itemId, int amount)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@itemId", itemId);
+                command.Parameters.AddWithValue("@amount", amount);
 
-
-        // Shared helper to reduce duplication
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+        // Shared helper methods
         private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
         {
             List<MenuItem> items = new List<MenuItem>();
@@ -76,9 +101,7 @@ namespace Chapeau.Repositories
                 {
                     try
                     {
-
                         while (reader.Read())
-
                         {
                             items.Add(new MenuItem
                             {
@@ -102,6 +125,7 @@ namespace Chapeau.Repositories
                     }
                 }
             }
+
             return items;
         }
     }

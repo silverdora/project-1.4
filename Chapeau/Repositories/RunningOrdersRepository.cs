@@ -6,6 +6,7 @@ using Microsoft.Data.SqlClient;
 //using System.Data.SqlClient;
 
 using Humanizer;
+using System.Text.RegularExpressions;
 
 namespace Chapeau.Repositories
 {
@@ -132,6 +133,7 @@ namespace Chapeau.Repositories
             List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status);
 
             return new Order(orderId, employee, table, orderTime, orderItems);
+
         }
 
         private Employee GetEmployeeByID (int id)
@@ -171,9 +173,14 @@ namespace Chapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * " +
-                    "FROM [Table] " +
-                    "WHERE tableID = @Id; ";
+                string query = @"SELECT t.tableID, t.table_number, t.isOccupied,
+                   MAX(oi.status) AS OrderStatus
+                    FROM[Table] t
+                    LEFT JOIN[Order] o ON t.tableID = o.tableID
+                    LEFT JOIN[OrderItem] oi ON o.orderID = oi.orderID
+                    WHERE t.tableID = @Id
+                    GROUP BY t.tableID, t.table_number, t.isOccupied;
+                ";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
@@ -195,8 +202,11 @@ namespace Chapeau.Repositories
             int tableID = (int)reader["tableID"];
             int tableNumber = (int)reader["table_number"];
             bool isOccupied = (bool)reader["isOccupied"];
+            Status? orderStatus = reader["orderStatus"] != DBNull.Value // Mo for sprint 2
+                ? (Status)Enum.Parse(typeof(Status), (string)reader["orderStatus"], true)
+                : null;
 
-            return new Table(tableID, tableNumber, isOccupied);
+            return new Table(tableID, tableNumber, isOccupied, orderStatus);   // Mo for sprint 2
         }
 
         private List<OrderItem> GetOrderItemsByOrderID(int id, Status status)
@@ -234,7 +244,7 @@ namespace Chapeau.Repositories
             int quantity = (int)reader["quantity"];
             //string notes = (string)reader["notes"];
 
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity);
+            return new OrderItem(itemID, menuItem, includeDate, status, quantity); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
         }
 
         public MenuItem GetMenuItemByID(int id)

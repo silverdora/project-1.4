@@ -4,10 +4,14 @@ namespace Chapeau.Services
 {
     public interface IMenuItemService
     {
-        public List<MenuItem> GetAllMenuItems();
-        public List<MenuItem> GetMenuItemsByCard(MenuCard card);
-        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category);
+        public List<MenuItem> GetMenuItems();
+       // public List<MenuItem> GetMenuItemsByCard(string? card);
+        //public List<MenuItem> GetMenuItemsByCategory(string? category);
 
-        List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category);
+        //List<MenuItem> GetMenuItemsByCardAndCategory(string? card, string? category);
+        List<MenuItem> GetFilteredMenuItems(string? card, string? category);
+        MenuItem GetMenuItemByID(int itemID);
+        void ReduceStock(int itemId, int amount);
+
     }
 }

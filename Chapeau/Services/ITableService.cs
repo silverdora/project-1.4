@@ -5,6 +5,7 @@ namespace Chapeau.Service.Interface
     public interface ITableService
     {
         List<Table> GetAllTables();
+        List<Table> GetTablesWithOrderStatus();
 
         void MarkTableFreeByOrder(int orderId);
 

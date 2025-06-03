@@ -1,4 +1,5 @@
 ﻿using Chapeau.Models;
+using Chapeau.Repository;
 using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +18,11 @@ namespace Chapeau.Service
         }
 
         public List<Table> GetAllTables() => _tableRepository.GetAllTables();
+        
+        public List<Table> GetTablesWithOrderStatus()
+        {
+            return _tableRepository.GetTablesWithOrderStatus();
+        }
 
         public void MarkTableFreeByOrder(int orderId)
         {
