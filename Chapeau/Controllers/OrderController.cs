@@ -52,9 +52,6 @@ namespace Chapeau.Controllers
                 Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table (I was having an error)
                 Employee = employee,
                 OrderTime = DateTime.Now,
-                IsServed = false,
-                IsPaid = false,
-                IsReadyToPay = false
             };
 
             _orderService.InsertOrder(newOrder);

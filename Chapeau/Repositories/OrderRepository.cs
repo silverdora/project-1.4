@@ -21,8 +21,8 @@ namespace Chapeau.Repositories
 
         public void InsertOrder(Order order)
         {
-            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime, isServed) " +
-                           "VALUES (@employeeID, @tableID, @orderTime, @isServed); " +
+            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime) " +
+                           "VALUES (@employeeID, @tableID, @orderTime); " +
                            "SELECT SCOPE_IDENTITY();";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -31,7 +31,6 @@ namespace Chapeau.Repositories
                 command.Parameters.AddWithValue("@employeeID", order.Employee.employeeID);
                 command.Parameters.AddWithValue("@tableID", order.Table.TableId);
                 command.Parameters.AddWithValue("@orderTime", order.OrderTime);
-                command.Parameters.AddWithValue("@isServed", order.IsServed);
 
                 connection.Open();
                 object result = command.ExecuteScalar();

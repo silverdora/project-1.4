@@ -44,9 +44,9 @@
 
 	foreach (var item in Model.Items)
 	{
-		if (!categoriesInItems.Contains(item.Category))
+		if (!categoriesInItems.Contains(item.Category.ToString()))
 		{
-			categoriesInItems.Add(item.Category);
+			categoriesInItems.Add(item.Category.ToString());
 		}
 	}
 

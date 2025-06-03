@@ -6,6 +6,7 @@ using Microsoft.Data.SqlClient;
 //using System.Data.SqlClient;
 
 using Humanizer;
+using System.Text.RegularExpressions;
 
 namespace Chapeau.Repositories
 {
@@ -172,9 +173,14 @@ namespace Chapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * " +
-                    "FROM [Table] " +
-                    "WHERE tableID = @Id; ";
+                string query = @"SELECT t.tableID, t.table_number, t.isOccupied,
+                   MAX(oi.status) AS OrderStatus
+                    FROM[Table] t
+                    LEFT JOIN[Order] o ON t.tableID = o.tableID
+                    LEFT JOIN[OrderItem] oi ON o.orderID = oi.orderID
+                    WHERE t.tableID = @Id
+                    GROUP BY t.tableID, t.table_number, t.isOccupied;
+                ";
 
                 SqlCommand command = new SqlCommand(query, connection);
 

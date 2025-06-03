@@ -2,7 +2,7 @@
 {
     public class OrderItem
     {
-        //public int OrderID { get; set; }
+        public int OrderID { get; set; }
         public MenuItem MenuItem { get; set; }
         public int ItemID { get; set; } //is used to change status
         public DateTime IncludeDate { get; set; }
