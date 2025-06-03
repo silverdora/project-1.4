@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Chapeau.Models;
+using Newtonsoft.Json;
 
 namespace Chapeau.HelperMethods
 {
@@ -28,5 +29,17 @@ namespace Chapeau.HelperMethods
             T result = JsonConvert.DeserializeObject<T>(json);
             return result;
         }
+
+
+
+
+
+
+        //returns the list of items currently stored in session
+        public static List<OrderItem> GetSelectedItemsFromSession(this ISession session)
+        {
+            return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
+        }
     }
+
 }

@@ -79,11 +79,5 @@ namespace Chapeau.Services
 
             _paymentRepository.Add(payment);
         }
-
-
-
-
-
-
     }
 }

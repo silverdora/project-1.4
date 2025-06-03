@@ -34,7 +34,6 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-
         public IActionResult Index()
         {
             return View();
@@ -47,22 +46,37 @@ namespace Chapeau.Controllers
             if (employee == null)
                 return RedirectToAction("Login", "Employee");
 
-            Order newOrder = new Order
+            Order? existingOrder = _orderService.GetActiveOrderByTableId(tableId);
+
+            Order order;
+
+            if (existingOrder != null)
             {
-                Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table (I was having an error)
-                Employee = employee,
-                OrderTime = DateTime.Now,
-            };
+                order = existingOrder;
+            }
+            else
+            {
+                order = new Order
+                {
+                    Table = new Table { TableId = tableId },
+                    Employee = employee,
+                    OrderTime = DateTime.Now,
+                    IsPaid = false,
+                   
+                };
 
-            _orderService.InsertOrder(newOrder);
+                _orderService.InsertOrder(order);
+            }
 
-            //Store in session
-            HttpContext.Session.SetInt32("CurrentOrderId", newOrder.OrderID);
+            HttpContext.Session.SetInt32("CurrentOrderId", order.OrderID);
             HttpContext.Session.SetInt32("CurrentTableId", tableId);
 
-            return RedirectToAction("Index", "MenuItem");             
-        }
-       
+            // Clear any old items
+            HttpContext.Session.Remove("SelectedItems");
+
+            return RedirectToAction("Index", "MenuItem");
+        }           
+        
         [HttpPost]
         public IActionResult AddItem(int menuItemId, int quantity)
         {
@@ -84,10 +98,10 @@ namespace Chapeau.Controllers
         }
         [HttpGet]
         public IActionResult OrderDetails()
-        {            
+        {
+            //reusing helper method to read the session value for the key "SelectedItems"
+            List<OrderItem> selectedItems = HttpContext.Session.GetSelectedItemsFromSession();
 
-            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            
             return View(selectedItems);
         }
        
@@ -102,7 +116,7 @@ namespace Chapeau.Controllers
                 return RedirectToAction("Overview", "Restaurant");
             }
 
-            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
+            List<OrderItem> selectedItems = HttpContext.Session.GetSelectedItemsFromSession();
 
             if (selectedItems != null && selectedItems.Count > 0)
             {
