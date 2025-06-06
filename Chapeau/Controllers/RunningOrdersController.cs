@@ -135,6 +135,20 @@ namespace Chapeau.Controllers
             }
             return RedirectToAction("Index");
         }
+
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            _runningOrdersService.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("ReadyToBeServed");
+            }
+            return RedirectToAction("Index");
+        }
     }
 }
 

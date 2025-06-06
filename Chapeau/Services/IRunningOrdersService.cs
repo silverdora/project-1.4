@@ -11,6 +11,7 @@ namespace Chapeau.Services
         void ChangeOrderStatus(int orderID, int itemID, Status status);
         void ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus);
         Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> order);
+        void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course);
     }
 }
 
