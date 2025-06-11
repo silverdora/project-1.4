@@ -45,13 +45,11 @@
         <textarea asp-for="Feedback" rows="4" cols="50"></textarea>
     </div>
 
-    <a asp-controller="Order" asp-action="SplitBill" asp-route-orderId="@Model.OrderID" class="btn btn-primary">
+    <a asp-controller="Payment" asp-action="SplitBill" asp-route-orderId="@Model.OrderID" class="btn btn-primary">
         Split Bill
     </a>
 
-
-    <a href="@Url.Action("Confirmation", "Order")" class="btn btn-primary">Confirm Payment</a>
-
+    <button type="submit" class="btn btn-success">Confirm Payment</button>
 
 </form>
 
