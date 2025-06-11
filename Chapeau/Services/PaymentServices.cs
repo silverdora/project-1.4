@@ -65,7 +65,7 @@ namespace Chapeau.Services
         public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, PaymentType paymentType, string feedback)
         {
             try
-            {
+            { 
                 if (orderId <= 0)
                     throw new ArgumentException("Invalid order ID");
 
