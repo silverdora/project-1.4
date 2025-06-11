@@ -30,7 +30,7 @@
 </table>
 
 <p><strong>Total:</strong> @Model.TotalAmount.ToString("C2")</p>
-<p><strong>VAT:</strong> @(Model.LowVAT + Model.HighVAT).ToString("C2")</p>
+<p><strong>VAT:</strong> @(Math.Round(Model.LowVAT + Model.HighVAT, 2).ToString("C2"))</p>
 
 <a asp-controller="Payment" asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-success">
     Finish Order
