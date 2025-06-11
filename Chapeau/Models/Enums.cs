@@ -21,12 +21,11 @@
         SoftDrink
     }
 
-
     public enum PaymentType
     {
-        Cash,
-        DebitCard,
-        CreditCard
+        Cash = 0,
+        DebitCard = 1,
+        CreditCard = 2
     }
 }
 

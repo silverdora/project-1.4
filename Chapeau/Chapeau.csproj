@@ -43,4 +43,7 @@
     <Compile Include="ViewModels\ReadyToBeServedOrdersViewModel.cs" />
     <Compile Include="ViewModels\TableOrderViewModel.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Models\PaymentType.cs" />
+  </ItemGroup>
 </Project>

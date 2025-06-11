@@ -33,16 +33,7 @@ namespace Chapeau.Controllers
             var orderSummary = _dummyOrderService.GetOrderSummaryById(orderId);
             if (orderSummary == null) return NotFound();
 
-            var paymentViewModel = new FinishOrderViewModel
-            {
-                OrderID = orderId,
-                AmountPaid = orderSummary.TotalAmount,
-                LowVatAmount = orderSummary.LowVAT,
-                HighVatAmount = orderSummary.HighVAT
-                // populate other fields as needed
-            };
-
-            return View(paymentViewModel);
+            return View(orderSummary);
         }
 
         [HttpGet]
