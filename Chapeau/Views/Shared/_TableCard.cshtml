@@ -39,10 +39,7 @@
         @* Pay button only visible if table is occupied and has an active order *@
         @if (Model.IsOccupied && Model.OrderID.HasValue)
         {
-            <form asp-controller="Payment" asp-action="ViewOrder" method="get" class="d-inline">
-                <input type="hidden" name="orderId" value="@Model.OrderID.Value" />
-                <button type="submit" class="btn btn-sm btn-success">Pay</button>
-            </form>
+            <a asp-controller="Payment" asp-action="ViewOrder" asp-route-orderId="@Model.OrderID.Value" class="btn btn-sm btn-success">Pay</a>
         }
     </div>
 </div>

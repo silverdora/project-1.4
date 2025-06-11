@@ -1,4 +1,5 @@
 ﻿using Chapeau.ViewModels;
+using Chapeau.ViewModels;
 using Chapeau.Repositories;
 
 using Microsoft.Data.SqlClient;
@@ -6,7 +7,7 @@ using Chapeau.Models;
 
 
 namespace Chapeau.Services
-    
+
 {
     public class DummyOrderService
     {
@@ -48,7 +49,7 @@ namespace Chapeau.Services
             return new OrderSummaryViewModel
             {
                 OrderID = order.OrderID,
-                //TableNumber = order.TableId,  // Or appropriate property
+                TableNumber = order.Table.TableId,  // Set the table number
                 Items = groupedItems,
                 TotalAmount = totalAmount,
                 LowVAT = lowVAT,
