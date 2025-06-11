@@ -21,7 +21,7 @@ namespace Chapeau.Repositories
             string query = @"
                 SELECT o.orderID, o.tableID, o.isServed, o.orderTime, o.isPaid,
                        oi.itemID, oi.quantity, oi.includeDate, oi.status AS itemStatus,
-                       m.itemID, m.item_name, m.price, m.VATPercent
+                       m.itemID, m.item_name, m.price, m.VATPercent, oi.orderItemID
                 FROM [Order] o
                 JOIN OrderItem oi ON o.orderID = oi.orderID
                 JOIN MenuItem m ON oi.itemID = m.itemID
@@ -63,15 +63,11 @@ namespace Chapeau.Repositories
 
                         OrderItem item = new OrderItem
                         {
-                            ItemID = reader.GetInt32(5),
+                            OrderItemID = reader.GetInt32(13),
+                            MenuItem = menuItem,
                             Quantity = reader.GetInt32(6),
                             IncludeDate = reader.GetDateTime(7),
                             Status = (Status)Enum.Parse(typeof(Status), reader.GetString(8)),
-
-
-
-
-                            MenuItem = menuItem
                         };
 
                         order.OrderItems.Add(item);
@@ -90,7 +86,7 @@ namespace Chapeau.Repositories
                 string query = @"
                 SELECT o.OrderID, o.OrderTime, o.IsServed, 
                        oi.ItemID, oi.Quantity, 
-                       m.Item_name, m.Price
+                       m.Item_name, m.Price, oi.orderItemID
                 FROM [Order] o
                 JOIN OrderItem oi ON o.OrderID = oi.OrderID
                 JOIN MenuItem m ON oi.ItemID = m.ItemID

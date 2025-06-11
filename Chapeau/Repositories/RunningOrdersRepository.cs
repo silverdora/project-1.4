@@ -222,7 +222,7 @@ namespace Chapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
-                string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
+                string query = "SELECT OrderItem.orderItemID, OrderItem.itemID, includeDate, [status], quantity, comment  " +
                     "FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
                     "WHERE orderID = @Id and [status] = @status and item_type = @type; ";
                 SqlCommand command = new SqlCommand(query, connection);
@@ -244,6 +244,7 @@ namespace Chapeau.Repositories
 
         private OrderItem ReadOrderItem(SqlDataReader reader)
         {
+            int orderItemID = (int)reader["orderItemID"];
             int itemID = (int)reader["itemID"];
             MenuItem menuItem = GetMenuItemByID(itemID);
 
@@ -251,9 +252,13 @@ namespace Chapeau.Repositories
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
-            //string notes = (string)reader["notes"];
-
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
+            //string? comment = (string?)reader["comment"];
+            string? comment = null;
+            if (!(reader["comment"] == null || reader["comment"] == DBNull.Value))
+            {
+                comment = (string)reader["comment"];
+            }
+            return new OrderItem(orderItemID, menuItem, includeDate, status, quantity, comment); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
         }
 
         public MenuItem GetMenuItemByID(int id)

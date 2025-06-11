@@ -51,7 +51,7 @@ namespace Chapeau.Services
             else
             {
                 MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-                OrderItem newItem = new OrderItem(menuItem.ItemID, menuItem, DateTime.Now, Status.Ordered, quantity);
+                OrderItem newItem = new OrderItem(null, menuItem, DateTime.Now, Status.Ordered, quantity, null);
                 selectedItems.Add(newItem);
             }
 
@@ -63,8 +63,8 @@ namespace Chapeau.Services
         {
             foreach (var item in items)
             {
-                item.OrderID = orderId;
-                _orderItemRepository.Insert(item);
+                //item.OrderID = orderId;
+                _orderItemRepository.Insert(item, orderId);
             }
         }
 
