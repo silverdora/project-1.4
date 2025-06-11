@@ -14,6 +14,10 @@ namespace Chapeau.ViewModels
         public bool HasFoodOrder => FoodStatus.HasValue;
         public bool HasDrinkOrder => DrinkStatus.HasValue;
 
+        //lulu
+        public int? OrderID { get; set; } // Nullable if no active order
+
+
         //public bool CanMarkAsServed => FoodStatus == Status.Ready || DrinkStatus == Status.Ready;
         //public bool CanFreeTable => IsOccupied && !HasFoodOrder && !HasDrinkOrder;
     }

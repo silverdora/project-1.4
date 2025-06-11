@@ -10,24 +10,23 @@ namespace Chapeau.Services
 {
     public class DummyOrderService
     {
-        private readonly DummyOrderRepository _repo;
+        private readonly PaymentRepository _paymentRepository;
 
         private readonly string _connectionString;
 
         public DummyOrderService(IConfiguration configuration)
         {
-            _repo = new DummyOrderRepository(configuration);
+            _paymentRepository = new PaymentRepository(configuration);
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         // Simple method to get order summary by table ID
-        public OrderSummaryViewModel GetOrderSummary(int tableId)
+        public OrderSummaryViewModel GetOrderSummaryById(int orderId)
         {
-            var order = _repo.GetActiveOrderByTable(tableId);
+            var order = _paymentRepository.GetOrderById(orderId);
             if (order == null)
                 return null;
 
-            // Group order items by item name
             var groupedItems = order.OrderItems
                 .GroupBy(i => i.MenuItem.Item_name)
                 .Select(g => new OrderItemViewModel
@@ -38,7 +37,6 @@ namespace Chapeau.Services
                     VATRate = g.First().MenuItem.VATPercent
                 }).ToList();
 
-            // Calculate totals
             decimal totalAmount = groupedItems.Sum(i => i.Quantity * i.UnitPrice);
             decimal lowVAT = groupedItems
                 .Where(i => i.VATRate == 9)
@@ -50,7 +48,7 @@ namespace Chapeau.Services
             return new OrderSummaryViewModel
             {
                 OrderID = order.OrderID,
-                TableNumber = tableId,
+                //TableNumber = order.TableId,  // Or appropriate property
                 Items = groupedItems,
                 TotalAmount = totalAmount,
                 LowVAT = lowVAT,
@@ -74,7 +72,7 @@ namespace Chapeau.Services
         }
         public Order GetOrderById(int orderId)
         {
-            return _repo.GetOrderById(orderId);
+            return _paymentRepository.GetOrderById(orderId);
         }
 
         public decimal GetOrderTotal(int orderId)

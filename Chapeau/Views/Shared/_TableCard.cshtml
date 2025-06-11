@@ -36,5 +36,12 @@
             <input type="hidden" name="employeeId" value="@employeeId" />
             <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
         </form>
-    </div>
+        @* Pay button only visible if table is occupied *@
+        @if (Model.IsOccupied)
+        {
+            <form asp-controller="Payment" asp-action="ViewOrder" method="get" class="d-inline">
+                <input type="hidden" name="orderId" value="@Model.OrderID" />
+                <button type="submit" class="btn btn-sm btn-success">Pay</button>
+            </form>
+        }
 </div>
