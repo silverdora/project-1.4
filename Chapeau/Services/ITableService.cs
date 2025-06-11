@@ -12,9 +12,6 @@ namespace Chapeau.Service.Interface
         void SetTableOccupiedStatus(int tableId, bool isOccupied);
         bool TrySetTableFree(int tableId);
         void MarkOrderAsServed(int tableId);
-
-
         void MarkTableFreeByOrder(int orderId);
-
     }
 }

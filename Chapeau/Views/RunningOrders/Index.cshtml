@@ -44,8 +44,7 @@
                                                     <div class=" d-flex justify-content-between align-items-center">
                                                         <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
                                                         <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
-                                                            <input hidden name="orderID" value="@order.OrderID" />
-                                                            <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
+                                                            <input hidden name="orderID" value="@orderItem.Order" />
                                                             <input hidden name="status" value="InProgress" />
                                                             <button type="submit" class="btn btn-primary btn-sm">Prepare</button>
                                                         </form>
