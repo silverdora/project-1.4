@@ -10,7 +10,7 @@ namespace Chapeau.Repository.Interface
         List<Table> GetAllTables();
         List<Table> GetTablesWithOrderStatus();
         List<TableOrderViewModel> GetTableOverview();
-        List<TableOrderViewModel> GetTableOrderViewModels();
+        //List<TableOrderViewModel> GetTableOrderViewModels();
         // sprint 3
         void UpdateTableOccupiedStatus(int tableId, bool isOccupied);
         bool HasUnservedOrders(int tableId);

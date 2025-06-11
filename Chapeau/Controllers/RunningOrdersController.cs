@@ -67,7 +67,7 @@ namespace Chapeau.Controllers
 
             else
             {
-                throw new Exception("no access");
+                 throw new Exception("no access");
             }
         }
 
@@ -151,4 +151,3 @@ namespace Chapeau.Controllers
         }
     }
 }
-
