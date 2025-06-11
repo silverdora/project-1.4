@@ -134,12 +134,13 @@ namespace Chapeau.Repository
             SELECT 
                 t.tableID, t.table_number, t.isOccupied,
                 MAX(CASE WHEN mi.category = 'Drinks' THEN oi.status END) AS DrinkStatus,
-                MAX(CASE WHEN mi.category <> 'Drinks' THEN oi.status END) AS FoodStatus
+                MAX(CASE WHEN mi.category <> 'Drinks' THEN oi.status END) AS FoodStatus,
+                o.orderID
             FROM [Table] t
-            LEFT JOIN [Order] o ON t.tableID = o.tableID
+            LEFT JOIN [Order] o ON t.tableID = o.tableID AND o.isPaid = 0
             LEFT JOIN [OrderItem] oi ON o.orderID = oi.orderID
             LEFT JOIN [MenuItem] mi ON oi.itemID = mi.itemID
-            GROUP BY t.tableID, t.table_number, t.isOccupied";
+            GROUP BY t.tableID, t.table_number, t.isOccupied, o.orderID";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 conn.Open();
@@ -153,7 +154,8 @@ namespace Chapeau.Repository
                         TableNumber = Convert.ToInt32(reader["table_number"]),
                         IsOccupied = Convert.ToBoolean(reader["isOccupied"]),
                         DrinkStatus = reader["DrinkStatus"] != DBNull.Value && Enum.TryParse(reader["DrinkStatus"].ToString(), out Status drinkStatus) ? drinkStatus : (Status?)null,
-                        FoodStatus = reader["FoodStatus"] != DBNull.Value && Enum.TryParse(reader["FoodStatus"].ToString(), out Status foodStatus) ? foodStatus : (Status?)null
+                        FoodStatus = reader["FoodStatus"] != DBNull.Value && Enum.TryParse(reader["FoodStatus"].ToString(), out Status foodStatus) ? foodStatus : (Status?)null,
+                        OrderID = reader["orderID"] != DBNull.Value ? Convert.ToInt32(reader["orderID"]) : null
                     };
 
                     viewModels.Add(viewModel);

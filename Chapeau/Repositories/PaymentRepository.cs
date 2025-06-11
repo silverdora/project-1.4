@@ -171,9 +171,9 @@ namespace Chapeau.Repositories
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-                    SELECT o.OrderID, o.OrderTime,
-                           oi.ItemID, oi.Quantity,
-                           m.Item_name, m.Price
+                    SELECT o.OrderID, o.OrderTime, o.TableID,
+                           oi.ItemID, oi.Quantity, oi.Status,
+                           m.Item_name, m.Price, m.VATPercent
                     FROM [Order] o
                     JOIN OrderItem oi ON o.OrderID = oi.OrderID
                     JOIN MenuItem m ON oi.ItemID = m.ItemID
@@ -193,19 +193,25 @@ namespace Chapeau.Repositories
                             {
                                 OrderID = orderId,
                                 OrderTime = Convert.ToDateTime(reader["OrderTime"]),
+                                Table = new Table { TableId = Convert.ToInt32(reader["TableID"]) },
                                 OrderItems = new List<OrderItem>()
                             };
                         }
 
+                        var menuItem = new MenuItem
+                        {
+                            ItemID = Convert.ToInt32(reader["ItemID"]),
+                            Item_name = reader["Item_name"].ToString(),
+                            Price = Convert.ToDecimal(reader["Price"]),
+                            VATPercent = Convert.ToDecimal(reader["VATPercent"])
+                        };
+
                         var orderItem = new OrderItem
                         {
+                            ItemID = Convert.ToInt32(reader["ItemID"]),
                             Quantity = Convert.ToInt32(reader["Quantity"]),
-                            MenuItem = new MenuItem
-                            {
-                                ItemID = Convert.ToInt32(reader["ItemID"]),
-                                Item_name = reader["Item_name"].ToString(),
-                                Price = Convert.ToDecimal(reader["Price"])
-                            }
+                            Status = (Status)Enum.Parse(typeof(Status), reader["Status"].ToString()),
+                            MenuItem = menuItem
                         };
 
                         order.OrderItems.Add(orderItem);
@@ -217,5 +223,3 @@ namespace Chapeau.Repositories
         }
     }
 }
-
-
