@@ -28,9 +28,9 @@ namespace Chapeau.Controllers
             return View(payments);
         }
         [HttpGet]
-        public IActionResult ViewOrder(int orderId)
+        public IActionResult ViewOrder(int id)
         {
-            var orderSummary = _dummyOrderService.GetOrderSummaryById(orderId);
+            var orderSummary = _dummyOrderService.GetOrderSummaryById(id);
             if (orderSummary == null) return NotFound();
 
             return View(orderSummary);

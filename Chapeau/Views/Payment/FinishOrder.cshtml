@@ -22,11 +22,8 @@
 
     <div>
         <label>Payment Type</label>
-        <select asp-for="PaymentType" required>
+        <select asp-for="PaymentType" asp-items="@Html.GetEnumSelectList<Chapeau.Models.PaymentType>()" required>
             <option value="">-- Select --</option>
-            <option>Cash</option>
-            <option>Debit Card</option>
-            <option>Credit Card</option>
         </select>
     </div>
 
@@ -52,5 +49,8 @@
     <button type="submit" class="btn btn-success">Confirm Payment</button>
 
 </form>
+
+
+
 
 

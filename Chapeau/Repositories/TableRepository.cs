@@ -135,12 +135,12 @@ namespace Chapeau.Repository
                 t.tableID, t.table_number, t.isOccupied,
                 MAX(CASE WHEN mi.category = 'Drinks' THEN oi.status END) AS DrinkStatus,
                 MAX(CASE WHEN mi.category <> 'Drinks' THEN oi.status END) AS FoodStatus,
-                o.orderID
+                MAX(CASE WHEN o.isPaid = 0 THEN o.orderID END) AS orderID
             FROM [Table] t
-            LEFT JOIN [Order] o ON t.tableID = o.tableID AND o.isPaid = 0
+            LEFT JOIN [Order] o ON t.tableID = o.tableID
             LEFT JOIN [OrderItem] oi ON o.orderID = oi.orderID
             LEFT JOIN [MenuItem] mi ON oi.itemID = mi.itemID
-            GROUP BY t.tableID, t.table_number, t.isOccupied, o.orderID";
+            GROUP BY t.tableID, t.table_number, t.isOccupied";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 conn.Open();
