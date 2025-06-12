@@ -21,8 +21,8 @@ namespace Chapeau.Repositories
 
         public void InsertOrder(Order order)
         {
-            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime) " +
-                           "VALUES (@employeeID, @tableID, @orderTime); " +
+            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime, isPaid) " +
+                           "VALUES (@employeeID, @tableID, @orderTime, 0); " +
                            "SELECT SCOPE_IDENTITY();";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -34,7 +34,7 @@ namespace Chapeau.Repositories
 
                 connection.Open();
                 object result = command.ExecuteScalar();
-                order.OrderID = Convert.ToInt32(result);
+                order.OrderId = Convert.ToInt32(result);
             }
         }
 
@@ -65,21 +65,11 @@ namespace Chapeau.Repositories
         private Order MapToOrder(SqlDataReader reader)
         {
             int tableId = Convert.ToInt32(reader["tableID"]);
-            Table matchedTable = null;
-            List<Table> allTables = _tableRepository.GetAllTables();
-
-            foreach (Table table in allTables)
-            {
-                if (table.TableId == tableId)
-                {
-                    matchedTable = table;
-                    break;
-                }
-            }
+            Table matchedTable = _tableRepository.GetTableById(tableId);
 
             return new Order
             {
-                OrderID = Convert.ToInt32(reader["orderID"]),
+                OrderId = Convert.ToInt32(reader["orderID"]),
                 OrderTime = Convert.ToDateTime(reader["orderTime"]),
                 IsPaid = Convert.ToBoolean(reader["isPaid"]),
                 Table = matchedTable,

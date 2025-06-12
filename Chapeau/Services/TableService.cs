@@ -19,7 +19,13 @@ namespace Chapeau.Service
         }
 
         public List<Table> GetAllTables() => _tableRepository.GetAllTables();
-        
+
+        public Table? GetTableById(int tableId)
+        {
+            return _tableRepository.GetTableById(tableId);
+        }
+
+
         public List<Table> GetTablesWithOrderStatus()
         {
             return _tableRepository.GetTablesWithOrderStatus();

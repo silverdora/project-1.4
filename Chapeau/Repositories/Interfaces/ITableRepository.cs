@@ -16,6 +16,7 @@ namespace Chapeau.Repository.Interface
         bool HasUnservedOrders(int tableId);
         void MarkReadyOrdersAsServed(int tableId);
 
+        public Table? GetTableById(int tableId); //(matheus)
 
 
         void MarkTableFreeByOrder(int orderId);

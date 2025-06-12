@@ -45,7 +45,7 @@ namespace Chapeau.Repositories
                         {
                             order = new Order
                             {
-                                OrderID = reader.GetInt32(0),
+                                OrderId = reader.GetInt32(0),
                                 Table = new Table { TableNumber = reader.GetInt32(1) },
                                 OrderTime = reader.GetDateTime(3),
                                 Status = reader.GetBoolean(4) ? Status.Served : Status.Ordered,
@@ -55,7 +55,7 @@ namespace Chapeau.Repositories
 
                         MenuItem menuItem = new MenuItem
                         {
-                            ItemID = reader.GetInt32(9),
+                            ItemId = reader.GetInt32(9),
                             Item_name = reader.GetString(10),
                             Price = reader.GetDecimal(11),
                             VATPercent = reader.GetDecimal(12)
@@ -63,7 +63,7 @@ namespace Chapeau.Repositories
 
                         OrderItem item = new OrderItem
                         {
-                            ItemID = reader.GetInt32(5),
+                            ItemId = reader.GetInt32(5),
                             Quantity = reader.GetInt32(6),
                             IncludeDate = reader.GetDateTime(7),
                             Status = (Status)Enum.Parse(typeof(Status), reader.GetString(8)),
@@ -108,7 +108,7 @@ namespace Chapeau.Repositories
                         {
                             order = new Order
                             {
-                                OrderID = orderId,
+                                OrderId = orderId,
                                 OrderTime = Convert.ToDateTime(reader["OrderTime"]),
                                 OrderItems = new List<OrderItem>()
                             };
@@ -119,7 +119,7 @@ namespace Chapeau.Repositories
                             Quantity = Convert.ToInt32(reader["Quantity"]),
                             MenuItem = new MenuItem
                             {
-                                ItemID = Convert.ToInt32(reader["ItemID"]),
+                                ItemId = Convert.ToInt32(reader["ItemID"]),
                                 Item_name = reader["Item_name"].ToString(),
                                 Price = Convert.ToDecimal(reader["Price"])
                             }

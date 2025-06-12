@@ -1,15 +1,18 @@
 ﻿
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Chapeau.Models
 {
     public class Order
     {
-        public int OrderID { get; set; }
+        public int OrderId { get; set; }
         public Employee Employee { get; set; }
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public string? Notes { get; set; }
+        public string? Notes { get; set; }//delete this field! 
 
         public bool? IsPaid { get; set; } = false;
         public Status Status { get; set; }
@@ -18,14 +21,97 @@ namespace Chapeau.Models
             OrderItems = new List<OrderItem>();
         }
 
-        public Order(int orderID, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems, bool isPaid)
+        public Order(int orderId, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems, bool isPaid, string notes)
         {
-            OrderID = orderID;
+            OrderId = orderId;
             Employee = employee;
             Table = table;
             OrderTime = orderTime;
             OrderItems = orderItems;
             IsPaid = isPaid;
-        }      
+            Notes =notes;//delete
+        }
+
+        // --- Session handling ---
+
+        private const string SessionKey = "CurrentOrder";
+
+        public void SaveToSession(ISession session)
+        {
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                WriteIndented = false
+            };
+
+            string json = JsonSerializer.Serialize(this, options);
+            session.SetString(SessionKey, json);
+        }
+
+        public static Order LoadFromSession(ISession session)
+        {
+            string? json = session.GetString(SessionKey);
+            if (string.IsNullOrEmpty(json))
+                return new Order();
+
+            return JsonSerializer.Deserialize<Order>(json) ?? new Order();
+        }
+
+        public static void ClearFromSession(ISession session)
+        {
+            session.Remove(SessionKey);
+        }
+
+        // --- Cart behavior ---
+
+        public void AddOrUpdateItem(MenuItem item, int quantity)
+        {
+            OrderItem existing = null;
+
+            foreach (OrderItem orderItem in OrderItems)
+            {
+                if (orderItem.MenuItem.ItemId == item.ItemId)
+                {
+                    existing = orderItem;
+                    break; // Stop the loop once we find the match
+                }
+            }
+            if (existing != null)
+            {
+                existing.Quantity += quantity;
+                existing.IncludeDate = DateTime.Now;
+            }
+            else
+            {
+                OrderItems.Add(new OrderItem
+                {
+                    MenuItem = item,
+                    Quantity = quantity,
+                    IncludeDate = DateTime.Now,
+                    Status = Status.Ordered
+                });
+            }
+        }
+        public void IncreaseOrDecreaseQuantity(int itemId, int adjustment)
+        {
+            OrderItem item = null;
+
+            foreach (OrderItem orderItem in OrderItems)
+            {
+                if (orderItem.MenuItem.ItemId == itemId)
+                {
+                    item = orderItem;
+                    break;
+                }
+            }
+            if (item != null)
+            {
+                item.Quantity += adjustment;
+                if (item.Quantity <= 0)
+                {
+                    OrderItems.Remove(item);
+                }
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace Chapeau.Services
         Order? GetActiveOrderByTableId(int tableId);
 
 
-        void AddItemToSessionSelection(int menuItemId, int quantity, ISession session);
+       // void AddItemToSessionSelection(MenuItem menuItem, int quantity, ISession session);
 
         void AddItemsToOrder(int orderId, List<OrderItem> items);
 

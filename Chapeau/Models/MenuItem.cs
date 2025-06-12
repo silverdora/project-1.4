@@ -2,14 +2,14 @@
 {
     public class MenuItem
     {
-        public int ItemID { get; set; }
+        public int ItemId { get; set; }
         public string Item_name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
         public decimal VATPercent { get; set; }
         public MenuCategory Category { get; set; }
         public int StockQuantity { get; set; }
-        public int CardID { get; set; }
+        public string Card { get; set; }
         public bool IsOutOfStock
         {
             get

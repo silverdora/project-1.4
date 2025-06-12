@@ -13,7 +13,7 @@ namespace Chapeau.Service.Interface
         bool TrySetTableFree(int tableId);
         void MarkOrderAsServed(int tableId);
 
-
+        public Table? GetTableById(int tableId);//(matheus)
         void MarkTableFreeByOrder(int orderId);
 
     }

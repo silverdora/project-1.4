@@ -1,6 +1,4 @@
 ﻿@model Chapeau.ViewModels.MenuSelectionViewModel
-@using Chapeau.ViewModels
-
 
 <h2>Menu Selection</h2>
 <!-- To display a message confirming every item while is being added -->
@@ -11,13 +9,15 @@
 	</div>
 }
 
-<!-- Card Buttons -->
-<div class="mb-3">
-	@{
-		var cardNames = new[] { "Lunch", "Dinner", "Drinks" };
-	}
+@{
+	// Define all available cards and categories
+	var cardNames = new[] { "Lunch", "Dinner", "Drinks" };
+	var categoriesInItems = Enum.GetNames(typeof(MenuCategory)).ToList(); // Show all possible categories
+}
 
-	<!-- "All" card -->
+<!-- CARD FILTER BUTTONS -->
+<div class="mb-3">
+	<!-- "All" card button -->
 	<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
 		<input type="hidden" name="tableID" value="@Model.TableID" />
 		<input type="hidden" name="orderID" value="@Model.OrderID" />
@@ -26,7 +26,8 @@
 		</button>
 	</form>
 
-	@foreach (var card in cardNames)
+	<!-- Card buttons -->
+	@foreach (string card in cardNames)
 	{
 		<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
 			<input type="hidden" name="card" value="@card" />
@@ -39,20 +40,11 @@
 	}
 </div>
 
-<!-- Category Buttons -->
+<!-- CATEGORY FILTER BUTTONS (only show when a card is selected) -->
 @if (!string.IsNullOrWhiteSpace(Model.SelectedCard))
 {
-	List<string> categoriesInItems = new List<string>();
-
-	foreach (var item in Model.Items)
-	{
-		if (!categoriesInItems.Contains(item.Category.ToString()))
-		{
-			categoriesInItems.Add(item.Category.ToString());
-		}
-	}
-
 	<div class="mb-3">
+		<!-- "All" category -->
 		<a asp-controller="MenuItem" asp-action="Index"
 		   asp-route-card="@Model.SelectedCard"
 		   asp-route-tableID="@Model.TableID"
@@ -61,7 +53,8 @@
 			All
 		</a>
 
-		@foreach (var category in categoriesInItems)
+		<!-- Category buttons -->
+		@foreach (string category in categoriesInItems)
 		{
 			<a asp-controller="MenuItem" asp-action="Index"
 			   asp-route-card="@Model.SelectedCard"
@@ -102,7 +95,7 @@ else
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var item in Model.Items)
+			@foreach (MenuItem item in Model.Items)
 			{
 				<tr>
 					<td>@item.Item_name</td>
@@ -129,7 +122,7 @@ else
 						@if (item.StockQuantity > 0)
 						{
 							<form asp-controller="Order" asp-action="AddItem" method="post">
-								<input type="hidden" name="menuItemId" value="@item.ItemID" />
+								<input type="hidden" name="menuItemId" value="@item.ItemId" />
 								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />								
 								<button type="submit">Add</button>
 							</form>

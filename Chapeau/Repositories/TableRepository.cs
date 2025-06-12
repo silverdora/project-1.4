@@ -40,6 +40,34 @@ namespace Chapeau.Repository
 
             return tables;
         }
+        //(matheus)
+        public Table? GetTableById(int tableId)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT tableID, table_number, isOccupied FROM [Table] WHERE tableID = @tableID";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@tableID", tableId);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    return new Table
+                    {
+                        TableId = (int)reader["tableID"],
+                        TableNumber = (int)reader["table_number"],
+                        IsOccupied = (bool)reader["isOccupied"]
+                    };
+                }
+
+                return null; // Table not found
+            }
+        }
+
+
+
 
         public List<Table> GetTablesWithOrderStatus()
         {

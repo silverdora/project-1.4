@@ -49,7 +49,7 @@ namespace Chapeau.Services
 
             return new OrderSummaryViewModel
             {
-                OrderID = order.OrderID,
+                OrderID = order.OrderId,
                 TableNumber = tableId,
                 Items = groupedItems,
                 TotalAmount = totalAmount,

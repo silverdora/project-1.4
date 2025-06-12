@@ -27,7 +27,7 @@ namespace Chapeau.Repositories
 
             List<MenuItem> result = ExecuteQueryMapMenuItems(query, parameter);
 
-            foreach (var item in result)
+            foreach (MenuItem item in result)
             {
                 return item; // return the first one
             }
@@ -38,11 +38,7 @@ namespace Chapeau.Repositories
         // Get items by card name (e.g., "Lunch", "Dinner", "Drinks")
         public List<MenuItem> GetMenuItemsByCard(string cardName)
         {
-            string query = @"
-                SELECT mi.*
-                FROM MenuItem mi
-                JOIN MenuCard mc ON mi.cardID = mc.icardID
-                WHERE mc.card_name = @card";
+            string query = "SELECT * FROM MenuItem WHERE card = @card";
 
             SqlParameter cardParameter = new SqlParameter("@card", cardName);
             return ExecuteQueryMapMenuItems(query, cardParameter);
@@ -60,11 +56,7 @@ namespace Chapeau.Repositories
         //Get items by both card and category
         public List<MenuItem> GetMenuItemsByCardAndCategory(string cardName, string categoryName)
         {
-            string query = @"
-                SELECT mi.*
-                FROM MenuItem mi
-                JOIN MenuCard mc ON mi.cardID = mc.icardID
-                WHERE mc.card_name = @card AND mi.category = @category";
+            string query = "SELECT * FROM MenuItem WHERE card = @card AND category = @category";
 
             SqlParameter cardParameter = new SqlParameter("@card", cardName);
             SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
@@ -86,7 +78,7 @@ namespace Chapeau.Repositories
             }
         }
         // Shared helper methods
-        private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
+        private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters) //using an erray to allow me to pass many numbers of parameters
         {
             List<MenuItem> items = new List<MenuItem>();
 
@@ -105,13 +97,15 @@ namespace Chapeau.Repositories
                         {
                             items.Add(new MenuItem
                             {
-                                ItemID = (int)reader["itemID"],
+                                ItemId = (int)reader["itemID"],
                                 Item_name = reader["item_name"].ToString(),
                                 Description = reader["description"].ToString(),
                                 Price = (decimal)reader["price"],
                                 VATPercent = (decimal)reader["VATpercent"],
                                 Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), (string)reader["category"], true),
-                                StockQuantity = (int)reader["stockQuantity"]
+                                StockQuantity = (int)reader["stockQuantity"],
+                                Card = reader["card"].ToString()
+
                             });
                         }
                     }
