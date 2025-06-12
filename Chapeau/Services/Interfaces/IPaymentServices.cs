@@ -12,6 +12,10 @@ namespace Chapeau.Services.Interfaces
         void SavePayment(FinishOrderViewModel model);
 
         void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback);
+        //Mo added in order to free the table after payment is done Sprint3
+        void MarkOrderAsPaid(int orderId);
+        int? GetLatestUnpaidOrderIdByTable(int tableId);
+
 
     }
 }

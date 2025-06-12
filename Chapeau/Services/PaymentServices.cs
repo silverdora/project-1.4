@@ -1,5 +1,6 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
+using Chapeau.Repository.Interface;
 using Chapeau.Services.Interfaces;
 using Chapeau.ViewModels;
 using Microsoft.Data.SqlClient; 
@@ -12,9 +13,27 @@ namespace Chapeau.Services
         private readonly IPaymentRepository _paymentRepository;
         private readonly string _connectionString;
 
-        public PaymentService(IPaymentRepository paymentRepository)
+        //Mo added in order to free the table after payment is done Sprint3
+        private readonly ITableRepository _tableRepository;
+        //public PaymentService(ITableRepository tableRepository)
+        //{
+        //    _tableRepository = tableRepository;
+        //}
+
+        public void MarkOrderAsPaid(int orderID)
+        {
+            _tableRepository.MarkOrderAsPaid(orderID);
+        }
+        public int? GetLatestUnpaidOrderIdByTable(int tableId)
+        {
+            return _tableRepository.GetLatestUnpaidOrderIdByTable(tableId);
+        }
+
+        /////////////////////////////////////////////////////////
+        public PaymentService(IPaymentRepository paymentRepository, ITableRepository tableRepository)
         {
             _paymentRepository = paymentRepository;
+            _tableRepository = tableRepository;
         }
 
         public List<Payment> GetAllPayments(int orderID)
@@ -81,7 +100,8 @@ namespace Chapeau.Services
         }
 
 
-
+        //Mo added in order to free the table after payment is done Sprint3
+        
 
 
 

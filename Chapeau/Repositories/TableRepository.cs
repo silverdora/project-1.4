@@ -257,5 +257,23 @@ namespace Chapeau.Repository
             cmd.ExecuteNonQuery();
         }
 
+        //Mo.....sprint 3
+        public int? GetLatestUnpaidOrderIdByTable(int tableId)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            string query = @"
+        SELECT TOP 1 orderID
+        FROM [Order]
+        WHERE tableID = @tableId AND IsPaid = 0
+        ORDER BY orderTime DESC";
+
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@tableId", tableId);
+            conn.Open();
+            var result = cmd.ExecuteScalar();
+            return result != null ? Convert.ToInt32(result) : (int?)null;
+        }
+
+
     }
 }

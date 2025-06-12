@@ -8,59 +8,42 @@
         {
             Status.Ordered => "bg-primary",
             Status.InProgress => "bg-warning text-dark",
-            Status.ReadyToBeServed => "bg-success", // use "Ready" if that's your enum value
-            _ => "bg-secondary"
+            Status.ReadyToBeServed => "bg-success",
+            Status.Served => "bg-secondary",
+            _ => "bg-light text-dark"
         };
     }
 }
 
-@{
-    int? employeeId = Context.Session.GetInt32("EmployeeID");
-}
-
-<!-- Entire card is clickable -->
-<button onclick="openTableModal(
-        @Model.TableId,
-        '@Model.IsOccupied'.toLowerCase(),
-        '@(Model.FoodStatus?.ToString() ?? "null")',
-        '@(Model.DrinkStatus?.ToString() ?? "null")'
-    )"
-        class="btn p-0 text-start w-100 border-0 bg-transparent"
-        style="cursor: pointer;"
-        type="button">
-
-    <div class="card border border-secondary-subtle shadow-sm h-100">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-semibold">Table @Model.TableNumber</h5>
-            <span class="badge rounded-pill px-3 py-2 fs-6 @(Model.IsOccupied ? "bg-danger" : "bg-success")">
-                @(Model.IsOccupied ? "Occupied" : "Free")
-            </span>
-        </div>
-
-        <div class="card-body p-4">
-            <div class="mb-3">
-                @if (Model.FoodStatus.HasValue && Model.FoodStatus != Status.Served)
-                {
-                    <span class="badge @GetStatusBadgeClass(Model.FoodStatus.Value)">
-                        Food: @Model.FoodStatus.Value
-                    </span>
-                }
-
-                @if (Model.DrinkStatus.HasValue && Model.DrinkStatus != Status.Served)
-                {
-                    <span class="badge @GetStatusBadgeClass(Model.DrinkStatus.Value)">
-                        Drink: @Model.DrinkStatus.Value
-                    </span>
-                }
-
-                @if ((!Model.FoodStatus.HasValue || Model.FoodStatus == Status.Served)
-                && (!Model.DrinkStatus.HasValue || Model.DrinkStatus == Status.Served))
-                {
-                    <span class="text-muted small">No Active Orders</span>
-                }
-            </div>
-
-            <div class="text-center text-muted small">Click for more actions</div>
-        </div>
+<div class="card border border-secondary-subtle shadow-sm h-100">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">Table @Model.TableNumber</h5>
+        <span class="badge rounded-pill px-3 py-2 fs-6 @(Model.IsOccupied ? "bg-danger" : "bg-success")">
+            @(Model.IsOccupied ? "Occupied" : "Free")
+        </span>
     </div>
-</button>
+
+    <div class="card-body p-4">
+        <div class="mb-3">
+            @if (Model.FoodStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.FoodStatus.Value)">
+                    Food: @Model.FoodStatus.Value
+                </span>
+            }
+
+            @if (Model.DrinkStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.DrinkStatus.Value)">
+                    Drink: @Model.DrinkStatus.Value
+                </span>
+            }
+
+            @if (!Model.FoodStatus.HasValue && !Model.DrinkStatus.HasValue)
+            {
+                <span class="text-muted small">No Active Orders</span>
+            }
+        </div>
+        <div class="text-center text-muted small">Click for more actions</div>
+    </div>
+</div>

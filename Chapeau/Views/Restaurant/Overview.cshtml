@@ -95,10 +95,16 @@
         }
 
         // 3. Process Payment
-        if (foodStatus === "Served" && drinkStatus === "Served") {
+        const canPay =
+            (foodStatus === "Served" || foodStatus === "null") &&
+            (drinkStatus === "Served" || drinkStatus === "null") &&
+            (foodStatus === "Served" || drinkStatus === "Served");
+
+        if (canPay) {
             html += `
-                <form method="post" action="/Payment/Process?tableId=${tableId}">
-                    <button type="submit" class="btn btn-outline-dark w-100 mb-2">💰 Process Payment</button>
+                <form method="post" action="/Payment/StartPayment">
+                    <input type="hidden" name="tableId" value="${tableId}" />
+                    <button class="btn btn-dark w-100 mb-2">💰 Process Payment</button>
                 </form>`;
         }
 

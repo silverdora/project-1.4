@@ -10,6 +10,7 @@ namespace Chapeau.ViewModels
 
         public Status? FoodStatus { get; set; }
         public Status? DrinkStatus { get; set; }
+        //public int? OrderId { get; set; } // ✅ Small and safe///Mo added sprint3 to process payment
 
         public bool HasFoodOrder => FoodStatus.HasValue;
         public bool HasDrinkOrder => DrinkStatus.HasValue;
