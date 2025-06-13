@@ -88,7 +88,7 @@ namespace Chapeau.Repositories
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-            INSERT INTO Payments (orderID, amountPaid, tipAmount, paymentType, Feedback, paymentDAte)
+            INSERT INTO Payment (orderID, amountPaid, tipAmount, paymentType, Feedback, paymentDAte)
             VALUES (@orderID, @amountPaid, @tipAmount, @paymentType, @Feedback, @paymentDAte)";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
