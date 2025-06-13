@@ -10,7 +10,7 @@
 
 <div class="col mb-2" role="group">
     <a class="btn btn-dark" href="/RunningOrders/Index">Running Orders</a>
-    <a class="btn btn-light" href="/RunningOrders/ReadyToBeServed">Ready To Be Served Orders</a>
+    <a class="btn btn-light" href="/RunningOrders/FinishedOrders">Finished Orders</a>
 </div>
 <a class="btn btn-primary mb-2" href="/RunningOrders/Index">Refresh</a>
 @if (TempData["StatusChangeMessage"] != null)
@@ -27,7 +27,8 @@
                     var viewData = new ViewDataDictionary(ViewData){
                         { "OrdersByCourse", Model.NewOrdersByCourse },
                         { "CurrentStatus", Status.Ordered },
-                        { "NewStatus", Status.InProgress }
+                        { "NewStatus", Status.InProgress },
+                        {"EmployeeRole", Model.Employee.Role }
                     };
                     <partial name="_OrderCard" model="@order" view-data="viewData" />
                 }
@@ -47,7 +48,8 @@
                     var viewData = new ViewDataDictionary(ViewData){
                         { "OrdersByCourse", Model.PreparingOrdersByCourse },
                         { "CurrentStatus", Status.InProgress },
-                        { "NewStatus", Status.ReadyToBeServed }
+                        { "NewStatus", Status.ReadyToBeServed },
+                        {"EmployeeRole", Model.Employee.Role }
                     };
                     <partial name="_OrderCard" model="@order" view-data="viewData" />
                 }

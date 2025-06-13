@@ -8,68 +8,48 @@
 
 <div class="col mb-2" role="group">
     <a class="btn btn-light" href="/RunningOrders/Index">Running Orders</a>
-    <a class="btn btn-dark" href="/RunningOrders/ReadyToBeServed">Ready To Be Served Orders</a>
+    <a class="btn btn-dark" href="/RunningOrders/ReadyToBeServed">Finished Orders</a>
 </div>
 <a class="btn btn-primary mb-2" href="/RunningOrders/ReadyToBeServed">Refresh</a>
 @if (TempData["StatusChangeMessage"] != null)
 {
     <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
 }
+
 <div class="mb-4">
+    <h4>Ready To Be Served</h4>
     <div class="container">
-        <div class="row row d-flex align-items-start">
+        <div class="row d-flex align-items-start">
             @{
                 foreach (Order order in Model.ReadyOrders)
                 {
-                    <div class="card m-2" style="width: 18rem; padding: 0">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
-                            <p class="card-text mb-0">@order.Employee.employeeName</p>
-                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
-                        </div>
-                        <div class="card-body">
-                            @{
-                                foreach (MenuCategory course in Model.ReadyOrdersByCourse[order.OrderID])
-                                {
-                                    <strong>@course</strong>
-                                    <ul class="list-group list-group-flush">
+                    var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.ReadyOrdersByCourse },
+                        { "CurrentStatus", Status.ReadyToBeServed },
+                        { "NewStatus", Status.Served },
+                        {"EmployeeRole", Model.Employee.Role }
+                    };
+                    <partial name="_OrderCard" model="@order" view-data="viewData" />
+                }
+            }
+        </div>
+    </div>
+</div>
 
-                                        @foreach (OrderItem orderItem in order.OrderItems)
-                                            if (orderItem.MenuItem.Category == course && orderItem.Status == Status.ReadyToBeServed)
-                                            {
-                                                <li class="list-group-item ps-0 pe-0">
-                                                    <div class=" d-flex justify-content-between align-items-center">
-                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
-                                                        <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
-                                                            <input hidden name="orderItemID" value="@orderItem.OrderItemID" />
-                                                            <input hidden name="status" value="Served" />
-                                                            <button type="submit" class="btn btn-primary btn-sm">Close</button>
-                                                        </form>
-                                                    </div>
-                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                                    <br />
-                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                                    <br />
-                                                </li>
-                                            }
-                                    </ul>
-                                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
-                                        <input hidden name="orderID" value="@order.OrderID" />
-                                        <input hidden name="currentStatus" value="Ordered" />
-                                        <input hidden name="newStatus" value="InProgress" />
-                                        <input hidden name="course" value="@course" />
-                                        <button type="submit" class="btn btn-info btn-sm mb-2">Prepare course</button>
-                                    </form>
-                                }
-                            }
-                            <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
-                                <input hidden name="orderID" value="@order.OrderID" />
-                                <input hidden name="currentStatus" value="ReadyToBeServed" />
-                                <input hidden name="newStatus" value="Served" />
-                                <button type="submit" class="btn btn-primary">Close all</button>
-                            </form>
-                        </div>
-                    </div>
+<div class="mb-4">
+    <h4>Served Today</h4>
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            @{
+                    foreach (Order order in Model.ReadyOrders)
+                    {
+                        var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.ReadyOrdersByCourse },
+                        { "CurrentStatus", Status.Served },
+                        { "NewStatus", null },
+                        {"EmployeeRole", Model.Employee.Role }
+                };
+                    <partial name="_OrderCard" model="@order" view-data="viewData" />
                 }
             }
         </div>

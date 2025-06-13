@@ -3,6 +3,7 @@
     var ordersByCourse = ViewData["OrdersByCourse"] as IDictionary<int, List<MenuCategory>>;
     var currentStatus = ViewData["CurrentStatus"] as Status?;
     var newStatus = ViewData["NewStatus"] as Status?;
+    var employeeRole = ViewData["EmployeeRole"] as Role?;
     string changeItemStatus;
     string changeCourseStatus;
     string changeOrderStatus;
@@ -25,6 +26,7 @@
         changeOrderStatus = "All Is Served";
     }
 }
+
 <div class="card m-2" style="width: 18rem; padding: 0">
     <div class="card-header">
         <h5 class="card-title mb-0">Order #@Model.OrderID</h5>
@@ -33,15 +35,20 @@
     </div>
     <div class="card-body">
         @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderID))
-        {
-            foreach (MenuCategory course in ordersByCourse[Model.OrderID])
             {
-                <strong>@course</strong>
+                foreach (MenuCategory course in ordersByCourse[Model.OrderID])
+                {
+                @if (employeeRole == Role.Kitchen)
+                    {
+                    <strong>@course</strong>
+                    }
+                    
+
                 <ul class="list-group list-group-flush">
 
                     @foreach (OrderItem orderItem in Model.OrderItems)
-                        if (orderItem.MenuItem.Category == course && orderItem.Status == currentStatus)
-                        {
+                            if (orderItem.MenuItem.Category == course && orderItem.Status == currentStatus)
+                            {
                             <li class="list-group-item ps-0 pe-0">
                                 <div class=" d-flex justify-content-between align-items-center">
                                     <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
@@ -56,15 +63,21 @@
                                 <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
                                 <br />
                             </li>
-                        }
+                            }
                 </ul>
-                <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
-                    <input hidden name="orderID" value="@Model.OrderID" />
-                    <input hidden name="currentStatus" value="@currentStatus" />
-                    <input hidden name="newStatus" value="@newStatus" />
-                    <input hidden name="course" value="@course" />
-                    <button type="submit" class="btn btn-info btn-sm mb-2">@changeCourseStatus</button>
-                </form>
+
+                @if (employeeRole == Role.Kitchen)
+                        {
+                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
+                        <input hidden name="orderID" value="@Model.OrderID" />
+                        <input hidden name="currentStatus" value="@currentStatus" />
+                        <input hidden name="newStatus" value="@newStatus" />
+                        <input hidden name="course" value="@course" />
+                        <button type="submit" class="btn btn-info btn-sm mb-2">@changeCourseStatus</button>
+                    </form>
+                        }
+                    
+
             }
             <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
                 <input hidden name="orderID" value="@Model.OrderID" />

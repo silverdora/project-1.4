@@ -57,7 +57,7 @@ namespace Chapeau.Controllers
         }
 
         [HttpGet]
-        public IActionResult ReadyToBeServed()
+        public IActionResult FinishedOrders()
         {
             //get Employee object 
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
