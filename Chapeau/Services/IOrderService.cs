@@ -13,7 +13,7 @@ namespace Chapeau.Services
 
         //kitchen or bar
         List<Order> GetOrdersByStatus(Status status, string type);
-        void ChangeOrderStatus(int orderItemID, Status status);
+        void ChangeOrderItemStatus(int orderItemID, Status status);
         void ChangeAllOrderItemsStatus(int orderID, string type, Status currentStatus, Status newStatus);
         Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> order);
         void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course);

@@ -77,7 +77,7 @@ namespace Chapeau.Services
         }
 
         //methods connected with bar or kitchen
-        public void ChangeOrderStatus(int orderItemID, Status status)
+        public void ChangeOrderItemStatus(int orderItemID, Status status)
         {
             _orderItemRepository.ChangeOrderItemStatus(orderItemID, status);
         }

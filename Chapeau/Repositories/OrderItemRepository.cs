@@ -2,6 +2,7 @@
 using Chapeau.Repositories.Interfaces;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using Chapeau.Exceptions;
 
 namespace Chapeau.Repositories
 {
@@ -95,7 +96,7 @@ namespace Chapeau.Repositories
                 int nrOfRowsAffected = command.ExecuteNonQuery();
                 if (nrOfRowsAffected != 1)
                 {
-                    throw new Exception("Changing status failed!");
+                    throw new ChangeStatusException();
                 }
             }
         }
@@ -122,7 +123,7 @@ namespace Chapeau.Repositories
                 int nrOfRowsAffected = command.ExecuteNonQuery();
                 if (nrOfRowsAffected == 0)
                 {
-                    throw new Exception("Changing status failed!");
+                    throw new ChangeStatusException();
                 }
             }
         }
@@ -151,7 +152,7 @@ namespace Chapeau.Repositories
                 int nrOfRowsAffected = command.ExecuteNonQuery();
                 if (nrOfRowsAffected == 0)
                 {
-                    throw new Exception("Changing status failed!");
+                    throw new ChangeStatusException();
                 }
             }
         }
