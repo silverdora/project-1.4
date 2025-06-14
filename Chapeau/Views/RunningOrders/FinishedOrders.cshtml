@@ -10,11 +10,8 @@
     <a class="btn btn-light" href="/RunningOrders/Index">Running Orders</a>
     <a class="btn btn-dark" href="/RunningOrders/ReadyToBeServed">Finished Orders</a>
 </div>
-<a class="btn btn-primary mb-2" href="/RunningOrders/ReadyToBeServed">Refresh</a>
-@if (TempData["StatusChangeMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
-}
+<a class="btn btn-primary mb-2" href="/RunningOrders/FinishedOrders">Refresh</a>
+@Html.Partial("_ChangeStatusConfirmation")
 
 <div class="mb-4">
     <h4>Ready To Be Served</h4>
@@ -41,9 +38,9 @@
     <div class="container">
         <div class="row d-flex align-items-start">
             @{
-                    foreach (Order order in Model.ServedOrders)
-                    {
-                        var viewData = new ViewDataDictionary(ViewData){
+                foreach (Order order in Model.ServedOrders)
+                {
+                    var viewData = new ViewDataDictionary(ViewData){
                         { "OrdersByCourse", Model.ServedOrdersByCourse },
                         {"EmployeeRole", Model.Employee.Role }
                 };

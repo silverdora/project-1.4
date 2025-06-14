@@ -13,10 +13,7 @@
     <a class="btn btn-light" href="/RunningOrders/FinishedOrders">Finished Orders</a>
 </div>
 <a class="btn btn-primary mb-2" href="/RunningOrders/Index">Refresh</a>
-@if (TempData["StatusChangeMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
-}
+@Html.Partial("_ChangeStatusConfirmation")
 <div class="mb-4">
     <h4>Ordered</h4>
     <div class="container">
