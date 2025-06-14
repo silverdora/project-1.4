@@ -107,16 +107,45 @@ namespace Chapeau.Controllers
             TempData["SuccessMessage"] = "Payment completed successfully!";
             return RedirectToAction("Index", "Restaurant");
         }
-
         [HttpGet]
         public IActionResult SplitBill(int orderId)
         {
-            // Prepare a SplitPaymentViewModel, e.g.:
-            var model = new SplitPaymentViewModel { OrderID = orderId, TotalAmount = ... };
-            return View(model);
+            var order = _orderService.GetOrderSummaryById(orderId);
+            if (order == null) return RedirectToAction("Index", "Restaurant");
+            ViewBag.OrderID = orderId; ViewBag.TotalAmount = order.TotalAmount;
+            return View();
         }
+
+        [HttpPost]
+        public IActionResult SplitBill(int orderId, int numberOfPeople)
+        {
+            var order = _orderService.GetOrderSummaryById(orderId);
+            if (order == null || numberOfPeople < 1)
+                return RedirectToAction("SplitBill", new { orderId });
+
+            decimal amountPerPerson = order.TotalAmount / numberOfPeople;
+
+            for (int i = 0; i < numberOfPeople; i++)
+            {
+                var payment = new Payment
+                {
+                    orderID = orderId,
+                    amountPaid = amountPerPerson,
+                    tipAmount = 0,
+                    paymentType = PaymentType.Cash,  // Or whatever default you want
+                    paymentDAte = DateTime.Now,
+                    Feedback = $"Split payment part {i + 1}"
+                };
+
+                _paymentService.AddPayment(payment);
+            }
+
+            TempData["SuccessMessage"] = "Split payment completed successfully!";
+            return RedirectToAction("Index", "Restaurant");
+        }
+
 
     }
 }
 
- 
+
