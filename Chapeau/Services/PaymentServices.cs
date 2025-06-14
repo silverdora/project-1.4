@@ -61,25 +61,19 @@ namespace Chapeau.Services
 
         public void SavePayment(FinishOrderViewModel model)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            var payment = new Payment
             {
-                string query = @"INSERT INTO Payment (orderID, paymentType, amountPaid, tipAmount, paymentDAte, lowVatAmount, highVATAmount)
-                         VALUES (@orderID, @paymentType, @amountPaid, @tipAmount, @paymentDate, @lowVatAmount, @highVATAmount)";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@orderID", model.OrderID);
-                    cmd.Parameters.AddWithValue("@paymentType", model.PaymentType);
-                    cmd.Parameters.AddWithValue("@amountPaid", model.AmountPaid);
-                    cmd.Parameters.AddWithValue("@tipAmount", model.TipAmount);
-                    cmd.Parameters.AddWithValue("@paymentDate", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@lowVatAmount", model.LowVatAmount);
-                    cmd.Parameters.AddWithValue("@highVATAmount", model.HighVatAmount);
+                orderID = model.OrderID,
+                paymentType = model.PaymentType,
+                amountPaid = model.AmountPaid,
+                tipAmount = model.TipAmount,
+                paymentDAte = DateTime.Now,
+                lowVatAmount = model.LowVatAmount,
+                highVATAmount = model.HighVatAmount,
+                Feedback = model.Feedback
+            };
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
+            _paymentRepository.AddPayment(payment);
         }
         public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
         {
@@ -98,7 +92,7 @@ namespace Chapeau.Services
 
 
         //Mo added in order to free the table after payment is done Sprint3
-        
+
 
 
 

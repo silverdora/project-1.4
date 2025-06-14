@@ -32,6 +32,6 @@
 <p><strong>Total:</strong> @Model.TotalAmount.ToString("C2")</p>
 <p><strong>VAT:</strong> @(Math.Round(Model.LowVAT + Model.HighVAT, 2).ToString("C2"))</p>
 
-<form asp-action="FinishOrder" method="post">
-    <button type="submit" class="btn btn-success">Confirm Payment</button>
-</form>
+<div class="mt-3">
+    <a asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-primary">Proceed to Payment</a>
+</div>

@@ -20,8 +20,8 @@ namespace Chapeau.Repositories
         {
             string query = @"
                 INSERT INTO Payment 
-                (orderID, paymentType, amountPaid, tipAmount, paymentDAte, lowVatAmount, highVATAmount)
-                VALUES (@orderID, @paymentType, @amountPaid, @tipAmount, @paymentDate, @lowVatAmount, @highVATAmount)";
+                (orderID, paymentType, amountPaid, tipAmount, paymentDAte, lowVatAmount, highVATAmount, Feedback)
+                VALUES (@orderID, @paymentType, @amountPaid, @tipAmount, @paymentDate, @lowVatAmount, @highVATAmount, @feedback)";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -33,6 +33,7 @@ namespace Chapeau.Repositories
                 cmd.Parameters.AddWithValue("@paymentDate", payment.paymentDAte);
                 cmd.Parameters.AddWithValue("@lowVatAmount", payment.lowVatAmount);
                 cmd.Parameters.AddWithValue("@highVATAmount", payment.highVATAmount);
+                cmd.Parameters.AddWithValue("@feedback", string.IsNullOrEmpty(payment.Feedback) ? DBNull.Value : (object)payment.Feedback);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
