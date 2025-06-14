@@ -4,6 +4,12 @@ namespace Chapeau.Repositories.Interfaces
 {
     public interface IOrderRepository
     {    
-        public void InsertOrder(Order order);
+        void InsertOrder(Order order);
+
+        Order? GetActiveOrderByTableId(int tableId);
+
+
+   
+
     }
 }

@@ -22,20 +22,16 @@
             <tr>
                 <td>@item.ItemName</td>
                 <td>@item.Quantity</td>
-                <td>€@item.UnitPrice</td>
-                <td>€@item.TotalPrice</td>
+                <td>@item.UnitPrice.ToString("C2")</td>
+                <td>@item.TotalPrice.ToString("C2")</td>
             </tr>
         }
     </tbody>
 </table>
 
-<p><strong>Total:</strong> €@Model.TotalAmount</p>
-<p><strong>Low VAT (9%):</strong> €@Model.LowVAT</p>
-<p><strong>High VAT (21%):</strong> €@Model.HighVAT</p>
+<p><strong>Total:</strong> @Model.TotalAmount.ToString("C2")</p>
+<p><strong>VAT:</strong> @(Math.Round(Model.LowVAT + Model.HighVAT, 2).ToString("C2"))</p>
 
-<a asp-controller="Order" asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-success">
-    Finish Order
-</a>
-
-
-
+<form asp-action="FinishOrder" method="post">
+    <button type="submit" class="btn btn-success">Confirm Payment</button>
+</form>

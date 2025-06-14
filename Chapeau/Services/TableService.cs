@@ -10,8 +10,10 @@ using Microsoft.Data.SqlClient;
 namespace Chapeau.Service
 {
     public class TableService : ITableService
+  
     {
         private readonly ITableRepository _tableRepository;
+
 
         public TableService(ITableRepository tableRepository)
         {

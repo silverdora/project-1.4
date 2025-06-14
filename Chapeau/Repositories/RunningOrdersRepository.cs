@@ -162,7 +162,7 @@ namespace Chapeau.Repositories
             //bool isServed = true;
             List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status, type);
 
-            return new Order(orderId, employee, table, orderTime, orderItems);
+            return new Order(orderId, employee, table, orderTime, orderItems, false);
 
         }
 

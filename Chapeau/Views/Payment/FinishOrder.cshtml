@@ -22,11 +22,8 @@
 
     <div>
         <label>Payment Type</label>
-        <select asp-for="PaymentType" required>
+        <select asp-for="PaymentType" asp-items="@Html.GetEnumSelectList<Chapeau.Models.PaymentType>()" required>
             <option value="">-- Select --</option>
-            <option>Cash</option>
-            <option>Debit Card</option>
-            <option>Credit Card</option>
         </select>
     </div>
 
@@ -45,14 +42,15 @@
         <textarea asp-for="Feedback" rows="4" cols="50"></textarea>
     </div>
 
-    <a asp-controller="Order" asp-action="SplitBill" asp-route-orderId="@Model.OrderID" class="btn btn-primary">
+    <a asp-controller="Payment" asp-action="SplitBill" asp-route-orderId="@Model.OrderID" class="btn btn-primary">
         Split Bill
     </a>
 
-
-    <a href="@Url.Action("Confirmation", "Order")" class="btn btn-primary">Confirm Payment</a>
-
+    <button type="submit" class="btn btn-success">Confirm Payment</button>
 
 </form>
+
+
+
 
 

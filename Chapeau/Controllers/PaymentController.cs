@@ -13,12 +13,14 @@ namespace Chapeau.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        // ✅ Use ONE constructor
-        public PaymentController(IPaymentService paymentService)
+        private readonly DummyOrderService _dummyOrderService;
+
+        public PaymentController(IPaymentService paymentService, DummyOrderService dummyOrderService)
         {
             _paymentService = paymentService;
-           
+            _dummyOrderService = dummyOrderService;
         }
+
 
         public ActionResult Index()
         {
@@ -70,6 +72,8 @@ namespace Chapeau.Controllers
 
 
     }
+
 }
+
 
  
