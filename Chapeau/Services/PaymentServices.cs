@@ -1,21 +1,39 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
+using Chapeau.Repository.Interface;
 using Chapeau.Services.Interfaces;
 using Chapeau.ViewModels;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient; 
+
 
 namespace Chapeau.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly string _connectionString;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly DummyOrderService _orderService;
+        private readonly string _connectionString;
 
-        public PaymentService(IPaymentRepository paymentRepository, DummyOrderService orderService)
+        //Mo added in order to free the table after payment is done Sprint3
+        private readonly ITableRepository _tableRepository;
+        //public PaymentService(ITableRepository tableRepository)
+        //{
+        //    _tableRepository = tableRepository;
+        //}
+
+        public void MarkOrderAsPaid(int orderID)
+        {
+            _tableRepository.MarkOrderAsPaid(orderID);
+        }
+        public int? GetLatestUnpaidOrderIdByTable(int tableId)
+        {
+            return _tableRepository.GetLatestUnpaidOrderIdByTable(tableId);
+        }
+
+        /////////////////////////////////////////////////////////
+        public PaymentService(IPaymentRepository paymentRepository, ITableRepository tableRepository)
         {
             _paymentRepository = paymentRepository;
-            _orderService = orderService;
+            _tableRepository = tableRepository;
         }
 
         public List<Payment> GetAllPayments(int orderID)
@@ -27,7 +45,6 @@ namespace Chapeau.Services
         {
             _paymentRepository.AddPayment(payment);
         }
-
         public void CompletePayment(int id)
         {
             _paymentRepository.MarkPaymentComplete(id);
@@ -37,7 +54,9 @@ namespace Chapeau.Services
         public void CompletePayment(Payment payment)
         {
             if (payment == null) return;
+            // Either add new payment or update existing one, depending on your logic
             _paymentRepository.AddPayment(payment);
+            // or _paymentRepository.UpdatePayment(payment); if you have update logic
         }
 
         public void SavePayment(FinishOrderViewModel model)
@@ -49,7 +68,7 @@ namespace Chapeau.Services
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@orderID", model.OrderID);
-                    cmd.Parameters.AddWithValue("@paymentType", model.PaymentType.ToString());
+                    cmd.Parameters.AddWithValue("@paymentType", model.PaymentType);
                     cmd.Parameters.AddWithValue("@amountPaid", model.AmountPaid);
                     cmd.Parameters.AddWithValue("@tipAmount", model.TipAmount);
                     cmd.Parameters.AddWithValue("@paymentDate", DateTime.Now);
@@ -60,36 +79,31 @@ namespace Chapeau.Services
                     cmd.ExecuteNonQuery();
                 }
             }
-        }
 
-        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, PaymentType paymentType, string feedback)
+        }
+        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
         {
-            try
-            { 
-                if (orderId <= 0)
-                    throw new ArgumentException("Invalid order ID");
+            // Save payment record for the order into the database
+            // Assuming you have a PaymentRepository or similar to persist data
 
-                if (amountPaid <= 0)
-                    throw new ArgumentException("Amount paid must be greater than 0");
-
-                var payment = new Payment
-                {
-                    orderID = orderId,
-                    amountPaid = amountPaid,
-                    tipAmount = tipAmount,
-                    paymentType = paymentType,
-                    Feedback = feedback,
-                    paymentDAte = DateTime.Now
-                };
-
-                _paymentRepository.Add(payment);
-            }
-            catch (Exception ex)
+            var payment = new Payment
             {
-                // Log the error
-                throw new Exception($"Failed to save individual payment: {ex.Message}", ex);
-            }
+                orderID = orderId,
+                amountPaid = amountPaid,
+                tipAmount = tipAmount,
+                paymentType = paymentType,
+                Feedback = feedback,
+                paymentDAte = DateTime.Now
+            };
+
+            _paymentRepository.Add(payment);
         }
+
+
+        //Mo added in order to free the table after payment is done Sprint3
+        
+
+
+
     }
 }
-

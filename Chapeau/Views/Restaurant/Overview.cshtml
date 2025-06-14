@@ -1,48 +1,55 @@
 ﻿@model List<TableOrderViewModel>
 @using Chapeau.ViewModels
 
-<!-- This is used to display the message only once after after triggering the button submit order and redirect to table overview-->
+<!-- Flash Messages -->
 @if (TempData["OrderSuccess"] != null)
 {
-    <div class="alert alert-success">
+    <div class="alert alert-success text-center">
         @TempData["OrderSuccess"]
     </div>
 }
-<h2 class="text-center mb-4">Restaurant Seating Overview</h2>
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
         @TempData["Error"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
         @TempData["Success"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
+<h2 class="text-center mb-4">Restaurant Seating Overview</h2>
+
 <div class="container">
     <div class="d-flex justify-content-end mb-3">
-        <a class="btn btn-outline-primary" href="/Restaurant/Overview">
-            🔄 Refresh
-        </a>
+        <a class="btn btn-outline-primary" href="/Restaurant/Overview">🔄 Refresh</a>
     </div>
 
-    <div class="row row-cols-2 g-4 justify-content-center">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
         @foreach (var table in Model.OrderBy(t => t.TableNumber))
         {
-            <div class="col d-flex justify-content-center">
-                <partial name="_TableCard" model="table" />
+            <div class="col">
+                <div class="card shadow-sm h-100"
+                     onclick="openTableModal(
+                         @table.TableId,
+                         '@table.IsOccupied'.toLowerCase(),
+                         '@(table.FoodStatus?.ToString() ?? "null")',
+                         '@(table.DrinkStatus?.ToString() ?? "null")')">
+                    <div class="card-body">
+                        <partial name="_TableCard" model="table" />
+                    </div>
+                </div>
             </div>
         }
     </div>
 </div>
 
-<!-- ✅ Table Action Modal -->
+<!-- Modal for table actions -->
 <div class="modal fade" id="tableActionModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -51,43 +58,66 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Populated dynamically -->
+                <!-- Injected by script -->
             </div>
         </div>
     </div>
 </div>
 
-<!-- ✅ Modal Trigger Script -->
 <script>
-    function openTableModal(tableId, isOccupied, orderStatus) {
+    function openTableModal(tableId, isOccupied, foodStatus, drinkStatus) {
         const body = document.getElementById("modalBody");
         let html = `<p><strong>Table #${tableId}</strong></p>`;
 
+        // 1. Start Order
+        html += `
+            <form method="post" action="/Order/TakeOrder">
+                <input type="hidden" name="tableId" value="${tableId}" />
+                <button type="submit" class="btn btn-sm btn-primary w-100 mb-2">🧾 Start Order</button>
+            </form>`;
+
+        // 2. Set as Free or Occupied
         if (isOccupied === "true") {
-            html += `<form method="post" action="/Restaurant/SetFree?tableId=${tableId}">
-                        <button type="submit" class="btn btn-outline-danger w-100 mb-2">Mark as Free</button>
-                     </form>`;
+            if (
+                (foodStatus === "null" || foodStatus === "Served") &&
+                (drinkStatus === "null" || drinkStatus === "Served")
+            ) {
+                html += `
+                    <form method="post" action="/Restaurant/SetFree?tableId=${tableId}">
+                        <button type="submit" class="btn btn-outline-danger w-100 mb-2">Set as Free</button>
+                    </form>`;
+            }
         } else {
-            html += `<form method="post" action="/Restaurant/SetOccupied?tableId=${tableId}">
-                        <button type="submit" class="btn btn-outline-success w-100 mb-2">Mark as Occupied</button>
-                     </form>`;
+            html += `
+                <form method="post" action="/Restaurant/SetOccupied?tableId=${tableId}">
+                    <button type="submit" class="btn btn-outline-success w-100 mb-2">Set as Occupied</button>
+                </form>`;
         }
 
-        if (orderStatus && orderStatus.toLowerCase() === "ready") {
-            html += `<form method="post" action="/Restaurant/MarkOrderServed?tableId=${tableId}">
-                        <button type="submit" class="btn btn-outline-primary w-100">Mark Order as Served</button>
-                     </form>`;
+        // 3. Process Payment
+        const canPay =
+            (foodStatus === "Served" || foodStatus === "null") &&
+            (drinkStatus === "Served" || drinkStatus === "null") &&
+            (foodStatus === "Served" || drinkStatus === "Served");
+
+        if (canPay) {
+            html += `
+                <form method="post" action="/Payment/StartPayment">
+                    <input type="hidden" name="tableId" value="${tableId}" />
+                    <button class="btn btn-dark w-100 mb-2">💰 Process Payment</button>
+                </form>`;
+        }
+
+        // 4. Mark Order as Served
+        if (foodStatus === "ReadyToBeServed" || drinkStatus === "ReadyToBeServed") {
+            html += `
+                <form method="post" action="/Restaurant/MarkOrderServed?tableId=${tableId}">
+                    <button type="submit" class="btn btn-outline-primary w-100 mb-2">✅ Mark Order as Served</button>
+                </form>`;
         }
 
         body.innerHTML = html;
-
         const modal = new bootstrap.Modal(document.getElementById("tableActionModal"));
         modal.show();
     }
-</script>
-<script>
-    setTimeout(() => {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => new bootstrap.Alert(alert).close());
-    }, 3000);
 </script>

@@ -39,6 +39,7 @@ namespace Chapeau.Controllers
         public IActionResult SetOccupied(int tableId)
         {
             _tableService.SetTableOccupiedStatus(tableId, true);
+            TempData["Success"] = $"Table {tableId} marked as occupied.";
             return RedirectToAction("Overview");
         }
 
@@ -46,11 +47,9 @@ namespace Chapeau.Controllers
         public IActionResult SetFree(int tableId)
         {
             bool success = _tableService.TrySetTableFree(tableId);
-            if (!success)
-                TempData["Error"] = "❌ Table cannot be freed because there are still active orders.";
-            else
-                TempData["Success"] = "✅ Table marked as free.";
-
+            TempData[success ? "Success" : "Error"] = success
+                ? $"Table {tableId} is now free."
+                : $"Cannot free Table {tableId}: active orders exist.";
             return RedirectToAction("Overview");
         }
 
@@ -59,6 +58,7 @@ namespace Chapeau.Controllers
         public IActionResult MarkOrderServed(int tableId)
         {
             _tableService.MarkOrderAsServed(tableId);
+            TempData["Success"] = $"Order at Table {tableId} ready orders were marked as served..";
             return RedirectToAction("Overview");
 
         }

@@ -28,7 +28,7 @@ namespace Chapeau.Service
         }
         public List<TableOrderViewModel> GetTableOverview()
         {
-            return _tableRepository.GetTableOrderViewModels();
+            return _tableRepository.GetTableOverview();
         }
 
 
@@ -46,6 +46,7 @@ namespace Chapeau.Service
             _tableRepository.UpdateTableOccupiedStatus(tableId, false);
             return true;
         }
+
 
         public void MarkOrderAsServed(int tableId)
         {
