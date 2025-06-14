@@ -121,6 +121,7 @@ namespace Chapeau.Repository
 
                 while (reader.Read())
                 {
+                    // Existing viewModel creation
                     var viewModel = new TableOrderViewModel
                     {
                         TableId = Convert.ToInt32(reader["tableID"]),
@@ -136,7 +137,14 @@ namespace Chapeau.Repository
                                       : (Status?)null
                     };
 
+                    // ✅ NEW: Load detailed items for this table
+                    int tableId = viewModel.TableId;
+                    var allItems = GetOrderItemsByTable(tableId); // <- this is the new helper method
+                    viewModel.FoodItems = allItems.Where(i => i.ItemType == "Dish").ToList();
+                    viewModel.DrinkItems = allItems.Where(i => i.ItemType == "Drink").ToList();
+
                     tableOverview.Add(viewModel);
+
                 }
             }
 
@@ -274,6 +282,44 @@ namespace Chapeau.Repository
             return result != null ? Convert.ToInt32(result) : (int?)null;
         }
 
+
+        //to show the items on the Table 
+
+        public List<OrderItemViewModel> GetOrderItemsByTable(int tableId)
+        {
+            var items = new List<OrderItemViewModel>();
+
+            using var conn = new SqlConnection(_connectionString);
+            string query = @"
+    SELECT mi.item_name, mi.item_type, oi.status, oi.quantity, mi.price, mi.VATPercent
+    FROM [OrderItem] oi
+    JOIN [Order] o ON oi.orderID = o.orderID
+    JOIN [MenuItem] mi ON oi.itemID = mi.itemID
+    WHERE o.tableID = @tableId AND o.IsPaid = 0";
+
+
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@tableId", tableId);
+            conn.Open();
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                items.Add(new OrderItemViewModel
+                {
+                    ItemName = reader["item_name"].ToString(),
+                    ItemType = reader["item_type"].ToString(),
+                    Status = Enum.Parse<Status>(reader["status"].ToString()),
+                    Quantity = Convert.ToInt32(reader["quantity"]),
+                    UnitPrice = Convert.ToDecimal(reader["price"]),
+                    VATRate = Convert.ToDecimal(reader["VATPercent"])
+                });
+
+
+            }
+
+            return items;
+        }
 
     }
 }

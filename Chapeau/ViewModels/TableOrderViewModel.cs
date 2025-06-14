@@ -17,5 +17,10 @@ namespace Chapeau.ViewModels
 
         //public bool CanMarkAsServed => FoodStatus == Status.Ready || DrinkStatus == Status.Ready;
         //public bool CanFreeTable => IsOccupied && !HasFoodOrder && !HasDrinkOrder;
+
+        //to show the items on the Table 
+        public List<OrderItemViewModel> FoodItems { get; set; } = new();
+        public List<OrderItemViewModel> DrinkItems { get; set; } = new();
+
     }
 }

@@ -44,6 +44,33 @@
                 <span class="text-muted small">No Active Orders</span>
             }
         </div>
+
+        @if (Model.FoodItems?.Any() == true)
+        {
+            <div class="mb-2 ms-2">
+                <strong>Food Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.FoodItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (Model.DrinkItems?.Any() == true)
+        {
+            <div class="mb-2 ms-2">
+                <strong>Drink Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.DrinkItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
         <div class="text-center text-muted small">Click for more actions</div>
     </div>
 </div>
