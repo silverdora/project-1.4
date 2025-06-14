@@ -27,7 +27,7 @@ namespace Chapeau.Services
 
         public List<Order> GetOrdersByStatus(Status status, string type)
         {
-            DateTime createdAfter = DateTime.Today.AddDays(-10);
+            DateTime createdAfter = DateTime.Today;
             return _runningOrdersRepository.GetOrdersByStatus(status, type, createdAfter);
         }
 

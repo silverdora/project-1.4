@@ -41,7 +41,7 @@
     <div class="container">
         <div class="row d-flex align-items-start">
             @{
-                    foreach (Order order in Model.ReadyToBeServedOrders)
+                    foreach (Order order in Model.ServedOrders)
                     {
                         var viewData = new ViewDataDictionary(ViewData){
                         { "OrdersByCourse", Model.ServedOrdersByCourse },

@@ -17,7 +17,7 @@ namespace Chapeau.Repositories
         public void Insert(OrderItem item, int orderId)
         {
             string query = @"INSERT INTO OrderItem (orderItemID, orderID, itemID, includeDate, status, quantity)
-                             VALUES (@orderID, @itemID, @includeDate, @status, @quantity)";
+                             VALUES (@orderItemID, @orderID, @itemID, @includeDate, @status, @quantity)";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
