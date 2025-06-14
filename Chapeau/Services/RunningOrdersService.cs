@@ -8,33 +8,30 @@ namespace Chapeau.Services
     public class RunningOrdersService : IRunningOrdersService
     {
         private readonly IRunningOrdersRepository _runningOrdersRepository;
-        private readonly IPaymentService _paymentService;
 
-        public RunningOrdersService(IRunningOrdersRepository runningOrdersRepository, IPaymentService paymentService)
+        public RunningOrdersService(IRunningOrdersRepository runningOrdersRepository)
         {
             _runningOrdersRepository = runningOrdersRepository;
-            _paymentService = paymentService;
         }
 
-        public void ChangeOrderStatus(int orderID, int itemID, Status status)
+        public void ChangeOrderStatus(int orderItemID, Status status)
         {
-            _runningOrdersRepository.ChangeOrderStatus(orderID, itemID, status);
+            _runningOrdersRepository.ChangeOrderItemStatus(orderItemID, status);
         }
 
-        public void ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        public void ChangeAllOrderItemsStatus(int orderID, string type, Status currentStatus, Status newStatus)
         {
-            _runningOrdersRepository.ChangeAllOrderItemsStatus(orderID, currentStatus, newStatus);
+            // ...foreach orderitem in orderitems in ordercard
+            _runningOrdersRepository.ChangeAllOrderItemsStatus(orderID, type, currentStatus, newStatus);
         }
 
-        public List<Order> GetBarOrdersByStatus(Status status)
+        public List<Order> GetOrdersByStatus(Status status, string type)
         {
-            return _runningOrdersRepository.GetBarOrdersByStatus(status);
+            DateTime createdAfter = DateTime.Today;
+            return _runningOrdersRepository.GetOrdersByStatus(status, type, createdAfter);
         }
 
-        public List<Order> GetKitchenOrdersByStatus(Status status)
-        {
-            return _runningOrdersRepository.GetKitchenOrdersByStatus(status);
-        }
+        
         public Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> orders)
         {
             Dictionary<int, List<MenuCategory>> categoriesByOrderId = new Dictionary<int, List<MenuCategory>>();

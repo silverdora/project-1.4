@@ -19,12 +19,7 @@ namespace Chapeau.Models
             Role = role;
             //Password = password;
         }
-
-
-
     }
-
-
 }
 
 

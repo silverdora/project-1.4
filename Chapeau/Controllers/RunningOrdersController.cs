@@ -23,7 +23,7 @@ namespace Chapeau.Controllers
 
         }
 
-        //for the time when log in implementation is not available, only kitchen orders are displayed
+        
         [HttpGet]
         public IActionResult Index()
         {
@@ -34,32 +34,17 @@ namespace Chapeau.Controllers
                 throw new Exception("no user");
             }
 
-            if (loggedInEmployee.Role == Role.Bar)
-            {
-                List<Order> newOrders = _runningOrdersService.GetBarOrdersByStatus(Status.Ordered);
-                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
-
-                List<Order> preparingOrders = _runningOrdersService.GetBarOrdersByStatus(Status.InProgress);
-                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
-
-                //store data in the running orders ViewModel
-                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
-                //pass data to view
-                return View(runningOrdersViewModel);
-            }
-
-
-            else if (loggedInEmployee.Role == Role.Kitchen)
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
             {
 
-                List<Order> newOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.Ordered);
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> newOrders = _runningOrdersService.GetOrdersByStatus(Status.Ordered, type);
                 Dictionary<int, List<MenuCategory>> newOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(newOrders);
 
-                List<Order> preparingOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.InProgress);
+                List<Order> preparingOrders = _runningOrdersService.GetOrdersByStatus(Status.InProgress, type);
                 Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(preparingOrders);
 
-
-                //store data in the running orders ViewModel
+                //store data in the ready orders ViewModel
                 RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
                 //pass data to view
                 return View(runningOrdersViewModel);
@@ -72,34 +57,27 @@ namespace Chapeau.Controllers
         }
 
         [HttpGet]
-        public IActionResult ReadyToBeServed()
+        public IActionResult FinishedOrders()
         {
             //get Employee object 
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            
             if (loggedInEmployee == null)
             {
                 throw new Exception("no user");
             }
 
-            if (loggedInEmployee.Role == Role.Bar)
+            
+            if ((loggedInEmployee.Role == Role.Bar ) || (loggedInEmployee.Role == Role.Kitchen))
             {
-                List<Order> readyOrders = _runningOrdersService.GetBarOrdersByStatus(Status.ReadyToBeServed);
+                 
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order>  readyOrders = _runningOrdersService.GetOrdersByStatus(Status.ReadyToBeServed, type);
+                List<Order> servedOrders = _runningOrdersService.GetOrdersByStatus(Status.Served, type);
                 Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
-
+                Dictionary<int, List<MenuCategory>> servedOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(servedOrders);
                 //store data in the ready orders ViewModel
-                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, readyOrdersByCourse, loggedInEmployee);
-                //pass data to view
-                return View(toBeServedOrdersViewModel);
-            }
-
-
-            else if (loggedInEmployee.Role == Role.Kitchen)
-            {
-                List<Order> readyOrders = _runningOrdersService.GetKitchenOrdersByStatus(Status.ReadyToBeServed);
-                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
-
-                //store data in the ready orders ViewModel
-                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, readyOrdersByCourse, loggedInEmployee);
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, servedOrders, readyOrdersByCourse, servedOrdersByCourse, loggedInEmployee);
                 //pass data to view
                 return View(toBeServedOrdersViewModel);
             }
@@ -108,17 +86,18 @@ namespace Chapeau.Controllers
             {
                 throw new Exception("no access");
             }
+            
         }
 
         [HttpPost]
-        public IActionResult ChangeOrderItemStatus(int orderID, int itemID, Status status)
+        public IActionResult ChangeOrderItemStatus(int orderItemID, Status status)
         {
-            _runningOrdersService.ChangeOrderStatus(orderID, itemID, status);
+            _runningOrdersService.ChangeOrderStatus(orderItemID, status);
             TempData["StatusChangeMessage"] = "Status has been changed.";
             //go back
             if (status == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }
@@ -126,12 +105,21 @@ namespace Chapeau.Controllers
         [HttpPost]
         public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
         {
-            _runningOrdersService.ChangeAllOrderItemsStatus(orderID, currentStatus, newStatus);
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee.Role == Role.Kitchen)
+            {
+                _runningOrdersService.ChangeAllOrderItemsStatus(orderID, "Dish", currentStatus, newStatus);
+            }
+            else
+            {
+                _runningOrdersService.ChangeAllOrderItemsStatus(orderID, "Drink", currentStatus, newStatus);
+            }
+            
             //go back
             TempData["StatusChangeMessage"] = "Status has been changed.";
             if (newStatus == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }
@@ -145,7 +133,7 @@ namespace Chapeau.Controllers
             TempData["StatusChangeMessage"] = "Status has been changed.";
             if (newStatus == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }

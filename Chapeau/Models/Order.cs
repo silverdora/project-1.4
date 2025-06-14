@@ -9,7 +9,7 @@ namespace Chapeau.Models
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public string? Notes { get; set; }
+        
 
         public bool? IsPaid { get; set; } = false;
         public Status Status { get; set; }

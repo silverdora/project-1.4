@@ -54,15 +54,7 @@ namespace Chapeau.Services
             {
                 // If it doesn't exist, retrieve the menu item and add a new one
                 MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-                OrderItem newItem = new OrderItem(
-                    menuItem.ItemID,
-                    menuItem,
-                    DateTime.Now,
-                    Status.Ordered,
-                    quantity,
-                    null // optional comment field
-                );
-
+                OrderItem newItem = new OrderItem(null, menuItem, DateTime.Now, Status.Ordered, quantity, null);
                 selectedItems.Add(newItem);
             }
 
@@ -74,17 +66,8 @@ namespace Chapeau.Services
         {
             foreach (var item in items)
             {
-                var existing = _orderItemRepository.GetByOrderAndItem(orderId, item.ItemID);
-                if (existing != null)
-                {
-                    int newQuantity = existing.Quantity + item.Quantity;
-                    _orderItemRepository.UpdateQuantity(orderId, item.ItemID, newQuantity);
-                }
-                else
-                {
-                    item.OrderID = orderId;
-                    _orderItemRepository.Insert(item);
-                }
+                //item.OrderID = orderId;
+                _orderItemRepository.Insert(item, orderId);
             }
         }      
 

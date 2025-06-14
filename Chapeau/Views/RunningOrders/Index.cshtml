@@ -10,13 +10,10 @@
 
 <div class="col mb-2" role="group">
     <a class="btn btn-dark" href="/RunningOrders/Index">Running Orders</a>
-    <a class="btn btn-light" href="/RunningOrders/ReadyToBeServed">Ready To Be Served Orders</a>
+    <a class="btn btn-light" href="/RunningOrders/FinishedOrders">Finished Orders</a>
 </div>
 <a class="btn btn-primary mb-2" href="/RunningOrders/Index">Refresh</a>
-@if (TempData["StatusChangeMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
-}
+@Html.Partial("_ChangeStatusConfirmation")
 <div class="mb-4">
     <h4>Ordered</h4>
     <div class="container">
@@ -24,67 +21,13 @@
             @{
                 foreach (Order order in Model.NewOrders)
                 {
-                    <div class="card m-2" style="width: 18rem; padding: 0">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
-                            <p class="card-text mb-0">@order.Employee.employeeName</p>
-                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
-                        </div>
-                        <div class="card-body">
-                            @{
-                                foreach (MenuCategory course in Model.NewOrdersByCourse[order.OrderID])
-                                {
-                                    <strong>@course</strong>
-                                    <ul class="list-group list-group-flush">
-
-                                        @foreach (OrderItem orderItem in order.OrderItems)
-                                            if (orderItem.MenuItem.Category == course && orderItem.Status == Status.Ordered)
-                                            {
-                                                <li class="list-group-item ps-0 pe-0">
-                                                    <div class=" d-flex justify-content-between align-items-center">
-                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
-                                                        <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
-                                                            <input hidden name="orderID" value="@order.OrderID" />
-                                                            <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
-                                                            <input hidden name="status" value="InProgress" />
-                                                            <button type="submit" class="btn btn-primary btn-sm">Prepare</button>
-                                                        </form>
-                                                    </div>
-                                                    <small>
-                                                        Notes:
-                                                        @{
-                                                            if (orderItem.Comment != null)
-                                                            {
-                                                                @orderItem.Comment
-                                                            }
-                                                        }
-                                                    </small>
-                                                    <br />
-                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                                    <br />
-                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                                    <br />
-
-                                                </li>
-                                            }
-                                    </ul>
-                                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
-                                        <input hidden name="orderID" value="@order.OrderID" />
-                                        <input hidden name="currentStatus" value="Ordered" />
-                                        <input hidden name="newStatus" value="InProgress" />
-                                        <input hidden name="course" value="@course" />
-                                        <button type="submit" class="btn btn-info btn-sm mb-2">Prepare course</button>
-                                    </form>
-                                }
-                            }
-                            <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
-                                <input hidden name="orderID" value="@order.OrderID" />
-                                <input hidden name="currentStatus" value="Ordered" />
-                                <input hidden name="newStatus" value="InProgress" />
-                                <button type="submit" class="btn btn-primary">Prepare all</button>
-                            </form>
-                        </div>
-                    </div>
+                    var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.NewOrdersByCourse },
+                        { "CurrentStatus", Status.Ordered },
+                        { "NewStatus", Status.InProgress },
+                        {"EmployeeRole", Model.Employee.Role }
+                    };
+                    <partial name="_OrderCard" model="@order" view-data="viewData" />
                 }
             }
         </div>
@@ -99,66 +42,13 @@
             @{
                 foreach (Order order in Model.InProgessOrders)
                 {
-                    <div class="card m-2" style="width: 18rem; padding: 0">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Order #@order.OrderID</h5>
-                            <p class="card-text mb-0">@order.Employee.employeeName</p>
-                            <p class="card-text mb-0">table #@order.Table.TableNumber</p>
-                        </div>
-                        <div class="card-body">
-                            @{
-                                foreach (MenuCategory course in Model.PreparingOrdersByCourse[order.OrderID])
-                                {
-                                    <strong>@course</strong>
-                                    <ul class="list-group list-group-flush">
-
-                                        @foreach (OrderItem orderItem in order.OrderItems)
-                                            if (orderItem.MenuItem.Category == course && orderItem.Status == Status.InProgress)
-                                            {
-                                                <li class="list-group-item ps-0 pe-0">
-                                                    <div class=" d-flex justify-content-between align-items-center">
-                                                        <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
-                                                        <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
-                                                            <input hidden name="orderID" value="@order.OrderID" />
-                                                            <input hidden name="itemID" value="@orderItem.MenuItem.ItemID" />
-                                                            <input hidden name="status" value="ReadyToBeServed" />
-                                                            <button type="submit" class="btn btn-primary btn-sm">Ready to be served</button>
-                                                        </form>
-                                                    </div>
-                                                    <small>
-                                                        Notes:
-                                                        @{
-                                                            if (orderItem.Comment != null)
-                                                            {
-                                                                @orderItem.Comment
-                                                            }
-                                                        }
-                                                    </small>
-                                                    <br />
-                                                    <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
-                                                    <br />
-                                                    <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
-                                                    <br />
-                                                </li>
-                                            }
-                                    </ul>
-                                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
-                                        <input hidden name="orderID" value="@order.OrderID" />
-                                        <input hidden name="currentStatus" value="Ordered" />
-                                        <input hidden name="newStatus" value="InProgress" />
-                                        <input hidden name="course" value="@course" />
-                                        <button type="submit" class="btn btn-info btn-sm mb-2">Prepare course</button>
-                                    </form>
-                                }
-                            }
-                            <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
-                                <input hidden name="orderID" value="@order.OrderID" />
-                                <input hidden name="currentStatus" value="InProgress" />
-                                <input hidden name="newStatus" value="ReadyToBeServed" />
-                                <button type="submit" class="btn btn-primary">All is ready to be served</button>
-                            </form>
-                        </div>
-                    </div>
+                    var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.PreparingOrdersByCourse },
+                        { "CurrentStatus", Status.InProgress },
+                        { "NewStatus", Status.ReadyToBeServed },
+                        {"EmployeeRole", Model.Employee.Role }
+                    };
+                    <partial name="_OrderCard" model="@order" view-data="viewData" />
                 }
             }
         </div>

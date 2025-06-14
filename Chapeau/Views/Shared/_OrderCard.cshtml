@@ -1,0 +1,90 @@
+﻿@model Order
+@{
+    var ordersByCourse = ViewData["OrdersByCourse"] as IDictionary<int, List<MenuCategory>>;
+    var currentStatus = ViewData["CurrentStatus"] as Status?;
+    var newStatus = ViewData["NewStatus"] as Status?;
+    var employeeRole = ViewData["EmployeeRole"] as Role?;
+    string changeItemStatus;
+    string changeCourseStatus;
+    string changeOrderStatus;
+    if (newStatus == Status.InProgress)
+    {
+        changeItemStatus = "Prepare";
+        changeCourseStatus = "Prepare Course";
+        changeOrderStatus = "Prepare All";
+    }
+    else if (newStatus == Status.ReadyToBeServed)
+    {
+        changeItemStatus = "Ready To Be Served";
+        changeCourseStatus = "Course Is Ready To Be Served";
+        changeOrderStatus = "All Is Ready To Be Served";
+    }
+    else
+    {
+        changeItemStatus = "Served";
+        changeCourseStatus = "Course Is Served";
+        changeOrderStatus = "All Is Served";
+    }
+}
+
+<div class="card m-2" style="width: 18rem; padding: 0">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Order #@Model.OrderID</h5>
+        <p class="card-text mb-0">@Model.Employee.employeeName</p>
+        <p class="card-text mb-0">table #@Model.Table.TableNumber</p>
+    </div>
+    <div class="card-body">
+        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderID))
+            {
+                foreach (MenuCategory course in ordersByCourse[Model.OrderID])
+                {
+                @if (employeeRole == Role.Kitchen)
+                    {
+                    <strong>@course</strong>
+                    }
+                    
+
+                <ul class="list-group list-group-flush">
+
+                    @foreach (OrderItem orderItem in Model.OrderItems)
+                            if (orderItem.MenuItem.Category == course && orderItem.Status == currentStatus)
+                            {
+                            <li class="list-group-item ps-0 pe-0">
+                                <div class=" d-flex justify-content-between align-items-center">
+                                    <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
+                                    <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
+                                        <input hidden name="orderItemID" value="@orderItem.OrderItemID" />
+                                        <input hidden name="status" value="@newStatus" />
+                                        <button type="submit" class="btn btn-primary btn-sm">@changeItemStatus</button>
+                                    </form>
+                                </div>
+                                <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                <br />
+                                <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
+                                <br />
+                            </li>
+                            }
+                </ul>
+
+                @if (employeeRole == Role.Kitchen)
+                        {
+                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
+                        <input hidden name="orderID" value="@Model.OrderID" />
+                        <input hidden name="currentStatus" value="@currentStatus" />
+                        <input hidden name="newStatus" value="@newStatus" />
+                        <input hidden name="course" value="@course" />
+                        <button type="submit" class="btn btn-info btn-sm mb-2">@changeCourseStatus</button>
+                    </form>
+                        }
+                    
+
+            }
+            <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
+                <input hidden name="orderID" value="@Model.OrderID" />
+                <input hidden name="currentStatus" value="@currentStatus" />
+                <input hidden name="newStatus" value="@newStatus" />
+                <button type="submit" class="btn btn-primary">@changeOrderStatus</button>
+            </form>
+        }
+    </div>
+</div>

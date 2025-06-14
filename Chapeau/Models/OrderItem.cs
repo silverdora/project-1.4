@@ -2,9 +2,8 @@
 {
     public class OrderItem
     {
-        public int OrderID { get; set; }
+        public int? OrderItemID { get; set; } //now nullable to keep OrderService alive
         public MenuItem MenuItem { get; set; }
-        public int ItemID { get; set; } //is used to change status
         public DateTime IncludeDate { get; set; }
         public TimeSpan WaitingTime
         {
@@ -22,9 +21,9 @@
         }
         
 
-        public OrderItem(int itemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity, string? comment)
+        public OrderItem(int? orderItemID, MenuItem menuItem, DateTime includeDate, Status status, int quantity, string comment)
         {
-            ItemID = itemID;
+            OrderItemID = orderItemID;
             MenuItem = menuItem;
             IncludeDate = includeDate;
             Status = status;

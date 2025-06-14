@@ -19,21 +19,18 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-
-
-        public void ChangeOrderStatus(int orderID, int itemID, Status status)
+        public void ChangeOrderItemStatus(int orderItemID, Status status)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = $"UPDATE OrderItem " +
                     $"SET status = @status " +
-                    $"WHERE orderID = @orderId AND itemID = @itemId";
+                    $"WHERE orderItemID = @orderItemID";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 // Preventing SQL injections
-                command.Parameters.AddWithValue("@orderId", orderID);
-                command.Parameters.AddWithValue("@itemId", itemID);
+                command.Parameters.AddWithValue("@orderItemID", orderItemID);
                 command.Parameters.AddWithValue("@status", status.ToString());
 
                 command.Connection.Open();
@@ -45,18 +42,21 @@ namespace Chapeau.Repositories
             }
         }
 
-        public void ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        public void ChangeAllOrderItemsStatus(int orderID, string type, Status currentStatus, Status newStatus)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = $"UPDATE OrderItem " +
                     $"SET [status] = @newStatus " +
-                    $"WHERE orderID = @orderId AND [status] = @currentStatus";
+                    $"WHERE itemID in ( " +
+                    $"SELECT itemID from MenuItem where item_type = @type )" +
+                    $"AND orderID = @orderId AND [status] = @currentStatus";
 
                 SqlCommand command = new SqlCommand(query, connection);
 
                 // Preventing SQL injections
                 command.Parameters.AddWithValue("@orderId", orderID);
+                command.Parameters.AddWithValue("@type", type);
                 command.Parameters.AddWithValue("@newStatus", newStatus.ToString());
                 command.Parameters.AddWithValue("@currentStatus", currentStatus.ToString());
 
@@ -98,7 +98,7 @@ namespace Chapeau.Repositories
             }
         }
 
-        public List<Order> GetBarOrdersByStatus(Status status)
+        public List<Order> GetOrdersByStatus(Status status, string type, DateTime createdAfter)
         {
             List<Order> orders = new List<Order>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -107,15 +107,17 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Drink' AND [status] = @status) " +
+                    "WHERE item_type = @type AND [status] = @status) AND orderTime > @time " +
                     "ORDER BY orderTime;";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@status", status.ToString());
+                command.Parameters.AddWithValue("@type", type.ToString());
+                command.Parameters.AddWithValue("@time", createdAfter);
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    Order order = ReadOrder(reader, status, "Drink");
+                    Order order = ReadOrder(reader, status, type);
                     orders.Add(order);
                 }
                 reader.Close();
@@ -123,30 +125,7 @@ namespace Chapeau.Repositories
             return orders;
         }
 
-        public List<Order> GetKitchenOrdersByStatus(Status status)
-        {
-            List<Order> orders = new List<Order>();
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT *" +
-                    "FROM [Order] " +
-                    "WHERE orderID IN (" +
-                    "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = 'Dish' AND OrderItem.[status] = @status) " +
-                    "ORDER BY orderTime;";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@status", status.ToString());
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Order order = ReadOrder(reader, status, "Dish");
-                    orders.Add(order);
-                }
-                reader.Close();
-            }
-            return orders;
-        }
+        
 
         private Order ReadOrder(SqlDataReader reader, Status status, string type)
         {
@@ -244,7 +223,7 @@ namespace Chapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
-                string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
+                string query = "SELECT OrderItem.orderItemID, OrderItem.itemID, includeDate, [status], quantity, comment  " +
                     "FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
                     "WHERE orderID = @Id and [status] = @status and item_type = @type; ";
                 SqlCommand command = new SqlCommand(query, connection);
@@ -266,6 +245,7 @@ namespace Chapeau.Repositories
 
         private OrderItem ReadOrderItem(SqlDataReader reader)
         {
+            int orderItemID = (int)reader["orderItemID"];
             int itemID = (int)reader["itemID"];
             MenuItem menuItem = GetMenuItemByID(itemID);
 
@@ -273,9 +253,13 @@ namespace Chapeau.Repositories
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
-            //string notes = (string)reader["notes"];
-
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity,null); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
+            //string? comment = (string?)reader["comment"];
+            string? comment = null;
+            if (!(reader["comment"] == null || reader["comment"] == DBNull.Value))
+            {
+                comment = (string)reader["comment"];
+            }
+            return new OrderItem(orderItemID, menuItem, includeDate, status, quantity, comment); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
         }
 
         public MenuItem GetMenuItemByID(int id)
