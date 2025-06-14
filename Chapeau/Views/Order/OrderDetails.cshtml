@@ -51,14 +51,15 @@ else
 				</tr>
 			}
 		</tbody>
-		<!-- Submit button -->
-		<form asp-controller="Order" asp-action="SubmitOrder" method="post">
-			<button type="submit" class="btn btn-success">Submit Order</button>
-		</form>
-
-		<a asp-controller="MenuItem" asp-action="Index" class="btn btn-secondary">
-			← Back to Menu
-		</a>
+		
 	</table>
 
+<!-- Submit button -->
+<form asp-controller="Order" asp-action="SubmitOrder" method="post">
+	<button type="submit" class="btn btn-success">Submit Order</button>
+</form>
 }
+<!-- Back to menu -->
+<a asp-controller="MenuItem" asp-action="Index" class="btn btn-secondary mt-2">
+	← Back to Menu
+</a>

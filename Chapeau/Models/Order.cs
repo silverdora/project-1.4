@@ -49,8 +49,13 @@ namespace Chapeau.Models
         {
             session.Remove(SessionKey);
         }
-
-        // --- Cart behavior ---
+        public static void AdjustQuantityInSession(ISession session, int menuItemId, int adjustment)
+        {
+            Order order = LoadFromSession(session);
+            order.IncreaseOrDecreaseQuantity(menuItemId, adjustment);
+            order.SaveToSession(session);
+        }
+        // --- Cart  ---
 
         public void AddOrUpdateItem(MenuItem item, int quantity)
         {

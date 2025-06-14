@@ -1,7 +1,7 @@
 ﻿@using Chapeau.Models.Extensions
 @using Chapeau.Models
 @{
-    var loggedInEmployee = Context.Session.GetObject<Employee>("LoggedInEmployee");
+    Employee loggedInEmployee = Context.Session.GetObject<Employee>("LoggedInEmployee");
 }
 
 <!DOCTYPE html>
@@ -38,9 +38,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Payment" asp-action="Index">Payment</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="MenuItem" asp-action="Index">Menu Items</a>
-                        </li>
+                        @if (loggedInEmployee != null && loggedInEmployee.Role == Role.Server)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="MenuItem" asp-action="Index">Menu Items</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="RunningOrders" asp-action="Index">Running Orders</a>
                         </li>

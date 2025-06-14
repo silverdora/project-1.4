@@ -33,19 +33,7 @@ namespace Chapeau.Controllers
             if (employee == null)
                 return RedirectToAction("Login", "Employee");
 
-            Order? order = _orderService.GetActiveOrderByTableId(tableId);
-
-            if (order == null)
-            {
-                order = new Order
-                {
-                    Table = new Table { TableId = tableId, IsOccupied = true },
-                    Employee = employee,
-                    OrderTime = DateTime.Now,
-                    IsPaid = false,                   
-                };
-                _orderService.InsertOrder(order);
-            }
+            Order order = _orderService.GetOrCreateActiveOrder(tableId, employee);
 
             //Mark the table as occupied in the database
             _tableService.SetTableOccupiedStatus(tableId, true);
@@ -89,7 +77,7 @@ namespace Chapeau.Controllers
             {
                 OrderID = order.OrderId,
                 TableNumber = order.Table.TableNumber,
-                Items = order.OrderItems
+                Items = order.OrderItems//list of order items
             }; 
             return View(viewModel);
         }
@@ -107,13 +95,7 @@ namespace Chapeau.Controllers
 
             if (order.OrderItems.Count >0)
             {
-                _orderService.AddItemsToOrder(order.OrderId, order.OrderItems);
-
-                foreach (OrderItem item in order.OrderItems)
-                {
-                    _menuItemService.ReduceStock(item.MenuItem.ItemId, item.Quantity);
-                }
-
+                _orderService.FinalizeOrder(order);
                 Order.ClearFromSession(HttpContext.Session);
                 TempData["OrderSuccess"] = "The order was submitted successfully!";
             }

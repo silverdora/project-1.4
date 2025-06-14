@@ -6,12 +6,9 @@ namespace Chapeau.Services
     public interface IOrderService
     {       
         void InsertOrder(Order order);
-
+        void FinalizeOrder(Order order);
         Order? GetActiveOrderByTableId(int tableId);
-
-
-       // void AddItemToSessionSelection(MenuItem menuItem, int quantity, ISession session);
-
+        Order GetOrCreateActiveOrder(int tableId, Employee employee);
         void AddItemsToOrder(int orderId, List<OrderItem> items);
 
 

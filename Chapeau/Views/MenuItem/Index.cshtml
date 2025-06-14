@@ -1,4 +1,10 @@
 ﻿@model Chapeau.ViewModels.MenuSelectionViewModel
+@using Chapeau.Models
+@using Chapeau.Models.Extensions
+@{
+	Order currentOrder = Context.Session.GetObject<Order>("CurrentOrder");
+}
+
 
 <h2>Menu Selection</h2>
 <!-- To display a message confirming every item while is being added -->
@@ -69,11 +75,14 @@
 }
 
 <!-- View Order Button -->
-<form asp-controller="Order" asp-action="OrderDetails" method="get">
+@if (currentOrder != null && currentOrder.OrderId != 0)
+{
+	<form asp-controller="Order" asp-action="OrderDetails" method="get">
 	<input type="hidden" name="id" value="@Model.OrderID" />
 	<input type="hidden" name="tableID" value="@Model.TableID" />
 	<button type="submit">View Order Details</button>
 </form>
+}
 
 <!-- Menu Table -->
 <h3>Menu Items</h3>
@@ -119,14 +128,14 @@ else
 						<span style="color:@color;">@message</span>
 					</td>
 					<td>
-						@if (item.StockQuantity > 0)
+						@if (currentOrder != null && currentOrder.OrderId != 0 && item.StockQuantity > 0)
 						{
 							<form asp-controller="Order" asp-action="AddItem" method="post">
 								<input type="hidden" name="menuItemId" value="@item.ItemId" />
-								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />								
+								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />
 								<button type="submit">Add</button>
 							</form>
-						}
+						}						
 						else
 						{
 							<span style="color: gray;">N/A</span>
