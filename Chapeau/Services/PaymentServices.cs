@@ -11,57 +11,106 @@ namespace Chapeau.Services
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
-        private readonly string _connectionString;
-
-        //Mo added in order to free the table after payment is done Sprint3
         private readonly ITableRepository _tableRepository;
-        //public PaymentService(ITableRepository tableRepository)
-        //{
-        //    _tableRepository = tableRepository;
-        //}
 
-        public void MarkOrderAsPaid(int orderID)
-        {
-            _tableRepository.MarkOrderAsPaid(orderID);
-        }
-        public int? GetLatestUnpaidOrderIdByTable(int tableId)
-        {
-            return _tableRepository.GetLatestUnpaidOrderIdByTable(tableId);
-        }
-
-        /////////////////////////////////////////////////////////
         public PaymentService(IPaymentRepository paymentRepository, ITableRepository tableRepository)
         {
             _paymentRepository = paymentRepository;
             _tableRepository = tableRepository;
         }
 
-        public List<Payment> GetAllPayments(int orderID)
+        public List<Payment> GetAllPayments(int orderId)
         {
-            return _paymentRepository.GetAllPayments();
+            try
+            {
+                return _paymentRepository.GetPaymentsByOrderId(orderId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to retrieve payments for order {orderId}", ex);
+            }
         }
 
         public void AddPayment(Payment payment)
         {
-            _paymentRepository.AddPayment(payment);
-        }
-        public void CompletePayment(int id)
-        {
-            _paymentRepository.MarkPaymentComplete(id);
+            try
+            {
+                ValidatePayment(payment);
+                _paymentRepository.AddPayment(payment);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to add payment", ex);
+            }
         }
 
-        // Save or update the full payment details
-        public void CompletePayment(Payment payment)
+        public void CompletePayment(int paymentId)
         {
-            if (payment == null) return;
-            // Either add new payment or update existing one, depending on your logic
-            _paymentRepository.AddPayment(payment);
-            // or _paymentRepository.UpdatePayment(payment); if you have update logic
+            try
+            {
+                _paymentRepository.MarkPaymentComplete(paymentId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to complete payment {paymentId}", ex);
+            }
         }
 
         public void SavePayment(FinishOrderViewModel model)
         {
-            var payment = new Payment
+            try
+            {
+                var payment = CreatePaymentFromViewModel(model);
+                ValidatePayment(payment);
+                _paymentRepository.AddPayment(payment);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to save payment", ex);
+            }
+        }
+
+        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
+        {
+            try
+            {
+                var payment = CreatePayment(orderId, amountPaid, tipAmount, paymentType, feedback);
+                ValidatePayment(payment);
+                _paymentRepository.AddPayment(payment);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to save individual payment", ex);
+            }
+        }
+
+        public void MarkOrderAsPaid(int orderId)
+        {
+            try
+            {
+                _tableRepository.MarkOrderAsPaid(orderId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to mark order {orderId} as paid", ex);
+            }
+        }
+
+        public int? GetLatestUnpaidOrderIdByTable(int tableId)
+        {
+            try
+            {
+                return _tableRepository.GetLatestUnpaidOrderIdByTable(tableId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to get latest unpaid order for table {tableId}", ex);
+            }
+        }
+
+        private Payment CreatePaymentFromViewModel(FinishOrderViewModel model)
+        {
+            return new Payment
             {
                 orderID = model.OrderID,
                 paymentType = model.PaymentType,
@@ -72,12 +121,11 @@ namespace Chapeau.Services
                 highVATAmount = model.HighVatAmount,
                 Feedback = model.Feedback
             };
-
-            _paymentRepository.AddPayment(payment);
         }
-        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
+
+        private Payment CreatePayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
         {
-            var payment = new Payment
+            return new Payment
             {
                 orderID = orderId,
                 amountPaid = amountPaid,
@@ -86,15 +134,21 @@ namespace Chapeau.Services
                 Feedback = feedback,
                 paymentDAte = DateTime.Now
             };
-
-            _paymentRepository.Add(payment);
         }
 
+        private void ValidatePayment(Payment payment)
+        {
+            if (payment == null)
+                throw new ArgumentNullException(nameof(payment), "Payment cannot be null");
 
-        //Mo added in order to free the table after payment is done Sprint3
+            if (payment.orderID <= 0)
+                throw new ArgumentException("Invalid order ID", nameof(payment.orderID));
 
+            if (payment.amountPaid <= 0)
+                throw new ArgumentException("Amount paid must be greater than zero", nameof(payment.amountPaid));
 
-
-
+            if (payment.tipAmount < 0)
+                throw new ArgumentException("Tip amount cannot be negative", nameof(payment.tipAmount));
+        }
     }
 }
