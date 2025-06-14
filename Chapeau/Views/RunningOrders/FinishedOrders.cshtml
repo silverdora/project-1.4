@@ -21,10 +21,10 @@
     <div class="container">
         <div class="row d-flex align-items-start">
             @{
-                foreach (Order order in Model.ReadyOrders)
+                foreach (Order order in Model.ReadyToBeServedOrders)
                 {
                     var viewData = new ViewDataDictionary(ViewData){
-                        { "OrdersByCourse", Model.ReadyOrdersByCourse },
+                        { "OrdersByCourse", Model.ReadyToBeServedOrdersByCourse },
                         { "CurrentStatus", Status.ReadyToBeServed },
                         { "NewStatus", Status.Served },
                         {"EmployeeRole", Model.Employee.Role }
@@ -41,15 +41,13 @@
     <div class="container">
         <div class="row d-flex align-items-start">
             @{
-                    foreach (Order order in Model.ReadyOrders)
+                    foreach (Order order in Model.ReadyToBeServedOrders)
                     {
                         var viewData = new ViewDataDictionary(ViewData){
-                        { "OrdersByCourse", Model.ReadyOrdersByCourse },
-                        { "CurrentStatus", Status.Served },
-                        { "NewStatus", null },
+                        { "OrdersByCourse", Model.ServedOrdersByCourse },
                         {"EmployeeRole", Model.Employee.Role }
                 };
-                    <partial name="_OrderCard" model="@order" view-data="viewData" />
+                    <partial name="_FinishedOrderCard" model="@order" view-data="viewData" />
                 }
             }
         </div>

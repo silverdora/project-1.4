@@ -98,7 +98,7 @@ namespace Chapeau.Repositories
             }
         }
 
-        public List<Order> GetOrdersByStatus(Status status, string type)
+        public List<Order> GetOrdersByStatus(Status status, string type, DateTime createdAfter)
         {
             List<Order> orders = new List<Order>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -107,11 +107,12 @@ namespace Chapeau.Repositories
                     "FROM [Order] " +
                     "WHERE orderID IN (" +
                     "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
-                    "WHERE item_type = @type AND [status] = @status) " +
+                    "WHERE item_type = @type AND [status] = @status) AND orderTime > @time " +
                     "ORDER BY orderTime;";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@status", status.ToString());
                 command.Parameters.AddWithValue("@type", type.ToString());
+                command.Parameters.AddWithValue("@time", createdAfter);
                 command.Connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())

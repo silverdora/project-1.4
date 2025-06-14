@@ -73,14 +73,14 @@ namespace Chapeau.Controllers
                  
                 string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
                 List<Order>  readyOrders = _runningOrdersService.GetOrdersByStatus(Status.ReadyToBeServed, type);
+                List<Order> servedOrders = _runningOrdersService.GetOrdersByStatus(Status.Served, type);
                 Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(readyOrders);
-
+                Dictionary<int, List<MenuCategory>> servedOrdersByCourse = _runningOrdersService.GetCategoriesOfAnOrder(servedOrders);
                 //store data in the ready orders ViewModel
-                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, readyOrdersByCourse, loggedInEmployee);
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, servedOrders, readyOrdersByCourse, servedOrdersByCourse, loggedInEmployee);
                 //pass data to view
                 return View(toBeServedOrdersViewModel);
             }
-
 
             else
             {
@@ -97,7 +97,7 @@ namespace Chapeau.Controllers
             //go back
             if (status == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }
@@ -119,7 +119,7 @@ namespace Chapeau.Controllers
             TempData["StatusChangeMessage"] = "Status has been changed.";
             if (newStatus == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }
@@ -133,7 +133,7 @@ namespace Chapeau.Controllers
             TempData["StatusChangeMessage"] = "Status has been changed.";
             if (newStatus == Status.Served)
             {
-                return RedirectToAction("ReadyToBeServed");
+                return RedirectToAction("FinishedOrders");
             }
             return RedirectToAction("Index");
         }
