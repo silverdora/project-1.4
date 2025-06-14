@@ -57,7 +57,7 @@ namespace Chapeau.Repositories
                         {
                             paymentID = reader.GetInt32(0),
                             orderID = reader.GetInt32(1),
-                            paymentType = (PaymentType)Enum.Parse(typeof(PaymentType), reader.GetString(2)),
+                            paymentType = reader.GetString(2),
                             amountPaid = reader.GetDecimal(3),
                             tipAmount = reader.GetDecimal(4),
                             paymentDAte = reader.GetDateTime(5),

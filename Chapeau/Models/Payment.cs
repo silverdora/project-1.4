@@ -4,7 +4,7 @@
     {
         public int paymentID { get; set; }
         public int orderID { get; set; }
-        public PaymentType paymentType { get; set; }
+        public string paymentType { get; set; } // Consider using an enum here if appropriate
         public decimal amountPaid { get; set; }
         public decimal tipAmount { get; set; }
         public DateTime paymentDAte { get; set; }
@@ -17,7 +17,7 @@
 
         public Payment() { }
 
-        public Payment(int paymentID, int orderID, PaymentType paymentType, decimal amountPaid, decimal tipAmount, DateTime paymentDate)
+        public Payment(int paymentID, int orderID, string paymentType, decimal amountPaid, decimal tipAmount, DateTime paymentDate)
         {
             this.paymentID = paymentID;
             this.orderID = orderID;
