@@ -13,7 +13,7 @@ namespace Chapeau.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        // ✅ Use ONE constructor
+        // Use ONE constructor
         public PaymentController(IPaymentService paymentService)
         {
             _paymentService = paymentService;
@@ -33,7 +33,7 @@ namespace Chapeau.Controllers
         {
             var model = new PaymentViewModel
             {
-                OrderId = orderId
+                OrderID = orderId
             };
             return View(model);
         }
@@ -46,12 +46,12 @@ namespace Chapeau.Controllers
                 return View(model);
             }
 
-            _paymentService.MarkOrderAsPaid(model.OrderId);
+            _paymentService.MarkOrderAsPaid(model.OrderID);
 
             // Optional: If i want to free the table automatically after payment,
             //_tableService.TrySetTableFree(tableId); // Requires getting tableId from Order
 
-            TempData["SuccessMessage"] = $"Payment for Order #{model.OrderId} completed successfully.";
+            TempData["SuccessMessage"] = $"Payment for Order #{model.OrderID} completed successfully.";
             return RedirectToAction("Index", "Restaurant");
         }
 

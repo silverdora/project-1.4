@@ -3,26 +3,26 @@
     ViewData["Title"] = "Process Payment";
 }
 
-<h2>Process Payment for Order #@Model.OrderId</h2>
+<h2>Process Payment for Order #@Model.OrderID</h2>
 
 <form asp-action="ProcessPayment" method="post">
-    <input type="hidden" asp-for="OrderId" />
+    <input type="hidden" asp-for="OrderID" />
 
     <div class="form-group">
-        <label asp-for="Amount" class="control-label"></label>
-        <input asp-for="Amount" class="form-control" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
+        <label asp-for="AmountToPay" class="control-label">Amount to Pay</label>
+        <input asp-for="AmountToPay" class="form-control" />
+        <span asp-validation-for="AmountToPay" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="PaymentMethod" class="control-label"></label>
-        <select asp-for="PaymentMethod" class="form-control">
+        <label asp-for="PaymentType" class="control-label">Payment Method</label>
+        <select asp-for="PaymentType" class="form-control">
             <option value="">-- Select Payment Method --</option>
             <option value="Cash">Cash</option>
             <option value="Credit Card">Credit Card</option>
             <option value="Debit Card">Debit Card</option>
         </select>
-        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+        <span asp-validation-for="PaymentType" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Confirm Payment</button>

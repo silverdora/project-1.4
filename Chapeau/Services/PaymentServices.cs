@@ -81,7 +81,7 @@ namespace Chapeau.Services
             }
 
         }
-        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
+        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentModel, string feedback)
         {
             // Save payment record for the order into the database
             // Assuming you have a PaymentRepository or similar to persist data
