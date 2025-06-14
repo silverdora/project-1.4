@@ -42,8 +42,7 @@ namespace Chapeau.Controllers
                     Table = new Table { TableId = tableId },
                     Employee = employee,
                     OrderTime = DateTime.Now,
-                    IsPaid = false,
-                    Notes = null,
+                    IsPaid = false,                   
                 };
                 _orderService.InsertOrder(order);
             }
@@ -56,7 +55,6 @@ namespace Chapeau.Controllers
         [HttpPost]
         public IActionResult AddItem(int menuItemId, int quantity)
         {
-
             MenuItem? item = _menuItemService.GetMenuItemByID(menuItemId);
             if (item == null)
             {

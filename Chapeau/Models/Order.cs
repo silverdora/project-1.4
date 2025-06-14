@@ -11,9 +11,7 @@ namespace Chapeau.Models
         public Employee Employee { get; set; }
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public string? Notes { get; set; }//delete this field! 
-
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();     
         public bool? IsPaid { get; set; } = false;
         public Status Status { get; set; }
         public Order()
@@ -21,15 +19,14 @@ namespace Chapeau.Models
             OrderItems = new List<OrderItem>();
         }
 
-        public Order(int orderId, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems, bool isPaid, string notes)
+        public Order(int orderId, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems, bool isPaid)
         {
             OrderId = orderId;
             Employee = employee;
             Table = table;
             OrderTime = orderTime;
             OrderItems = orderItems;
-            IsPaid = isPaid;
-            Notes =notes;//delete
+            IsPaid = isPaid;          
         }
 
         // --- Session handling ---

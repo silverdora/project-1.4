@@ -73,8 +73,7 @@ namespace Chapeau.Repositories
                 OrderTime = Convert.ToDateTime(reader["orderTime"]),
                 IsPaid = Convert.ToBoolean(reader["isPaid"]),
                 Table = matchedTable,
-                Employee = _employeeRepository.GetEmployeeByID(Convert.ToInt32(reader["employeeID"])),
-                //Notes = reader["notes"]?.ToString()
+                Employee = _employeeRepository.GetEmployeeByID(Convert.ToInt32(reader["employeeID"])),               
             };
         }
     }
