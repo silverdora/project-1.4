@@ -14,7 +14,7 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Insert(OrderItem item)
+        public void Insert(OrderItem item, int orderId)
         {
             string query = @"INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity, comment)
                              VALUES (@orderID, @itemID, @includeDate, @status, @quantity, @comment)";
@@ -22,7 +22,7 @@ namespace Chapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             using (SqlCommand command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@orderID", item.OrderId);
+                command.Parameters.AddWithValue("@orderID", orderId);
                 command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
                 command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
                 command.Parameters.AddWithValue("@status", item.Status.ToString());

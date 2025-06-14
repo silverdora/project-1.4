@@ -1,7 +1,4 @@
-﻿
-
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json;
 
 namespace Chapeau.Models
 {
@@ -34,14 +31,8 @@ namespace Chapeau.Models
         private const string SessionKey = "CurrentOrder";
 
         public void SaveToSession(ISession session)
-        {
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                WriteIndented = false
-            };
-
-            string json = JsonSerializer.Serialize(this, options);
+        {            
+            string json = JsonSerializer.Serialize(this);//convert the order object to json
             session.SetString(SessionKey, json);
         }
 

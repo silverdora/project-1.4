@@ -39,13 +39,17 @@ namespace Chapeau.Controllers
             {
                 order = new Order
                 {
-                    Table = new Table { TableId = tableId },
+                    Table = new Table { TableId = tableId, IsOccupied = true },
                     Employee = employee,
                     OrderTime = DateTime.Now,
                     IsPaid = false,                   
                 };
                 _orderService.InsertOrder(order);
             }
+
+            //Mark the table as occupied in the database
+            _tableService.SetTableOccupiedStatus(tableId, true);
+
             //saving a full order object to session
             order.SaveToSession(HttpContext.Session);
 
@@ -105,7 +109,7 @@ namespace Chapeau.Controllers
             {
                 _orderService.AddItemsToOrder(order.OrderId, order.OrderItems);
 
-                foreach (var item in order.OrderItems)
+                foreach (OrderItem item in order.OrderItems)
                 {
                     _menuItemService.ReduceStock(item.MenuItem.ItemId, item.Quantity);
                 }

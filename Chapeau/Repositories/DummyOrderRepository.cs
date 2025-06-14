@@ -63,7 +63,7 @@ namespace Chapeau.Repositories
 
                         OrderItem item = new OrderItem
                         {
-                            ItemId = reader.GetInt32(5),
+                           // ItemId = reader.GetInt32(5),
                             Quantity = reader.GetInt32(6),
                             IncludeDate = reader.GetDateTime(7),
                             Status = (Status)Enum.Parse(typeof(Status), reader.GetString(8)),

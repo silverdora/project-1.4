@@ -247,7 +247,7 @@ namespace Chapeau.Repositories
             string comment = (string)reader["comment"];
             int orderItemId = (int)reader["orderItemID"];
 
-            return new OrderItem(itemID, menuItem, orderItemId, includeDate, status, quantity, comment);
+            return new OrderItem(menuItem, orderItemId, includeDate, status, quantity, comment);
         }
 
         public MenuItem GetMenuItemByID(int id)

@@ -32,9 +32,8 @@ namespace Chapeau.Services
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
         {
             foreach (OrderItem item in items)
-            {
-                item.OrderId = orderId;
-                _orderItemRepository.Insert(item);
+            {               
+                _orderItemRepository.Insert(item, orderId);
             }
         }
 
