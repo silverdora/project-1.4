@@ -108,6 +108,14 @@ namespace Chapeau.Controllers
             return RedirectToAction("Index", "Restaurant");
         }
 
+        [HttpGet]
+        public IActionResult SplitBill(int orderId)
+        {
+            // Prepare a SplitPaymentViewModel, e.g.:
+            var model = new SplitPaymentViewModel { OrderID = orderId, TotalAmount = ... };
+            return View(model);
+        }
+
     }
 }
 
