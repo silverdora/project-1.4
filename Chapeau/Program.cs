@@ -68,8 +68,7 @@ public class Program
         builder.Services.AddScoped<ITableService, TableService>();
 
 
-        builder.Services.AddScoped<IRunningOrdersService, RunningOrdersService>();
-        builder.Services.AddScoped<IRunningOrdersRepository, RunningOrdersRepository>();
+        
 
 
         // Add configuration access

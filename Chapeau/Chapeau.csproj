@@ -12,10 +12,6 @@
     <None Remove="Repositories\" />
     <None Remove="Services\" />
     <None Remove="ViewModels\" />
-    <None Remove="Views\RunningOrders\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\RunningOrders\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />

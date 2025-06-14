@@ -34,11 +34,6 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-
-        public IActionResult Index()
-        {
-            return View();
-        }
         [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
@@ -122,6 +117,124 @@ namespace Chapeau.Controllers
 
             return RedirectToAction("Overview", "Restaurant");
         }
+
+        //bar or kitchen methods
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no user");
+            }
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> newOrders = _orderService.GetOrdersByStatus(Status.Ordered, type);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _orderService.GetCategoriesOfAnOrder(newOrders);
+
+                List<Order> preparingOrders = _orderService.GetOrdersByStatus(Status.InProgress, type);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _orderService.GetCategoriesOfAnOrder(preparingOrders);
+
+                //store data in the ready orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+
+            else
+            {
+                throw new Exception("no access");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult FinishedOrders()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no user");
+            }
+
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> readyOrders = _orderService.GetOrdersByStatus(Status.ReadyToBeServed, type);
+                List<Order> servedOrders = _orderService.GetOrdersByStatus(Status.Served, type);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _orderService.GetCategoriesOfAnOrder(readyOrders);
+                Dictionary<int, List<MenuCategory>> servedOrdersByCourse = _orderService.GetCategoriesOfAnOrder(servedOrders);
+                //store data in the ready orders ViewModel
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, servedOrders, readyOrdersByCourse, servedOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(toBeServedOrdersViewModel);
+            }
+
+            else
+            {
+                throw new Exception("no access");
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemStatus(int orderItemID, Status status)
+        {
+            _orderService.ChangeOrderStatus(orderItemID, status);
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            //go back
+            if (status == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee.Role == Role.Kitchen)
+            {
+                _orderService.ChangeAllOrderItemsStatus(orderID, "Dish", currentStatus, newStatus);
+            }
+            else
+            {
+                _orderService.ChangeAllOrderItemsStatus(orderID, "Drink", currentStatus, newStatus);
+            }
+
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            _orderService.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        //payment methods
 
         [HttpGet]
         public IActionResult ViewOrder(int tableId)

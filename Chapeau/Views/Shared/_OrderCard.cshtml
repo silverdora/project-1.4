@@ -52,7 +52,7 @@
                             <li class="list-group-item ps-0 pe-0">
                                 <div class=" d-flex justify-content-between align-items-center">
                                     <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
-                                    <form action="/RunningOrders/ChangeOrderItemStatus" method="post">
+                                    <form action="/Order/ChangeOrderItemStatus" method="post">
                                         <input hidden name="orderItemID" value="@orderItem.OrderItemID" />
                                         <input hidden name="status" value="@newStatus" />
                                         <button type="submit" class="btn btn-primary btn-sm">@changeItemStatus</button>
@@ -68,7 +68,7 @@
 
                 @if (employeeRole == Role.Kitchen)
                         {
-                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
+                    <form action="/Order/ChangeOrderItemsFromOneCourseStatus" method="post">
                         <input hidden name="orderID" value="@Model.OrderID" />
                         <input hidden name="currentStatus" value="@currentStatus" />
                         <input hidden name="newStatus" value="@newStatus" />
@@ -79,7 +79,7 @@
                     
 
             }
-            <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
+            <form action="/Order/ChangeAllOrderItemsStatus" method="post">
                 <input hidden name="orderID" value="@Model.OrderID" />
                 <input hidden name="currentStatus" value="@currentStatus" />
                 <input hidden name="newStatus" value="@newStatus" />
