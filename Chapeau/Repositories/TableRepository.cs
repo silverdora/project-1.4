@@ -191,6 +191,47 @@ namespace Chapeau.Repository
         //    return viewModels;
         //}
 
+        public Table GetTableByID(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = @"SELECT t.tableID, t.table_number, t.isOccupied,
+                   MAX(oi.status) AS OrderStatus
+                    FROM[Table] t
+                    LEFT JOIN[Order] o ON t.tableID = o.tableID
+                    LEFT JOIN[OrderItem] oi ON o.orderID = oi.orderID
+                    WHERE t.tableID = @Id
+                    GROUP BY t.tableID, t.table_number, t.isOccupied;
+                ";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                // Preventing SQL injections
+                command.Parameters.AddWithValue("@Id", id);
+
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                if (!reader.Read())
+                    return null;
+                Table table = ReadTable(reader);
+                reader.Close();
+
+                return table;
+            }
+        }
+
+        private Table ReadTable(SqlDataReader reader)
+        {
+            int tableID = (int)reader["tableID"];
+            int tableNumber = (int)reader["table_number"];
+            bool isOccupied = (bool)reader["isOccupied"];
+            Status? orderStatus = reader["orderStatus"] != DBNull.Value // Mo for sprint 2
+                ? (Status)Enum.Parse(typeof(Status), (string)reader["orderStatus"], true)
+                : null;
+
+            return new Table(tableID, tableNumber, isOccupied, orderStatus);   // Mo for sprint 2
+        }
+
         // scnario 2 sprint 3
         public void UpdateTableOccupiedStatus(int tableId, bool isOccupied)
         {

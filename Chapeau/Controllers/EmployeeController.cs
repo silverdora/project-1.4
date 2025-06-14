@@ -38,9 +38,9 @@ namespace Chapeau.Controllers
                 case Role.Server:
                     return RedirectToAction("Overview", "Restaurant");
                 case Role.Bar:
-                    return RedirectToAction("Index", "RunningOrders");
+                    return RedirectToAction("Index", "Order");
                 case Role.Kitchen:
-                    return RedirectToAction("Index", "RunningOrders");
+                    return RedirectToAction("Index", "Order");
                 case Role.Manager:
                     return RedirectToAction("Dashboard", "Manager");
                 default:

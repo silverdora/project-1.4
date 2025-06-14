@@ -30,10 +30,6 @@ namespace Chapeau.Controllers
             _menuItemService = menuItemService;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
         [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
@@ -133,6 +129,204 @@ namespace Chapeau.Controllers
             return RedirectToAction("Overview", "Restaurant");
         }
 
+        //bar or kitchen methods
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no user");
+            }
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> newOrders = _orderService.GetOrdersByStatus(Status.Ordered, type);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _orderService.GetCategoriesOfAnOrder(newOrders);
+
+                List<Order> preparingOrders = _orderService.GetOrdersByStatus(Status.InProgress, type);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _orderService.GetCategoriesOfAnOrder(preparingOrders);
+
+                //store data in the ready orders ViewModel
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(runningOrdersViewModel);
+            }
+
+            else
+            {
+                throw new Exception("no access");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult FinishedOrders()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+
+            if (loggedInEmployee == null)
+            {
+                throw new Exception("no user");
+            }
+
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> readyOrders = _orderService.GetOrdersByStatus(Status.ReadyToBeServed, type);
+                List<Order> servedOrders = _orderService.GetOrdersByStatus(Status.Served, type);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _orderService.GetCategoriesOfAnOrder(readyOrders);
+                Dictionary<int, List<MenuCategory>> servedOrdersByCourse = _orderService.GetCategoriesOfAnOrder(servedOrders);
+                //store data in the ready orders ViewModel
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, servedOrders, readyOrdersByCourse, servedOrdersByCourse, loggedInEmployee);
+                //pass data to view
+                return View(toBeServedOrdersViewModel);
+            }
+
+            else
+            {
+                throw new Exception("no access");
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemStatus(int orderItemID, Status status)
+        {
+            _orderService.ChangeOrderStatus(orderItemID, status);
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            //go back
+            if (status == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee.Role == Role.Kitchen)
+            {
+                _orderService.ChangeAllOrderItemsStatus(orderID, "Dish", currentStatus, newStatus);
+            }
+            else
+            {
+                _orderService.ChangeAllOrderItemsStatus(orderID, "Drink", currentStatus, newStatus);
+            }
+
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            _orderService.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+            //go back
+            TempData["StatusChangeMessage"] = "Status has been changed.";
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        //payment methods
+
+        [HttpGet]
+        public IActionResult ViewOrder(int tableId)
+        {
+            var summary = _dummyOrderService.GetOrderSummary(tableId);
+            if (summary == null)
+                return NotFound("No active order for this table.");
+
+            return View("~/Views/DummyOrder/ViewOrder.cshtml", summary);
+        }
+
+        [HttpGet]
+        public IActionResult FinishOrder(int orderId)
+        {
+            var viewModel = new FinishOrderViewModel { OrderID = orderId };
+            return View("~/Views/DummyOrder/FinishOrder.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public IActionResult FinishOrder(FinishOrderViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/DummyOrder/FinishOrder.cshtml", model);
+
+            _paymentService.SavePayment(model);
+            _dummyOrderService.MarkOrderAsPaid(model.OrderID);
+
+            ViewBag.Message = "Order successfully finished!";
+            return View("Confirmation");
+        }
+
+        public IActionResult Confirmation()
+        {
+            return View("~/Views/DummyOrder/Confirmation.cshtml");
+        }
+        [HttpGet]
+        public IActionResult SplitBill(int orderId, int numberOfPeople = 2)
+        {
+            // Retrieve total order amount from your order service
+            decimal totalAmount = _dummyOrderService.GetOrderTotal(orderId);
+
+            // Initialize payments list based on numberOfPeople
+            var payments = new List<IndividualPayment>();
+            for (int i = 0; i < numberOfPeople; i++)
+            {
+                payments.Add(new IndividualPayment
+                {
+                    // Default equal split
+                    AmountPaid = Math.Round(totalAmount / numberOfPeople, 2)
+                });
+            }
+
+            var model = new SplitPaymentViewModel
+            {
+                OrderID = orderId,
+                TotalAmount = totalAmount,
+                NumberOfPeople = numberOfPeople,
+                Payments = payments
+            };
+
+            return View("~/Views/DummyOrder/SplitBill.cshtml", model);
+        }
+
+        [HttpPost]
+        public IActionResult SplitBill(SplitPaymentViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("~/Views/DummyOrder/SplitBill.cshtml", model);
+
+            // Optional: Validate sum of AmountPaid >= TotalAmount
+
+            // Save each individual payment via your payment service
+            foreach (var payment in model.Payments)
+            {
+                _paymentService.SaveIndividualPayment(model.OrderID, payment.AmountPaid, payment.TipAmount, payment.PaymentType, payment.Feedback);
+            }
+
+            _dummyOrderService.MarkOrderAsPaid(model.OrderID);
+
+            return View("~/Views/DummyOrder/Confirmation.cshtml");
+        }
 
     }
 
