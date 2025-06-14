@@ -127,9 +127,7 @@ namespace Chapeau.Controllers
             //get Employee object 
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
             if (loggedInEmployee == null)
-            {
-                throw new Exception("no user");
-            }
+                return RedirectToAction("Login", "Employee");
 
             if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
             {
@@ -144,7 +142,7 @@ namespace Chapeau.Controllers
 
             else
             {
-                throw new Exception("no access");
+                return View("AccessForbidden");
             }
         }
 
@@ -154,9 +152,7 @@ namespace Chapeau.Controllers
             Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
 
             if (loggedInEmployee == null)
-            {
-                throw new Exception("no user");
-            }
+                return RedirectToAction("Login", "Employee");
 
             if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
             {
@@ -171,7 +167,7 @@ namespace Chapeau.Controllers
 
             else
             {
-                throw new Exception("no access");
+                return View("AccessForbidden");
             }
         }
 
