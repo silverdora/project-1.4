@@ -81,17 +81,14 @@ namespace Chapeau.Services
             }
 
         }
-        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentModel, string feedback)
+        public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
         {
-            // Save payment record for the order into the database
-            // Assuming you have a PaymentRepository or similar to persist data
-
             var payment = new Payment
             {
                 orderID = orderId,
                 amountPaid = amountPaid,
                 tipAmount = tipAmount,
-                paymentType = paymentType,
+                paymentType = (PaymentType)Enum.Parse(typeof(PaymentType), paymentType, true),
                 Feedback = feedback,
                 paymentDAte = DateTime.Now
             };

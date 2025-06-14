@@ -102,7 +102,7 @@
 
         if (canPay) {
             html += `
-                <form method="post" action="/Payment/StartPayment">
+                <form method="get" action="/Payment/ViewOrder">
                     <input type="hidden" name="tableId" value="${tableId}" />
                     <button class="btn btn-dark w-100 mb-2">💰 Process Payment</button>
                 </form>`;
