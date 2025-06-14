@@ -3,22 +3,18 @@
 @using Chapeau.Models.Extensions
 @{
 	Order currentOrder = Context.Session.GetObject<Order>("CurrentOrder");
+	// Define all available cards and categories
+	IEnumerable<MenuCard> cards = Enum.GetValues(typeof(MenuCard)).Cast<MenuCard>();
+	IEnumerable<MenuCategory> categories = Enum.GetValues(typeof(MenuCategory)).Cast<MenuCategory>();
 }
-
-
 <h2>Menu Selection</h2>
+
 <!-- To display a message confirming every item while is being added -->
 @if (TempData["AddedMessage"] != null)
 {
 	<div class="alert alert-success" role="alert">
 		@TempData["AddedMessage"]
 	</div>
-}
-
-@{
-	// Define all available cards and categories
-	var cardNames = new[] { "Lunch", "Dinner", "Drinks" };
-	var categoriesInItems = Enum.GetNames(typeof(MenuCategory)).ToList(); // Show all possible categories
 }
 
 <!-- CARD FILTER BUTTONS -->
@@ -33,10 +29,10 @@
 	</form>
 
 	<!-- Card buttons -->
-	@foreach (string card in cardNames)
+	@foreach (MenuCard card in cards)
 	{
 		<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
-			<input type="hidden" name="card" value="@card" />
+			<input type="hidden" name="card" value="@card.ToString()" />
 			<input type="hidden" name="tableID" value="@Model.TableID" />
 			<input type="hidden" name="orderID" value="@Model.OrderID" />
 			<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == card ? "active" : "")">
@@ -47,7 +43,7 @@
 </div>
 
 <!-- CATEGORY FILTER BUTTONS (only show when a card is selected) -->
-@if (!string.IsNullOrWhiteSpace(Model.SelectedCard))
+@if (Model.SelectedCard != null)
 {
 	<div class="mb-3">
 		<!-- "All" category -->
@@ -60,14 +56,14 @@
 		</a>
 
 		<!-- Category buttons -->
-		@foreach (string category in categoriesInItems)
+		@foreach (MenuCategory category in categories)
 		{
 			<a asp-controller="MenuItem" asp-action="Index"
 			   asp-route-card="@Model.SelectedCard"
 			   asp-route-category="@category"
 			   asp-route-tableID="@Model.TableID"
 			   asp-route-orderID="@Model.OrderID"
-			   class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == category ? "active" : "")">
+               class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == category ? "active" : "")">
 				@category
 			</a>
 		}
@@ -77,11 +73,13 @@
 <!-- View Order Button -->
 @if (currentOrder != null && currentOrder.OrderId != 0)
 {
+	<div class=" ="mb-3">
 	<form asp-controller="Order" asp-action="OrderDetails" method="get">
 	<input type="hidden" name="id" value="@Model.OrderID" />
 	<input type="hidden" name="tableID" value="@Model.TableID" />
 	<button type="submit">View Order Details</button>
 </form>
+	</div>
 }
 
 <!-- Menu Table -->
@@ -113,14 +111,14 @@ else
 					<td>@item.Category</td>
 					<td>
 						@{
-							var message = item.StockQuantity switch
+							string message = item.StockQuantity switch
 							{
 								0 => "Out of stock",
 								<= 10 => $"Low ({item.StockQuantity})",
 								_ => $"In stock ({item.StockQuantity})"
 							};
 
-							var color = item.StockQuantity == 0 ? "red"
+							string color = item.StockQuantity == 0 ? "red"
 							: item.StockQuantity <= 10 ? "orange"
 							: "green";
 						}

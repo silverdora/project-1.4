@@ -17,20 +17,16 @@ namespace Chapeau.Services
             return _menuItemRepository.GetMenuItems();
         }
 
-        public List<MenuItem> GetFilteredMenuItems(string? card, string? category)
+        public List<MenuItem> GetFilteredMenuItems(MenuCard? card, MenuCategory? category)
         {
-            if (!string.IsNullOrWhiteSpace(card) && !string.IsNullOrWhiteSpace(category))
+            if (card != null && category != null)
             {
-                return _menuItemRepository.GetMenuItemsByCardAndCategory(card, category);
+                return _menuItemRepository.GetMenuItemsByCardAndCategory(card.Value, category.Value);
             }
-            else if (!string.IsNullOrWhiteSpace(card))
+            else if (card != null)
             {
-                return _menuItemRepository.GetMenuItemsByCard(card);
-            }
-            else if (!string.IsNullOrWhiteSpace(category))
-            {
-                return _menuItemRepository.GetMenuItemsByCategory(category);
-            }
+                return _menuItemRepository.GetMenuItemsByCard(card.Value);
+            }            
             else
             {
                 return _menuItemRepository.GetMenuItems();

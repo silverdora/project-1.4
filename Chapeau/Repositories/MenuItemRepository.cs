@@ -36,30 +36,30 @@ namespace Chapeau.Repositories
         }
 
         // Get items by card name (e.g., "Lunch", "Dinner", "Drinks")
-        public List<MenuItem> GetMenuItemsByCard(string cardName)
+        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
         {
             string query = "SELECT * FROM MenuItem WHERE card = @card";
 
-            SqlParameter cardParameter = new SqlParameter("@card", cardName);
+            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
             return ExecuteQueryMapMenuItems(query, cardParameter);
         }
 
         // Get items by category (e.g., "Starters")
-        public List<MenuItem> GetMenuItemsByCategory(string categoryName)
+        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
         {
             string query = "SELECT * FROM MenuItem WHERE category = @category";
 
-            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
+            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
             return ExecuteQueryMapMenuItems(query, categoryParameter);
         }
 
         //Get items by both card and category
-        public List<MenuItem> GetMenuItemsByCardAndCategory(string cardName, string categoryName)
+        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
         {
             string query = "SELECT * FROM MenuItem WHERE card = @card AND category = @category";
 
-            SqlParameter cardParameter = new SqlParameter("@card", cardName);
-            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
+            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
+            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
 
             return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);
         }
