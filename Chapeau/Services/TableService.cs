@@ -10,8 +10,10 @@ using Microsoft.Data.SqlClient;
 namespace Chapeau.Service
 {
     public class TableService : ITableService
+  
     {
         private readonly ITableRepository _tableRepository;
+
 
         public TableService(ITableRepository tableRepository)
         {
@@ -26,7 +28,7 @@ namespace Chapeau.Service
         }
         public List<TableOrderViewModel> GetTableOverview()
         {
-            return _tableRepository.GetTableOrderViewModels();
+            return _tableRepository.GetTableOverview();
         }
 
 
@@ -42,8 +44,9 @@ namespace Chapeau.Service
                 return false;
 
             _tableRepository.UpdateTableOccupiedStatus(tableId, false);
-            return true;
+             return true;
         }
+
 
         public void MarkOrderAsServed(int tableId)
         {

@@ -9,7 +9,10 @@ namespace Chapeau.Repositories.Interfaces
         void MarkPaymentComplete(int paymentId);
 
         void Add(Payment payment);
-        // ... other methods you need
+
+        Order GetActiveOrderByTable(int tableId);
+        Order GetOrderById(int orderId);
+
 
 
     }

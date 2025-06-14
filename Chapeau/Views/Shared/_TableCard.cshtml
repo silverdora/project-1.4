@@ -1,40 +1,76 @@
 ﻿@model TableOrderViewModel
 @using Chapeau.ViewModels
 
-﻿
-
-@{
-    @*Get the currently logged-in employee's ID from the session(int? cause session can expire). *@
-    int? employeeId = Context.Session.GetInt32("EmployeeID");
+@functions {
+    public string GetStatusBadgeClass(Status status)
+    {
+        return status switch
+        {
+            Status.Ordered => "bg-primary",
+            Status.InProgress => "bg-warning text-dark",
+            Status.ReadyToBeServed => "bg-success",
+            Status.Served => "bg-secondary",
+            _ => "bg-light text-dark"
+        };
+    }
 }
-<div class="restaurant-table @(Model.IsOccupied ? "occupied" : "free")">
-    <div class="table-top">
-        <span>Table @Model.TableNumber</span>
-    </div>
-    <div class="table-status">
-        <span class="badge @(Model.IsOccupied ? "bg-danger" : "bg-success")">
+
+<div class="card border border-secondary-subtle shadow-sm h-100">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">Table @Model.TableNumber</h5>
+        <span class="badge rounded-pill px-3 py-2 fs-6 @(Model.IsOccupied ? "bg-danger" : "bg-success")">
             @(Model.IsOccupied ? "Occupied" : "Free")
         </span>
-        <br />
-
-        @if (Model.FoodStatus.HasValue)
-        {
-            <span class="badge bg-info">Food: @Model.FoodStatus.Value</span>
-        }
-        @if (Model.DrinkStatus.HasValue)
-        {
-            <span class="badge bg-warning text-dark">Drinks: @Model.DrinkStatus.Value</span>
-        }
-        @if (Model.IsOccupied && !Model.FoodStatus.HasValue && !Model.DrinkStatus.HasValue)
-        {
-            <span class="text-muted small">No Order</span>
-        }
     </div>
-    <div class="table-actions mt-2 text-center">
-        <form asp-controller="Order" asp-action="TakeOrder" method="post">
-            <input type="hidden" name="tableId" value="@Model.TableId" />
-            <input type="hidden" name="employeeId" value="@employeeId" />
-            <button type="submit" class="btn btn-sm btn-primary">Start Order</button>
-        </form>
+
+    <div class="card-body p-4">
+        <div class="mb-3">
+            @if (Model.FoodStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.FoodStatus.Value)">
+                    Food: @Model.FoodStatus.Value
+                </span>
+            }
+
+            @if (Model.DrinkStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.DrinkStatus.Value)">
+                    Drink: @Model.DrinkStatus.Value
+                </span>
+            }
+
+            @if (!Model.FoodStatus.HasValue && !Model.DrinkStatus.HasValue)
+            {
+                <span class="text-muted small">No Active Orders</span>
+            }
+        </div>
+
+        @if (Model.FoodItems?.Any() == true)
+        {
+            <div class="mb-2 ms-2">
+                <strong>Food Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.FoodItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (Model.DrinkItems?.Any() == true)
+        {
+            <div class="mb-2 ms-2">
+                <strong>Drink Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.DrinkItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="text-center text-muted small">Click for more actions</div>
     </div>
 </div>

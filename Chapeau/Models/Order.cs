@@ -10,25 +10,22 @@ namespace Chapeau.Models
         public DateTime OrderTime { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public string? Notes { get; set; }
-        
 
+        public bool? IsPaid { get; set; } = false;
         public Status Status { get; set; }
         public Order()
         {
             OrderItems = new List<OrderItem>();
         }
 
-
-        public Order(int orderID, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems)
+        public Order(int orderID, Employee employee, Table table, DateTime orderTime, List<OrderItem> orderItems, bool isPaid)
         {
             OrderID = orderID;
             Employee = employee;
             Table = table;
             OrderTime = orderTime;
             OrderItems = orderItems;
-        }
-
-        
-
+            IsPaid = isPaid;
+        }      
     }
 }
