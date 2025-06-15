@@ -36,27 +36,29 @@
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="navbarSupportedContent">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Payment" asp-action="Index">Payment</a>
-                        </li>
-                        @if (loggedInEmployee != null && loggedInEmployee.Role == Role.Server)
+
+                        @if (loggedInEmployee.Role == Role.Server)
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Restaurant" asp-action="Overview">Tables Overview</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="MenuItem" asp-action="Index">Menu Items</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Running Orders</a>
-                        </li>
+                        @if (loggedInEmployee.Role == Role.Bar || loggedInEmployee.Role == Role.Kitchen)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Order" asp-action="Index">Running Orders</a>
+                            </li>
+                        }
+
 
                         <form method="post" asp-controller="Employee" asp-action="LogOff" class="d-flex">
                             <span class="navbar-text me-2">Welcome, <strong>@loggedInEmployee.employeeName</strong></span>
                             <button type="submit" class="btn btn-outline-danger btn-sm">Log off</button>
                         </form>
-                    </div>
+</div>
                 </div>
             </nav>
         }
