@@ -6,11 +6,10 @@ namespace Chapeau.Repositories.Interfaces
     {
         void AddPayment(Payment payment);
         List<Payment> GetAllPayments();
+        List<Payment> GetPaymentsByOrderId(int orderId);
         void MarkPaymentComplete(int paymentId);
-
-        void Add(Payment payment);
-        // ... other methods you need
-
-
+        Order GetActiveOrderByTable(int tableId);
+        Order GetOrderById(int orderId);
     }
 }
+

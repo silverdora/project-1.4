@@ -10,8 +10,8 @@ using System.Text.RegularExpressions;
 
 namespace Chapeau.Repositories
 {
-	public class RunningOrdersRepository : IRunningOrdersRepository
-	{
+    public class RunningOrdersRepository : IRunningOrdersRepository
+    {
         private readonly string _connectionString;
 
         public RunningOrdersRepository(IConfiguration configuration)
@@ -19,7 +19,7 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        
+
 
         public void ChangeOrderStatus(int orderID, int itemID, Status status)
         {
@@ -68,6 +68,36 @@ namespace Chapeau.Repositories
                 }
             }
         }
+
+        public void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = $"UPDATE OrderItem " +
+                    $"SET [status] = @newStatus " +
+                    $"WHERE itemID in ( " +
+                    $"SELECT itemID " +
+                    $"from MenuItem " +
+                    $"where category = @course ) " +
+                    $"AND orderID = @orderId AND [status] = @currentStatus;";
+
+                SqlCommand command = new SqlCommand(query, connection);
+
+                // Preventing SQL injections
+                command.Parameters.AddWithValue("@orderId", orderID);
+                command.Parameters.AddWithValue("@newStatus", newStatus.ToString());
+                command.Parameters.AddWithValue("@currentStatus", currentStatus.ToString());
+                command.Parameters.AddWithValue("@course", course.ToString());
+
+                command.Connection.Open();
+                int nrOfRowsAffected = command.ExecuteNonQuery();
+                if (nrOfRowsAffected == 0)
+                {
+                    throw new Exception("Changing status failed!");
+                }
+            }
+        }
+
         public List<Order> GetBarOrdersByStatus(Status status)
         {
             List<Order> orders = new List<Order>();
@@ -132,11 +162,11 @@ namespace Chapeau.Repositories
             //bool isServed = true;
             List<OrderItem> orderItems = GetOrderItemsByOrderID(orderId, status, type);
 
-            return new Order(orderId, employee, table, orderTime, orderItems);
+            return new Order(orderId, employee, table, orderTime, orderItems, false);
 
         }
 
-        private Employee GetEmployeeByID (int id)
+        private Employee GetEmployeeByID(int id)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -214,7 +244,7 @@ namespace Chapeau.Repositories
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 List<OrderItem> orderItems = new List<OrderItem>();
-                string query = "SELECT OrderItem.itemID, includeDate, [status], quantity, comment " +
+                string query = "SELECT OrderItem.itemID, includeDate, [status], quantity " +
                     "FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
                     "WHERE orderID = @Id and [status] = @status and item_type = @type; ";
                 SqlCommand command = new SqlCommand(query, connection);
@@ -243,9 +273,9 @@ namespace Chapeau.Repositories
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
-            //string comment = (string)reader["comment"];
+            //string notes = (string)reader["notes"];
 
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity, null); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
+            return new OrderItem(itemID, menuItem, includeDate, status, quantity,null); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
         }
 
         public MenuItem GetMenuItemByID(int id)
@@ -287,4 +317,3 @@ namespace Chapeau.Repositories
         }
     }
 }
-

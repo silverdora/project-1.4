@@ -68,6 +68,13 @@
                                                 </li>
                                             }
                                     </ul>
+                                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
+                                        <input hidden name="orderID" value="@order.OrderID" />
+                                        <input hidden name="currentStatus" value="Ordered" />
+                                        <input hidden name="newStatus" value="InProgress" />
+                                        <input hidden name="course" value="@course" />
+                                        <button type="submit" class="btn btn-info btn-sm mb-2">Prepare course</button>
+                                    </form>
                                 }
                             }
                             <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">
@@ -135,6 +142,13 @@
                                                 </li>
                                             }
                                     </ul>
+                                    <form action="/RunningOrders/ChangeOrderItemsFromOneCourseStatus" method="post">
+                                        <input hidden name="orderID" value="@order.OrderID" />
+                                        <input hidden name="currentStatus" value="Ordered" />
+                                        <input hidden name="newStatus" value="InProgress" />
+                                        <input hidden name="course" value="@course" />
+                                        <button type="submit" class="btn btn-info btn-sm mb-2">Prepare course</button>
+                                    </form>
                                 }
                             }
                             <form action="/RunningOrders/ChangeAllOrderItemsStatus" method="post">

@@ -1,0 +1,83 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Chapeau.ViewModels.FinishOrderViewModel
+
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="mb-0">Finish Order</h2>
+                </div>
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
+                    <form asp-action="FinishOrder" method="post">
+                        <input type="hidden" asp-for="OrderID" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Amount Paid (€)</label>
+                                    <input asp-for="AmountPaid" type="number" step="0.01" class="form-control" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tip Amount (€)</label>
+                                    <input asp-for="TipAmount" type="number" step="0.01" class="form-control" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Payment Type</label>
+                                    <select asp-for="PaymentType" class="form-select" required>
+                                        <option value="">-- Select Payment Type --</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="CreditCard">Credit Card</option>
+                                        <option value="DebitCard">Debit Card</option>
+                                        <option value="Pin">PIN</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Low VAT Amount (€)</label>
+                                    <input asp-for="LowVatAmount" type="number" step="0.01" class="form-control bg-light" readonly />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">High VAT Amount (€)</label>
+                                    <input asp-for="HighVatAmount" type="number" step="0.01" class="form-control bg-light" readonly />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Feedback <span class="text-muted">(optional)</span></label>
+                                    <textarea asp-for="Feedback" class="form-control" rows="4" placeholder="Enter your feedback here (optional)..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="SplitBill" asp-route-orderId="@Model.OrderID" class="btn btn-primary">
+                                <i class="fas fa-users"></i> Split Bill
+                            </a>
+                            <button type="submit" name="action" value="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Confirm Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

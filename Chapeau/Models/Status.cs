@@ -8,6 +8,8 @@ namespace Chapeau.Models
 		InProgress,
 		ReadyToBeServed,
 		Served,
-	}
+        Paid //  in order to finalise the order,  
+
+    }
 }
 

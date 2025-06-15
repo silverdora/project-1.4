@@ -1,9 +1,8 @@
 ﻿using Chapeau.Models;
-using Chapeau.Services.Interfaces;
-using Chapeau.Repositories.Interfaces;
-using Chapeau.Repositories;
 using Chapeau.HelperMethods;
+using Chapeau.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Chapeau.Services
 {
@@ -23,18 +22,20 @@ namespace Chapeau.Services
         {
             _orderRepository.InsertOrder(order);
         }
+        public Order? GetActiveOrderByTableId(int tableId)
+        {
+            return _orderRepository.GetActiveOrderByTableId(tableId);
+
+        }
 
         // stores the selected menu item into the session list.
         public void AddItemToSessionSelection(int menuItemId, int quantity, ISession session)
         {
-            // Retrieve the current list from session (or create a new one if it doesn't exist)
-            List<OrderItem> selectedItems = session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            if (selectedItems == null)
-            {
-                selectedItems = new List<OrderItem>();
-            }
-
+            // Get the current list from session or create a new one
+            List<OrderItem> selectedItems = session.GetSelectedItemsFromSession();         
             OrderItem existingItem = null;
+
+            // Search for existing item
             foreach (OrderItem item in selectedItems)
             {
                 if (item.MenuItem.ItemID == menuItemId)
@@ -44,34 +45,48 @@ namespace Chapeau.Services
                 }
             }
 
+            // If item exists, increase quantity
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
             }
             else
             {
+                // If it doesn't exist, retrieve the menu item and add a new one
                 MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-                OrderItem newItem = new OrderItem(menuItem.ItemID, menuItem, DateTime.Now, Status.Ordered, quantity, null);
+                OrderItem newItem = new OrderItem(
+                    menuItem.ItemID,
+                    menuItem,
+                    DateTime.Now,
+                    Status.Ordered,
+                    quantity,
+                    null // optional comment field
+                );
+
                 selectedItems.Add(newItem);
             }
 
+            // Save back to session
             session.SetObjectAsJson("SelectedItems", selectedItems);
         }
 
-        // Inserts the items from session into the database, using OrderItemRepository.
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
         {
             foreach (var item in items)
             {
-                item.OrderID = orderId;
-                _orderItemRepository.Insert(item);
+                var existing = _orderItemRepository.GetByOrderAndItem(orderId, item.ItemID);
+                if (existing != null)
+                {
+                    int newQuantity = existing.Quantity + item.Quantity;
+                    _orderItemRepository.UpdateQuantity(orderId, item.ItemID, newQuantity);
+                }
+                else
+                {
+                    item.OrderID = orderId;
+                    _orderItemRepository.Insert(item);
+                }
             }
-        }
-
-        public List<OrderItem> GetSelectedItemsFromSession(ISession session)
-        {
-            return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
-        }
+        }      
 
         //public void ClearSelectedItemsFromSession(ISession session)
         //{
