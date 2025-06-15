@@ -46,9 +46,6 @@ namespace Chapeau.Repositories
                 throw new Exception("Failed to add payment", ex);
             }
         }
-        public Order GetActiveOrderByTable(int tableId)
-        {
-            Order order = null;
 
         public List<Payment> GetAllPayments()
         {

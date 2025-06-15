@@ -31,7 +31,7 @@ namespace Chapeau.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Failed to retrieve payments: " + ex.Message;
-                return RedirectToAction("Index", "Restaurant");
+                return RedirectToAction("Overview", "Restaurant");
             }
         }
 
@@ -48,7 +48,7 @@ namespace Chapeau.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Failed to process payment: " + ex.Message;
-                return RedirectToAction("Index", "Restaurant");
+                return RedirectToAction("Overview", "Restaurant");
             }
         }
 
@@ -64,12 +64,12 @@ namespace Chapeau.Controllers
 
                 _paymentService.MarkOrderAsPaid(model.OrderID);
                 TempData["SuccessMessage"] = $"Payment for Order #{model.OrderID} completed successfully.";
-                return RedirectToAction("Index", "Restaurant");
+                return RedirectToAction("Overview", "Restaurant");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Failed to process payment: " + ex.Message;
-                return View(model);
+                TempData["SuccessMessage"] = $"Payment for Order #{model.OrderID} completed successfully.";
+                return RedirectToAction("ViewOrder", "Payment", new { orderId = model.OrderID });
             }
         }
 
@@ -82,7 +82,7 @@ namespace Chapeau.Controllers
                 if (orderId == null)
                 {
                     TempData["Error"] = "No unpaid order found for this table.";
-                    return RedirectToAction("Index", "Restaurant");
+                    return RedirectToAction("Overview", "Restaurant");
                 }
 
                 return RedirectToAction("ProcessPayment", new { orderId = orderId.Value });
@@ -90,7 +90,7 @@ namespace Chapeau.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Failed to start payment: " + ex.Message;
-                return RedirectToAction("Index", "Restaurant");
+                return RedirectToAction("Overview", "Restaurant");
             }
         }
 
@@ -102,21 +102,21 @@ namespace Chapeau.Controllers
                 if (orderId == null)
                 {
                     TempData["Error"] = "No unpaid order found for this table.";
-                    return RedirectToAction("Index", "Restaurant");
+                    return RedirectToAction("Overview", "Restaurant");
                 }
 
                 var orderSummary = _orderService.GetOrderSummaryById(orderId.Value);
                 if (orderSummary == null)
                 {
                     TempData["Error"] = "Order summary not found.";
-                    return RedirectToAction("Index", "Restaurant");
+                    return RedirectToAction("Overview", "Restaurant");
                 }
                 return View(orderSummary);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Failed to view order: " + ex.Message;
-                return RedirectToAction("Index", "Restaurant");
+                return RedirectToAction("Overview", "Restaurant");
             }
         }
 
@@ -315,5 +315,4 @@ namespace Chapeau.Controllers
             }
         }
     }
-
 }

@@ -16,13 +16,10 @@ namespace Chapeau.Controllers
 
         public IActionResult Overview()
         {
-           
+
             try
             {
-                // ⬇ Use the Sprint 2 method to include order status
-                //var tables = _tableService.GetTablesWithOrderStatus();
-                // NEW Sprint 3 logic (returns List<TableOrderViewModel>)
-                //var tables = _tableService.GetTableOverview();
+               
 
                 //return View(tables);
                 var viewModels = _tableService.GetTableOverview();
