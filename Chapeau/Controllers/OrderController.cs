@@ -1,6 +1,5 @@
 using Chapeau.Models;
 using Chapeau.Services;
-using Chapeau.HelperMethods;
 using Microsoft.AspNetCore.Mvc;
 using Chapeau.Models.Extensions;
 using Chapeau.Services.Interfaces;
@@ -13,28 +12,15 @@ namespace Chapeau.Controllers
     public class OrderController : Controller
     {
         private readonly IOrderService _orderService;
-        private readonly DummyOrderService _dummyOrderService;
         private readonly IMenuItemService _menuItemService;
-        private readonly IPaymentService _paymentService;
         private readonly TableService _tableService;
-       
 
-
-        public OrderController(
-            IOrderService orderService,
-            DummyOrderService dummyOrderService,
-            IPaymentService paymentService,
-            TableService tableService,
-            IMenuItemService menuItemService
-            )
+        public OrderController(IOrderService orderService,TableService tableService,IMenuItemService menuItemService)
         {
             _orderService = orderService;
-            _dummyOrderService = dummyOrderService;
-            _paymentService = paymentService;
             _tableService = tableService;
             _menuItemService = menuItemService;
         }
-
         [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
@@ -43,80 +29,109 @@ namespace Chapeau.Controllers
             if (employee == null)
                 return RedirectToAction("Login", "Employee");
 
-            Order newOrder = new Order
-            {
-                Table = new Chapeau.Models.Table { TableId = tableId },//to avoid ambiguous reference with name Table (I was having an error)
-                Employee = employee,
-                OrderTime = DateTime.Now,
-            };
+            Order order = _orderService.GetOrCreateActiveOrder(tableId, employee);
 
-            _orderService.InsertOrder(newOrder);
+            //Mark the table as occupied in the database
+            _tableService.SetTableOccupiedStatus(tableId, true);
 
-            //Store in session
-            HttpContext.Session.SetInt32("CurrentOrderId", newOrder.OrderID);
-            HttpContext.Session.SetInt32("CurrentTableId", tableId);
+            //saving a full order object to session
+            order.SaveToSession(HttpContext.Session);
 
-            return RedirectToAction("Index", "MenuItem");             
+            return RedirectToAction("Index", "MenuItem");
         }
-       
+
         [HttpPost]
         public IActionResult AddItem(int menuItemId, int quantity)
         {
-            int? orderId = HttpContext.Session.GetInt32("CurrentOrderId");
-            int? tableId = HttpContext.Session.GetInt32("CurrentTableId");
-
-            if (orderId == null || tableId == null)
+            MenuItem? item = _menuItemService.GetMenuItemByID(menuItemId);
+            if (item == null)
             {
-                TempData["Error"] = "No active order found. Please start a new order.";
+                TempData["Error"] = "Invalid menu item.";
                 return RedirectToAction("Index", "MenuItem");
             }
 
-            _orderService.AddItemToSessionSelection(menuItemId, quantity, HttpContext.Session);
+            //retrieve the order to update items
+            Order order = GetOrderFromSession();
+            if (order.OrderId == 0)
+            {
+                TempData["Error"] = "No active order in session.";
+                return RedirectToAction("Index", "MenuItem");
+            }
 
-            MenuItem item = _menuItemService.GetMenuItemByID(menuItemId);
-            TempData["AddedMessage"] = $"{quantity} × \"{item.Item_name}\" added successfully!";
+            order.AddOrUpdateItem(item, quantity);
+            order.SaveToSession(HttpContext.Session);
 
+            TempData["AddedMessage"] = $"{quantity} × \"{item.Item_name}\" added!";
             return RedirectToAction("Index", "MenuItem");
         }
         [HttpGet]
         public IActionResult OrderDetails()
-        {            
+        {
+            Order order = GetOrderFromSession();
 
-            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            
-            return View(selectedItems);
+            OrderDetailsViewModel viewModel = new OrderDetailsViewModel
+            {
+                OrderID = order.OrderId,
+                TableNumber = order.Table.TableNumber,
+                Items = order.OrderItems//list of order items
+            }; 
+            return View(viewModel);
         }
-       
+
         [HttpPost]
         public IActionResult SubmitOrder()
         {
-            int? orderId = HttpContext.Session.GetInt32("CurrentOrderId");
+            Order order = GetOrderFromSession();
 
-            if (orderId == null)
+            if (order.OrderId == 0)
             {
                 TempData["OrderError"] = "No active order found.";
                 return RedirectToAction("Overview", "Restaurant");
             }
-
-            List<OrderItem> selectedItems = HttpContext.Session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-
-            if (selectedItems != null && selectedItems.Count > 0)
+            if (order.OrderItems.Count >0)
             {
-                _orderService.AddItemsToOrder(orderId.Value, selectedItems);
-
-                foreach (var item in selectedItems)
-                {
-                    _menuItemService.ReduceStock(item.MenuItem.ItemID, item.Quantity);
-                }
-                // clearing order/table data to be able to start a new one 
-                HttpContext.Session.Remove("SelectedItems");
-                HttpContext.Session.Remove("CurrentOrderId");
-                HttpContext.Session.Remove("CurrentTableId");
-
+                _orderService.FinalizeOrder(order);
+                Order.ClearFromSession(HttpContext.Session);
                 TempData["OrderSuccess"] = "The order was submitted successfully!";
             }
-
             return RedirectToAction("Overview", "Restaurant");
+        }
+
+        //sprint 3 (matheus)
+        [HttpPost]
+        public IActionResult UpdateQuantity(int menuItemId, int adjustment)
+        {
+            Order order = GetOrderFromSession();
+            order.IncreaseOrDecreaseQuantity(menuItemId, adjustment);
+            order.SaveToSession(HttpContext.Session);
+
+            return RedirectToAction("OrderDetails");
+        }
+        [HttpPost]
+        public IActionResult MakeComment(int menuItemId, string comment)
+        {
+            Order order = GetOrderFromSession();
+            OrderItem item = null;
+
+            foreach (OrderItem orderItem in order.OrderItems)
+            {
+                if (orderItem.MenuItem.ItemId == menuItemId)
+                {
+                    item = orderItem;
+                    break; // Stop after finding the first match
+                }
+            }
+            if (item != null)
+            {
+                item.Comment = comment;
+                order.SaveToSession(HttpContext.Session);
+                TempData["CommentSaved"] = $"Comment for \"{item.MenuItem.Item_name}\" saved.";
+            }
+            return RedirectToAction("OrderDetails");
+        }
+        private Order GetOrderFromSession()
+        {
+            return Order.LoadFromSession(HttpContext.Session);
         }
 
         //bar or kitchen methods
@@ -183,7 +198,7 @@ namespace Chapeau.Controllers
             {
                 TempData["StatusChangeError"] = "Status change failed.";
             }
-            
+
             if (status == Status.Served)
             {
                 return RedirectToAction("FinishedOrders");
@@ -241,88 +256,6 @@ namespace Chapeau.Controllers
         }
 
         //payment methods
-
-        [HttpGet]
-        public IActionResult ViewOrder(int tableId)
-        {
-            var summary = _dummyOrderService.GetOrderSummary(tableId);
-            if (summary == null)
-                return NotFound("No active order for this table.");
-
-            return View("~/Views/DummyOrder/ViewOrder.cshtml", summary);
-        }
-
-        [HttpGet]
-        public IActionResult FinishOrder(int orderId)
-        {
-            var viewModel = new FinishOrderViewModel { OrderID = orderId };
-            return View("~/Views/DummyOrder/FinishOrder.cshtml", viewModel);
-        }
-
-        [HttpPost]
-        public IActionResult FinishOrder(FinishOrderViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View("~/Views/DummyOrder/FinishOrder.cshtml", model);
-
-            _paymentService.SavePayment(model);
-            _dummyOrderService.MarkOrderAsPaid(model.OrderID);
-
-            ViewBag.Message = "Order successfully finished!";
-            return View("Confirmation");
-        }
-
-        public IActionResult Confirmation()
-        {
-            return View("~/Views/DummyOrder/Confirmation.cshtml");
-        }
-        [HttpGet]
-        public IActionResult SplitBill(int orderId, int numberOfPeople = 2)
-        {
-            // Retrieve total order amount from your order service
-            decimal totalAmount = _dummyOrderService.GetOrderTotal(orderId);
-
-            // Initialize payments list based on numberOfPeople
-            var payments = new List<IndividualPayment>();
-            for (int i = 0; i < numberOfPeople; i++)
-            {
-                payments.Add(new IndividualPayment
-                {
-                    // Default equal split
-                    AmountPaid = Math.Round(totalAmount / numberOfPeople, 2)
-                });
-            }
-
-            var model = new SplitPaymentViewModel
-            {
-                OrderID = orderId,
-                TotalAmount = totalAmount,
-                NumberOfPeople = numberOfPeople,
-                Payments = payments
-            };
-
-            return View("~/Views/DummyOrder/SplitBill.cshtml", model);
-        }
-
-        [HttpPost]
-        public IActionResult SplitBill(SplitPaymentViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View("~/Views/DummyOrder/SplitBill.cshtml", model);
-
-            // Optional: Validate sum of AmountPaid >= TotalAmount
-
-            // Save each individual payment via your payment service
-            foreach (var payment in model.Payments)
-            {
-                _paymentService.SaveIndividualPayment(model.OrderID, payment.AmountPaid, payment.TipAmount, payment.PaymentType, payment.Feedback);
-            }
-
-            _dummyOrderService.MarkOrderAsPaid(model.OrderID);
-
-            return View("~/Views/DummyOrder/Confirmation.cshtml");
-        }
-
     }
 
 }

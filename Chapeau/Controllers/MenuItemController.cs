@@ -14,12 +14,11 @@ namespace Chapeau.Controllers
         {
             _menuItemService = menuItemService;
         }
-
-        public IActionResult Index(string? card, string? category, int? orderID, int? tableID)
+        public IActionResult Index(MenuCard? card, MenuCategory? category, int? orderID, int? tableID)
         {
-            var filteredItems = _menuItemService.GetFilteredMenuItems(card, category);
+            List<MenuItem> filteredItems = _menuItemService.GetFilteredMenuItems(card, category);
 
-            var viewModel = new MenuSelectionViewModel
+            MenuSelectionViewModel viewModel = new MenuSelectionViewModel
             {
                 SelectedCard = card,
                 SelectedCategory = category,

@@ -35,7 +35,7 @@ public class Program
         builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>(); 
 
       
-        builder.Services.AddScoped<DummyOrderRepository>();
+      
         builder.Services.AddScoped<DummyOrderService>();
 
 

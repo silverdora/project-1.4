@@ -6,14 +6,14 @@
 
 <div class="card m-2" style="width: 18rem; padding: 0">
     <div class="card-header">
-        <h5 class="card-title mb-0">Order #@Model.OrderID</h5>
+        <h5 class="card-title mb-0">Order #@Model.OrderId</h5>
         <p class="card-text mb-0">@Model.Employee.employeeName</p>
         <p class="card-text mb-0">table #@Model.Table.TableNumber</p>
     </div>
     <div class="card-body">
-        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderID))
+        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderId))
         {
-            foreach (MenuCategory course in ordersByCourse[Model.OrderID])
+            foreach (MenuCategory course in ordersByCourse[Model.OrderId])
             {
                 @if (employeeRole == Role.Kitchen)
                 {
@@ -31,6 +31,16 @@
                                     <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
                                 </div>
                                 <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                <br />
+                                <small>
+                                    Notes:
+                                    @{
+                                        if (orderItem.Comment != null)
+                                        {
+                                            @orderItem.Comment
+                                        }
+                                    }
+                                </small>
                                 <br />
                             </li>
                         }

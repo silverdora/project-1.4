@@ -1,9 +1,5 @@
 ﻿using Chapeau.Models;
-using Chapeau.Services.Interfaces;
 using Chapeau.Repositories.Interfaces;
-using Chapeau.Repositories;
-using Chapeau.HelperMethods;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Chapeau.Services
 {
@@ -19,62 +15,47 @@ namespace Chapeau.Services
             _menuItemRepository = menuItemRepository;
             _orderItemRepository = orderItemRepository;
         }
-
-        //methods connected with taking an order
-
-        public void InsertOrder(Order order)
+        public Order? GetActiveOrderByTableId(int tableId)
         {
-            _orderRepository.InsertOrder(order);
+            return _orderRepository.GetActiveOrderByTableId(tableId);
         }
-
-        // stores the selected menu item into the session list.
-        public void AddItemToSessionSelection(int menuItemId, int quantity, ISession session)
+        public Order GetOrCreateActiveOrder(int tableId, Employee employee)
         {
-            // Retrieve the current list from session (or create a new one if it doesn't exist)
-            List<OrderItem> selectedItems = session.GetObjectFromJson<List<OrderItem>>("SelectedItems");
-            if (selectedItems == null)
-            {
-                selectedItems = new List<OrderItem>();
-            }
+            Order? existingOrder = _orderRepository.GetActiveOrderByTableId(tableId);
+            if (existingOrder != null)
+                return existingOrder;
 
-            OrderItem existingItem = null;
-            foreach (OrderItem item in selectedItems)
+            Order newOrder = new Order
             {
-                if (item.MenuItem.ItemID == menuItemId)
-                {
-                    existingItem = item;
-                    break;
-                }
-            }
-
-            if (existingItem != null)
-            {
-                existingItem.Quantity += quantity;
-            }
-            else
-            {
-                MenuItem menuItem = _menuItemRepository.GetMenuItemByID(menuItemId);
-                OrderItem newItem = new OrderItem(null, menuItem, DateTime.Now, Status.Ordered, quantity, null);
-                selectedItems.Add(newItem);
-            }
-
-            session.SetObjectAsJson("SelectedItems", selectedItems);
+                Table = new Table { TableId = tableId, IsOccupied = true },
+                Employee = employee,
+                OrderTime = DateTime.Now,
+                IsPaid = false,
+            };
+            _orderRepository.InsertOrder(newOrder);
+            return newOrder;
         }
-
-        // Inserts the items from session into the database, using OrderItemRepository.
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
         {
-            foreach (var item in items)
+            foreach (OrderItem item in items)
             {
-                //item.OrderID = orderId;
                 _orderItemRepository.Insert(item, orderId);
             }
         }
-
-        public List<OrderItem> GetSelectedItemsFromSession(ISession session)
+        public void FinalizeOrder(Order order)
         {
-            return session.GetObjectFromJson<List<OrderItem>>("SelectedItems") ?? new List<OrderItem>();
+            foreach (OrderItem item in order.OrderItems)
+            {
+                _orderItemRepository.Insert(item, order.OrderId);
+                _menuItemRepository.ReduceStock(item.MenuItem.ItemId, item.Quantity);
+            }
         }
+        public void InsertOrder(Order order)
+        {
+            // You could set the table as occupied here if needed
+            _orderRepository.InsertOrder(order);
+        }
+
 
         //methods connected with bar or kitchen
         public void ChangeOrderItemStatus(int orderItemID, Status status)
@@ -108,15 +89,15 @@ namespace Chapeau.Services
                     {
                         if (orderItem.MenuItem.Category == course)
                         {
-                            if (!categoriesByOrderId.ContainsKey(order.OrderID))
+                            if (!categoriesByOrderId.ContainsKey(order.OrderId))
                             {
-                                categoriesByOrderId.Add(order.OrderID, new List<MenuCategory> { course });
+                                categoriesByOrderId.Add(order.OrderId, new List<MenuCategory> { course });
                             }
                             else
                             {
-                                if (!categoriesByOrderId[order.OrderID].Contains(course))
+                                if (!categoriesByOrderId[order.OrderId].Contains(course))
                                 {
-                                    categoriesByOrderId[order.OrderID].Add(course);
+                                    categoriesByOrderId[order.OrderId].Add(course);
                                 }
 
                             }
@@ -131,6 +112,5 @@ namespace Chapeau.Services
         {
             _orderItemRepository.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
         }
-
     }
 }

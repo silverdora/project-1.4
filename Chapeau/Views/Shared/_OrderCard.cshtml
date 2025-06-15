@@ -29,14 +29,14 @@
 
 <div class="card m-2" style="width: 18rem; padding: 0">
     <div class="card-header">
-        <h5 class="card-title mb-0">Order #@Model.OrderID</h5>
+        <h5 class="card-title mb-0">Order #@Model.OrderId</h5>
         <p class="card-text mb-0">@Model.Employee.employeeName</p>
         <p class="card-text mb-0">table #@Model.Table.TableNumber</p>
     </div>
     <div class="card-body">
-        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderID))
+        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderId))
             {
-                foreach (MenuCategory course in ordersByCourse[Model.OrderID])
+                foreach (MenuCategory course in ordersByCourse[Model.OrderId])
                 {
                 @if (employeeRole == Role.Kitchen)
                     {
@@ -53,7 +53,7 @@
                                 <div class=" d-flex justify-content-between align-items-center">
                                     <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
                                     <form action="/Order/ChangeOrderItemStatus" method="post">
-                                        <input hidden name="orderItemID" value="@orderItem.OrderItemID" />
+                                        <input hidden name="orderItemID" value="@orderItem.OrderItemId" />
                                         <input hidden name="status" value="@newStatus" />
                                         <button type="submit" class="btn btn-primary btn-sm">@changeItemStatus</button>
                                     </form>
@@ -62,6 +62,16 @@
                                 <br />
                                 <small>Waiting time: @((int)orderItem.WaitingTime.TotalMinutes) min.</small>
                                 <br />
+                                <small>
+                                    Notes:
+                                    @{
+                                        if (orderItem.Comment != null)
+                                        {
+                                            @orderItem.Comment
+                                        }
+                                    }
+                                </small>
+                                <br />
                             </li>
                             }
                 </ul>
@@ -69,7 +79,7 @@
                 @if (employeeRole == Role.Kitchen)
                         {
                     <form action="/Order/ChangeOrderItemsFromOneCourseStatus" method="post">
-                        <input hidden name="orderID" value="@Model.OrderID" />
+                        <input hidden name="orderID" value="@Model.OrderId" />
                         <input hidden name="currentStatus" value="@currentStatus" />
                         <input hidden name="newStatus" value="@newStatus" />
                         <input hidden name="course" value="@course" />
@@ -80,7 +90,7 @@
 
             }
             <form action="/Order/ChangeAllOrderItemsStatus" method="post">
-                <input hidden name="orderID" value="@Model.OrderID" />
+                <input hidden name="orderID" value="@Model.OrderId" />
                 <input hidden name="currentStatus" value="@currentStatus" />
                 <input hidden name="newStatus" value="@newStatus" />
                 <button type="submit" class="btn btn-primary">@changeOrderStatus</button>

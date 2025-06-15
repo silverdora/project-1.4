@@ -19,23 +19,35 @@ namespace Chapeau.Repositories
 
         public void Insert(OrderItem item, int orderId)
         {
-            string query = @"INSERT INTO OrderItem (orderItemID, orderID, itemID, includeDate, status, quantity)
-                             VALUES (@orderItemID, @orderID, @itemID, @includeDate, @status, @quantity)";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
+            string query = @"INSERT INTO OrderItem (orderItemID, orderID, itemID, includeDate, status, quantity, comment)
+                             VALUES (@orderItemID, @orderID, @itemID, @includeDate, @status, @quantity, @comment)";
+            try
             {
-                command.Parameters.AddWithValue("@orderItemID", item.OrderItemID);
-                command.Parameters.AddWithValue("@orderID", orderId);
-                command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemID);
-                command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
-                command.Parameters.AddWithValue("@status", item.Status.ToString());
-                command.Parameters.AddWithValue("@quantity", item.Quantity);
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    AddOrderItemParameters(command, item, orderId);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error inserting order item into database.", ex);
             }
         }
+
+        private void AddOrderItemParameters(SqlCommand command, OrderItem item, int orderId)
+        {
+            command.Parameters.AddWithValue("@orderItemID", item.OrderItemId);
+            command.Parameters.AddWithValue("@orderID", orderId);
+            command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
+            command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
+            command.Parameters.AddWithValue("@status", item.Status.ToString());
+            command.Parameters.AddWithValue("@quantity", item.Quantity);
+            command.Parameters.AddWithValue("@comment", (object?)item.Comment ?? DBNull.Value);//expects an obj
+        }
+
 
         public List<OrderItem> GetOrderItemsByOrderID(int id, Status status, string type)
         {
@@ -158,4 +170,5 @@ namespace Chapeau.Repositories
         }
     }
 }
+
 

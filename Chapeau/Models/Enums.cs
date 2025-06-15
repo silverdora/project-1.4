@@ -20,4 +20,13 @@
         Tea,
         SoftDrink
     }
+
+
+    public enum PaymentType
+    {
+        Cash,
+        DebitCard,
+        CreditCard
+    }
 }
+

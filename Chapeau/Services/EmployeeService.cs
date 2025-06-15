@@ -2,6 +2,8 @@
 using Chapeau.Repository.Interface;
 using Chapeau.Service.Interface;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Chapeau.Service
 {
@@ -26,8 +28,20 @@ namespace Chapeau.Service
 
         public Employee? GetByLoginCredentials(string userName, string plainPassword)
         {
-            return _employeeRepository.GetByLoginCredentials(userName, plainPassword);
+            string hashed = HashPassword(plainPassword);
+
+            return _employeeRepository.GetByLoginCredentials(userName, hashed);
         }
+
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashBytes);
+            }
+        }
+
 
     }
 }
