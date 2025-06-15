@@ -3,7 +3,7 @@ using Chapeau.Repositories.Interfaces;
 using Chapeau.Repository.Interface;
 using Chapeau.Services.Interfaces;
 using Chapeau.ViewModels;
-using Microsoft.Data.SqlClient; 
+using Microsoft.Data.SqlClient;
 
 
 namespace Chapeau.Services
@@ -69,7 +69,6 @@ namespace Chapeau.Services
                 throw new Exception("Failed to save payment", ex);
             }
         }
-
         public void SaveIndividualPayment(int orderId, decimal amountPaid, decimal tipAmount, string paymentType, string feedback)
         {
             try

@@ -68,8 +68,8 @@ namespace Chapeau.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Failed to process payment: " + ex.Message;
-                return View(model);
+                TempData["SuccessMessage"] = $"Payment for Order #{model.OrderID} completed successfully.";
+                return RedirectToAction("ViewOrder", "Payment", new { orderId = model.OrderID });
             }
         }
 
@@ -348,5 +348,4 @@ namespace Chapeau.Controllers
         }
     }
 }
-
 

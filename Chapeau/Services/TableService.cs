@@ -44,7 +44,7 @@ namespace Chapeau.Service
                 return false;
 
             _tableRepository.UpdateTableOccupiedStatus(tableId, false);
-            return true;
+             return true;
         }
 
 
