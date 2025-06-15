@@ -253,11 +253,20 @@ namespace Chapeau.Controllers
                 Payments = new List<IndividualPayment>()
             };
 
-            decimal amountPerPerson = Math.Round(order.TotalAmount / 2, 2);
-            decimal remainingAmount = order.TotalAmount - amountPerPerson;
+            decimal total = order.TotalAmount;
+            int people = model.NumberOfPeople;
+            decimal baseAmount = Math.Floor((total / people) * 100) / 100;
+            decimal totalAssigned = baseAmount * people;
+            int remainderCents = (int)Math.Round((total - totalAssigned) * 100);
 
-            model.Payments.Add(new IndividualPayment { AmountPaid = amountPerPerson, TipAmount = 0, PaymentType = PaymentType.Cash });
-            model.Payments.Add(new IndividualPayment { AmountPaid = remainingAmount, TipAmount = 0, PaymentType = PaymentType.Cash });
+            for (int i = 0; i < people; i++)
+            {
+                decimal amount = baseAmount;
+                if (i < remainderCents)
+                    amount += 0.01m;
+
+                model.Payments.Add(new IndividualPayment { AmountPaid = amount, TipAmount = 0, PaymentType = PaymentType.Cash });
+            }
 
             return model;
         }
@@ -271,15 +280,24 @@ namespace Chapeau.Controllers
             }
 
             model.NumberOfPeople++;
-            decimal amountPerPerson = Math.Round(order.TotalAmount / model.NumberOfPeople, 2);
-            decimal remainingAmount = order.TotalAmount - (amountPerPerson * (model.NumberOfPeople - 1));
+            decimal total = order.TotalAmount;
+            int people = model.NumberOfPeople;
+
+            // Calculate the base amount per person, rounded down to 2 decimals
+            decimal baseAmount = Math.Floor((total / people) * 100) / 100;
+            decimal totalAssigned = baseAmount * people;
+            int remainderCents = (int)Math.Round((total - totalAssigned) * 100);
 
             model.Payments = new List<IndividualPayment>();
-            for (int i = 0; i < model.NumberOfPeople; i++)
+            for (int i = 0; i < people; i++)
             {
+                decimal amount = baseAmount;
+                if (i < remainderCents)
+                    amount += 0.01m;
+
                 model.Payments.Add(new IndividualPayment
                 {
-                    AmountPaid = i == model.NumberOfPeople - 1 ? remainingAmount : amountPerPerson,
+                    AmountPaid = amount,
                     TipAmount = 0,
                     PaymentType = PaymentType.Cash
                 });
