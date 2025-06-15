@@ -18,22 +18,31 @@ namespace Chapeau.Repositories
         {
             string query = @"INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity, comment)
                              VALUES (@orderID, @itemID, @includeDate, @status, @quantity, @comment)";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                command.Parameters.AddWithValue("@orderID", orderId);
-                command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
-                command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
-                command.Parameters.AddWithValue("@status", item.Status.ToString());
-                command.Parameters.AddWithValue("@quantity", item.Quantity);
-                command.Parameters.AddWithValue("@comment", (object?)item.Comment ?? DBNull.Value); //expects an obj
-
-
-                connection.Open();
-                command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    AddOrderItemParameters(command, item, orderId);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
             }
-        }  
+            catch (SqlException ex)
+            {
+                throw new Exception("Error inserting order item into database.", ex);
+            }
+        }
+
+        private void AddOrderItemParameters(SqlCommand command, OrderItem item, int orderId)
+        {
+            command.Parameters.AddWithValue("@orderID", orderId);
+            command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
+            command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
+            command.Parameters.AddWithValue("@status", item.Status.ToString());
+            command.Parameters.AddWithValue("@quantity", item.Quantity);
+            command.Parameters.AddWithValue("@comment", (object?)item.Comment ?? DBNull.Value);//expects an obj
+        }
     }
 
 }

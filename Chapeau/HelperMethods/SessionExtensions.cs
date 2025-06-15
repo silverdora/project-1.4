@@ -13,7 +13,7 @@ namespace Chapeau.HelperMethods
         {
             string? value = session.GetString(key);
             return value == null ? default : JsonSerializer.Deserialize<T>(value);
-        }
+        }      
     }
     
 }

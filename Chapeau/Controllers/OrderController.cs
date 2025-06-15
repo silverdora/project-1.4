@@ -20,11 +20,6 @@ namespace Chapeau.Controllers
             _tableService = tableService;
             _menuItemService = menuItemService;
         }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
         [HttpPost]
         public IActionResult TakeOrder(int tableId)
         {
@@ -55,7 +50,7 @@ namespace Chapeau.Controllers
             }
 
             //retrieve the order to update items
-            Order order = Order.LoadFromSession(HttpContext.Session);
+            Order order = GetOrderFromSession();
             if (order.OrderId == 0)
             {
                 TempData["Error"] = "No active order in session.";
@@ -71,7 +66,7 @@ namespace Chapeau.Controllers
         [HttpGet]
         public IActionResult OrderDetails()
         {
-            Order order = Order.LoadFromSession(HttpContext.Session);
+            Order order = GetOrderFromSession();
 
             OrderDetailsViewModel viewModel = new OrderDetailsViewModel
             {
@@ -85,21 +80,19 @@ namespace Chapeau.Controllers
         [HttpPost]
         public IActionResult SubmitOrder()
         {
-            Order order = Order.LoadFromSession(HttpContext.Session);
+            Order order = GetOrderFromSession();
 
             if (order.OrderId == 0)
             {
                 TempData["OrderError"] = "No active order found.";
                 return RedirectToAction("Overview", "Restaurant");
             }
-
             if (order.OrderItems.Count >0)
             {
                 _orderService.FinalizeOrder(order);
                 Order.ClearFromSession(HttpContext.Session);
                 TempData["OrderSuccess"] = "The order was submitted successfully!";
             }
-
             return RedirectToAction("Overview", "Restaurant");
         }
 
@@ -107,17 +100,16 @@ namespace Chapeau.Controllers
         [HttpPost]
         public IActionResult UpdateQuantity(int menuItemId, int adjustment)
         {
-            Order order = Order.LoadFromSession(HttpContext.Session);
+            Order order = GetOrderFromSession();
             order.IncreaseOrDecreaseQuantity(menuItemId, adjustment);
             order.SaveToSession(HttpContext.Session);
 
             return RedirectToAction("OrderDetails");
         }
-
         [HttpPost]
         public IActionResult MakeComment(int menuItemId, string comment)
         {
-            Order order = Order.LoadFromSession(HttpContext.Session);
+            Order order = GetOrderFromSession();
             OrderItem item = null;
 
             foreach (OrderItem orderItem in order.OrderItems)
@@ -134,9 +126,12 @@ namespace Chapeau.Controllers
                 order.SaveToSession(HttpContext.Session);
                 TempData["CommentSaved"] = $"Comment for \"{item.MenuItem.Item_name}\" saved.";
             }
-
             return RedirectToAction("OrderDetails");
         }
-
+        private Order GetOrderFromSession()
+        {
+            return Order.LoadFromSession(HttpContext.Session);
+        }
     }
+
 }

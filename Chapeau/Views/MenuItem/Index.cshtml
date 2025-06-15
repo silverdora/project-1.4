@@ -32,7 +32,7 @@
 	@foreach (MenuCard card in cards)
 	{
 		<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
-			<input type="hidden" name="card" value="@card.ToString()" />
+			<input type="hidden" name="card" value="@card" />
 			<input type="hidden" name="tableID" value="@Model.TableID" />
 			<input type="hidden" name="orderID" value="@Model.OrderID" />
 			<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == card ? "active" : "")">
@@ -73,7 +73,7 @@
 <!-- View Order Button -->
 @if (currentOrder != null && currentOrder.OrderId != 0)
 {
-	<div class=" ="mb-3">
+	<div class="mb-3">
 	<form asp-controller="Order" asp-action="OrderDetails" method="get">
 	<input type="hidden" name="id" value="@Model.OrderID" />
 	<input type="hidden" name="tableID" value="@Model.TableID" />
@@ -111,16 +111,24 @@ else
 					<td>@item.Category</td>
 					<td>
 						@{
-							string message = item.StockQuantity switch
-							{
-								0 => "Out of stock",
-								<= 10 => $"Low ({item.StockQuantity})",
-								_ => $"In stock ({item.StockQuantity})"
-							};
+							string message;
+							string color;
 
-							string color = item.StockQuantity == 0 ? "red"
-							: item.StockQuantity <= 10 ? "orange"
-							: "green";
+							if (item.StockQuantity == 0)
+							{
+								message = "Out of stock";
+								color = "red";
+							}
+							else if (item.StockQuantity <= 10)
+							{
+								message = $"Low ({item.StockQuantity})";
+								color = "orange";
+							}
+							else
+							{
+								message = $"In stock ({item.StockQuantity})";
+								color = "green";
+							}
 						}
 
 						<span style="color:@color;">@message</span>

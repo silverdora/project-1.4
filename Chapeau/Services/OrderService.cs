@@ -1,8 +1,5 @@
 ﻿using Chapeau.Models;
-using Chapeau.HelperMethods;
 using Chapeau.Repositories.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Chapeau.Services
 {
@@ -58,10 +55,5 @@ namespace Chapeau.Services
             // You could set the table as occupied here if needed
             _orderRepository.InsertOrder(order);
         }
-
-       
-
-       
-
     }
 }

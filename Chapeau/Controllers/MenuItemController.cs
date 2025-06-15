@@ -14,7 +14,6 @@ namespace Chapeau.Controllers
         {
             _menuItemService = menuItemService;
         }
-
         public IActionResult Index(MenuCard? card, MenuCategory? category, int? orderID, int? tableID)
         {
             List<MenuItem> filteredItems = _menuItemService.GetFilteredMenuItems(card, category);

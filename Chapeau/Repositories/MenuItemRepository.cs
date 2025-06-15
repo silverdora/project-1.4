@@ -68,17 +68,40 @@ namespace Chapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@itemId", itemId);
-                command.Parameters.AddWithValue("@amount", amount);
+                try
+                {
+                    string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@itemId", itemId);
+                    command.Parameters.AddWithValue("@amount", amount);
 
-                connection.Open();
-                command.ExecuteNonQuery();
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Database error while reducing stock.", ex);
+                }
             }
         }
         // Shared helper methods
-        private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters) //using an erray to allow me to pass many numbers of parameters
+
+        private MenuItem MapMenuItem(SqlDataReader reader)
+        {
+            return new MenuItem
+            {
+                ItemId = (int)reader["itemID"],
+                Item_name = reader["item_name"].ToString(),
+                Description = reader["description"].ToString(),
+                Price = (decimal)reader["price"],
+                VATPercent = (decimal)reader["VATpercent"],
+                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), reader["category"].ToString(), true),
+                StockQuantity = (int)reader["stockQuantity"],
+                Card = reader["card"].ToString()
+            };
+        }  
+        //using an array to allow me to pass many numbers of parameters
+        private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
         {
             List<MenuItem> items = new List<MenuItem>();
 
@@ -95,18 +118,7 @@ namespace Chapeau.Repositories
                     {
                         while (reader.Read())
                         {
-                            items.Add(new MenuItem
-                            {
-                                ItemId = (int)reader["itemID"],
-                                Item_name = reader["item_name"].ToString(),
-                                Description = reader["description"].ToString(),
-                                Price = (decimal)reader["price"],
-                                VATPercent = (decimal)reader["VATpercent"],
-                                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), (string)reader["category"], true),
-                                StockQuantity = (int)reader["stockQuantity"],
-                                Card = reader["card"].ToString()
-
-                            });
+                            items.Add(MapMenuItem(reader));
                         }
                     }
                     catch (SqlException ex)
@@ -119,7 +131,6 @@ namespace Chapeau.Repositories
                     }
                 }
             }
-
             return items;
         }
     }
