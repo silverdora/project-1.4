@@ -32,16 +32,12 @@
                                 </div>
                                 <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
                                 <br />
-                                <small>
-                                    Notes:
-                                    @{
-                                        if (orderItem.Comment != null)
-                                        {
-                                            @orderItem.Comment
-                                        }
+                                @{
+                                    if (orderItem.Comment != null)
+                                    {
+                                        <small>Notes: @orderItem.Comment</small><br />
                                     }
-                                </small>
-                                <br />
+                                }
                             </li>
                         }
                 </ul>
