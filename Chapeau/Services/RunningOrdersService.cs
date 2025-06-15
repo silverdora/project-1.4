@@ -66,9 +66,11 @@ namespace Chapeau.Services
             }
             return categoriesByOrderId;
         }
+        public void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            _runningOrdersRepository.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+        }
     }
-
-    // Add your other methods (like GetCompleteOrderForTable) here as well
 }
 
 
