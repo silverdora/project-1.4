@@ -96,9 +96,10 @@ namespace Chapeau.Controllers
 
         public IActionResult ViewOrder(int tableId)
         {
+            int? orderId = null;
             try
             {
-                int? orderId = _paymentService.GetLatestUnpaidOrderIdByTable(tableId);
+                orderId = _paymentService.GetLatestUnpaidOrderIdByTable(tableId);
                 if (orderId == null)
                 {
                     TempData["Error"] = "No unpaid order found for this table.";
@@ -115,7 +116,7 @@ namespace Chapeau.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Failed to view order: " + ex.Message;
+                TempData["Error"] = $"Failed to view order: {ex.Message} (orderId: {orderId})";
                 return RedirectToAction("Overview", "Restaurant");
             }
         }
@@ -132,8 +133,8 @@ namespace Chapeau.Controllers
                     return RedirectToAction("Overview", "Restaurant");
                 }
 
-                var model = new FinishOrderViewModel 
-                { 
+                var model = new FinishOrderViewModel
+                {
                     OrderID = orderId,
                     LowVatAmount = order.LowVAT,
                     HighVatAmount = order.HighVAT,
@@ -329,3 +330,5 @@ namespace Chapeau.Controllers
         }
     }
 }
+
+
