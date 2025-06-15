@@ -25,9 +25,10 @@ namespace Chapeau.ViewModels
         //to show the items on the Table 
         public List<OrderItemViewModel> FoodItems { get; set; } = new();
         public List<OrderItemViewModel> DrinkItems { get; set; } = new();
+
         public bool HasReadyToBeServedItems =>
-    FoodItems.Any(i => i.Status == Status.ReadyToBeServed) ||
-    DrinkItems.Any(i => i.Status == Status.ReadyToBeServed);
+        FoodItems.Any(i => i.Status == Status.ReadyToBeServed) ||
+        DrinkItems.Any(i => i.Status == Status.ReadyToBeServed);
 
     }
 }

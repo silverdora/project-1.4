@@ -4,53 +4,93 @@
 @{
 }
 @model Chapeau.ViewModels.SplitPaymentViewModel
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="mb-0">Split Bill Equally</h2>
+                </div>
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
 
-<h2>Split Bill Equally</h2>
+                    <form asp-action="SplitBill" method="post">
+                        <input type="hidden" asp-for="OrderID" />
 
-<form asp-action="SplitBill" method="post">
-    <input type="hidden" asp-for="OrderID" />
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Total Amount: @Model.TotalAmount.ToString("C")</label>
+                        </div>
 
-    <div>
-        <label>Total Amount: @Model.TotalAmount.ToString("C")</label>
-    </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Number of People: @Model.NumberOfPeople</label>
+                            @if (Model.NumberOfPeople < 4)
+                            {
+                                <button type="submit" name="action" value="add" class="btn btn-outline-primary ms-2">
+                                    Add Person
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted ms-2">(Maximum 4 people)</span>
+                            }
+                        </div>
 
-    <div>
-        <label>Number of People:</label>
-        <input asp-for="NumberOfPeople" type="number" min="1" max="20" />
-        <button type="submit" formaction="@Url.Action("SplitBill", new { orderId = Model.OrderID })">Update</button>
-    </div>
+                        <hr />
+                         
+                        @{
+                            int index = 0;
+                        }
+                        @foreach (var payment in Model.Payments)
+                        {
+                            <div class="payment-section mb-4">
+                                <h3>Person @(index + 1)</h3>
 
-    <hr />
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Amount Paid (€):</label>
+                                    <input asp-for="Payments[index].AmountPaid" type="number" step="0.01" class="form-control" required readonly />
+                                </div>
 
-    @for (int i = 0; i < Model.NumberOfPeople; i++)
-    {
-        <div class="payment-section">
-            <h3>Person @(i + 1)</h3>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tip (€):</label>
+                                    <input asp-for="Payments[index].TipAmount" type="number" step="0.01" class="form-control" />
+                                </div>
 
-            <div>
-                <label>Amount Paid (€):</label>
-                <input asp-for="Payments[@i].AmountPaid" type="number" step="0.01" required />
-            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Payment Type:</label>
+                                    <select asp-for="Payments[index].PaymentType" class="form-select" required>
+                                        <option value="">-- Select Payment Type --</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="CreditCard">Credit Card</option>
+                                        <option value="DebitCard">Debit Card</option>
+                                        <option value="Pin">PIN</option>
+                                    </select>
+                                </div>
 
-            <div>
-                <label>Tip (€):</label>
-                <input asp-for="Payments[@i].TipAmount" type="number" step="0.01" />
-            </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Feedback <span class="text-muted">(optional)</span></label>
+                                    <textarea asp-for="Payments[index].Feedback" class="form-control" rows="2" placeholder="Enter feedback here (optional)..."></textarea>
+                                </div>
+                            </div>
+                            <hr />
+                            index++;
+                        }
 
-            <div>
-                <label>Payment Type:</label>
-                <select asp-for="Payments[@i].PaymentType" asp-items="@Html.GetEnumSelectList<Chapeau.Models.PaymentType>()" required>
-                    <option value="">-- Select --</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Feedback (optional):</label>
-                <textarea asp-for="Payments[@i].Feedback"></textarea>
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Payment
+                            </a>
+                            <button type="submit" name="action" value="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Confirm Split Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <hr />
-    }
-
-    <button type="submit" class="btn btn-primary">Confirm Payment</button>
-</form>
+    </div>
+</div>
