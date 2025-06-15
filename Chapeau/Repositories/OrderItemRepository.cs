@@ -19,8 +19,8 @@ namespace Chapeau.Repositories
 
         public void Insert(OrderItem item, int orderId)
         {
-            string query = @"INSERT INTO OrderItem (orderItemID, orderID, itemID, includeDate, status, quantity, comment)
-                             VALUES (@orderItemID, @orderID, @itemID, @includeDate, @status, @quantity, @comment)";
+            string query = @"INSERT INTO OrderItem ( orderID, itemID, includeDate, status, quantity, comment)
+                             VALUES ( @orderID, @itemID, @includeDate, @status, @quantity, @comment)";
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -39,7 +39,6 @@ namespace Chapeau.Repositories
 
         private void AddOrderItemParameters(SqlCommand command, OrderItem item, int orderId)
         {
-            command.Parameters.AddWithValue("@orderItemID", item.OrderItemId);
             command.Parameters.AddWithValue("@orderID", orderId);
             command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
             command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
