@@ -280,10 +280,10 @@ namespace Chapeau.Controllers
             }
 
             model.NumberOfPeople++;
-            decimal total = order.TotalAmount;
-            int people = model.NumberOfPeople;
+            model.TotalAmount = order.TotalAmount;
 
-            // Calculate the base amount per person, rounded down to 2 decimals
+            decimal total = model.TotalAmount;
+            int people = model.NumberOfPeople;
             decimal baseAmount = Math.Floor((total / people) * 100) / 100;
             decimal totalAssigned = baseAmount * people;
             int remainderCents = (int)Math.Round((total - totalAssigned) * 100);

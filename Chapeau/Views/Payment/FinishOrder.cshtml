@@ -50,12 +50,12 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Low VAT Amount (€)</label>
-                                    <input asp-for="LowVatAmount" type="number" step="0.01" class="form-control bg-light" readonly />
+                                    <input type="text" class="form-control bg-light" readonly value="@Model.LowVatAmount.ToString("F2")" />
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">High VAT Amount (€)</label>
-                                    <input asp-for="HighVatAmount" type="number" step="0.01" class="form-control bg-light" readonly />
+                                    <input type="text" class="form-control bg-light" readonly value="@Model.HighVatAmount.ToString("F2")" />
                                 </div>
 
                                 <div class="mb-3">
