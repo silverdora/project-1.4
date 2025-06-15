@@ -1,0 +1,51 @@
+﻿@model Order
+@{
+    var ordersByCourse = ViewData["OrdersByCourse"] as IDictionary<int, List<MenuCategory>>;
+    var employeeRole = ViewData["EmployeeRole"] as Role?;
+}
+
+<div class="card m-2" style="width: 18rem; padding: 0">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Order #@Model.OrderId</h5>
+        <p class="card-text mb-0">@Model.Employee.employeeName</p>
+        <p class="card-text mb-0">table #@Model.Table.TableNumber</p>
+    </div>
+    <div class="card-body">
+        @if (ordersByCourse != null && ordersByCourse.ContainsKey(Model.OrderId))
+        {
+            foreach (MenuCategory course in ordersByCourse[Model.OrderId])
+            {
+                @if (employeeRole == Role.Kitchen)
+                {
+                    <strong>@course</strong>
+                }
+
+
+                <ul class="list-group list-group-flush">
+
+                    @foreach (OrderItem orderItem in Model.OrderItems)
+                        if (orderItem.MenuItem.Category == course && orderItem.Status == Status.Served)
+                        {
+                            <li class="list-group-item ps-0 pe-0">
+                                <div class=" d-flex justify-content-between align-items-center">
+                                    <em>@orderItem.MenuItem.Item_name (@orderItem.Quantity)</em>
+                                </div>
+                                <small>Order time: @orderItem.IncludeDate.ToString("HH:mm")</small>
+                                <br />
+                                <small>
+                                    Notes:
+                                    @{
+                                        if (orderItem.Comment != null)
+                                        {
+                                            @orderItem.Comment
+                                        }
+                                    }
+                                </small>
+                                <br />
+                            </li>
+                        }
+                </ul>
+            }
+        }
+    </div>
+</div>

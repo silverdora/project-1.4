@@ -1,0 +1,9 @@
+﻿@if (TempData["StatusChangeMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["StatusChangeMessage"]</div>
+}
+
+@if (TempData["StatusChangeError"] != null)
+{
+    <div class="alert alert-danger">@TempData["StatusChangeError"]</div>
+}

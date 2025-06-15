@@ -11,14 +11,17 @@ namespace Chapeau.Repositories
         private readonly string _connectionString;
         private readonly ITableRepository _tableRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IOrderItemRepository _orderItemRepository;
 
-        public OrderRepository(IConfiguration configuration, ITableRepository tableRepository, IEmployeeRepository employeeRepository)
+        public OrderRepository(IConfiguration configuration, ITableRepository tableRepository, IEmployeeRepository employeeRepository, IOrderItemRepository orderItemRepository)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
             _tableRepository = tableRepository;
             _employeeRepository = employeeRepository;
+            _orderItemRepository = orderItemRepository;
         }
 
+        //take an order
         public void InsertOrder(Order order)
         {
             string query = "INSERT INTO [Order] (employeeID, tableID, orderTime, isPaid) " +
@@ -43,6 +46,52 @@ namespace Chapeau.Repositories
                 throw new Exception("Database error while inserting order.", ex);
             }
 
+        }
+
+        //kitchen or bar
+        public List<Order> GetOrdersByStatus(Status status, string type, DateTime createdAfter)
+        {
+            List<Order> orders = new List<Order>();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * " +
+                    "FROM [Order] " +
+                    "WHERE orderID IN (" +
+                    "SELECT orderID FROM OrderItem JOIN MenuItem ON OrderItem.itemID = MenuItem.itemID " +
+                    "WHERE item_type = @type AND [status] = @status) AND orderTime > @time " +
+                    "ORDER BY orderTime;";
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@status", status.ToString());
+                command.Parameters.AddWithValue("@type", type.ToString());
+                command.Parameters.AddWithValue("@time", createdAfter);
+                command.Connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Order order = ReadOrder(reader, status, type);
+                    orders.Add(order);
+                }
+                reader.Close();
+            }
+            return orders;
+        }
+
+        private Order ReadOrder(SqlDataReader reader, Status status, string type)
+        {
+            int orderId = (int)reader["orderID"];
+
+            int employeeID = (int)reader["employeeID"];
+            Employee employee = _employeeRepository.GetEmployeeByID(employeeID);
+
+            int tableID = (int)reader["tableID"];
+            Table table = _tableRepository.GetTableByID(tableID);
+
+            DateTime orderTime = (DateTime)reader["orderTime"];
+            bool isPaid = Convert.ToBoolean(reader["isPaid"]);
+            //bool isServed = true;
+            List<OrderItem> orderItems = _orderItemRepository.GetOrderItemsByOrderID(orderId, status, type);
+
+            return new Order(orderId, employee, table, orderTime, orderItems, isPaid);
         }
 
         //get active order by table to double check that if there is any existent order, avoiding to creating everytime a new

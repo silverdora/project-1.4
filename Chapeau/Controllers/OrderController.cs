@@ -5,6 +5,7 @@ using Chapeau.Models.Extensions;
 using Chapeau.Services.Interfaces;
 using Chapeau.ViewModels;
 using Chapeau.Service;
+using Chapeau.Exceptions;
 
 namespace Chapeau.Controllers
 {
@@ -132,6 +133,129 @@ namespace Chapeau.Controllers
         {
             return Order.LoadFromSession(HttpContext.Session);
         }
+
+        //bar or kitchen methods
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            //get Employee object 
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            if (loggedInEmployee == null)
+                return RedirectToAction("Login", "Employee");
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> newOrders = _orderService.GetOrdersByStatus(Status.Ordered, type);
+                Dictionary<int, List<MenuCategory>> newOrdersByCourse = _orderService.GetCategoriesOfAnOrder(newOrders);
+                List<Order> preparingOrders = _orderService.GetOrdersByStatus(Status.InProgress, type);
+                Dictionary<int, List<MenuCategory>> preparingOrdersByCourse = _orderService.GetCategoriesOfAnOrder(preparingOrders);
+                RunningOrdersViewModel runningOrdersViewModel = new RunningOrdersViewModel(newOrders, preparingOrders, newOrdersByCourse, preparingOrdersByCourse, loggedInEmployee);
+                return View(runningOrdersViewModel);
+            }
+
+            else
+            {
+                return View("AccessForbidden");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult FinishedOrders()
+        {
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+
+            if (loggedInEmployee == null)
+                return RedirectToAction("Login", "Employee");
+
+            if ((loggedInEmployee.Role == Role.Bar) || (loggedInEmployee.Role == Role.Kitchen))
+            {
+                string type = (loggedInEmployee.Role == Role.Bar) ? "Drink" : "Dish";
+                List<Order> readyOrders = _orderService.GetOrdersByStatus(Status.ReadyToBeServed, type);
+                List<Order> servedOrders = _orderService.GetOrdersByStatus(Status.Served, type);
+                Dictionary<int, List<MenuCategory>> readyOrdersByCourse = _orderService.GetCategoriesOfAnOrder(readyOrders);
+                Dictionary<int, List<MenuCategory>> servedOrdersByCourse = _orderService.GetCategoriesOfAnOrder(servedOrders);
+                ReadyToBeServedOrdersViewModel toBeServedOrdersViewModel = new ReadyToBeServedOrdersViewModel(readyOrders, servedOrders, readyOrdersByCourse, servedOrdersByCourse, loggedInEmployee);
+                return View(toBeServedOrdersViewModel);
+            }
+
+            else
+            {
+                return View("AccessForbidden");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemStatus(int orderItemID, Status status)
+        {
+            try
+            {
+                _orderService.ChangeOrderItemStatus(orderItemID, status);
+                TempData["StatusChangeMessage"] = "Status has been changed.";
+            }
+            catch (ChangeStatusException)
+            {
+                TempData["StatusChangeError"] = "Status change failed.";
+            }
+
+            if (status == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult ChangeAllOrderItemsStatus(int orderID, Status currentStatus, Status newStatus)
+        {
+            Employee? loggedInEmployee = HttpContext.Session.GetObject<Employee>("LoggedInEmployee");
+            try
+            {
+                if (loggedInEmployee.Role == Role.Kitchen)
+                {
+                    _orderService.ChangeAllOrderItemsStatus(orderID, "Dish", currentStatus, newStatus);
+                }
+                else
+                {
+                    _orderService.ChangeAllOrderItemsStatus(orderID, "Drink", currentStatus, newStatus);
+                }
+
+                TempData["StatusChangeMessage"] = "Status has been changed.";
+            }
+            catch (ChangeStatusException)
+            {
+                TempData["StatusChangeError"] = "Status change failed.";
+            }
+
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        public IActionResult ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            try
+            {
+                _orderService.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+                TempData["StatusChangeMessage"] = "Status has been changed.";
+            }
+            catch (ChangeStatusException)
+            {
+                TempData["StatusChangeError"] = "Status change failed.";
+            }
+            if (newStatus == Status.Served)
+            {
+                return RedirectToAction("FinishedOrders");
+            }
+            return RedirectToAction("Index");
+        }
+
+        //payment methods
     }
 
 }

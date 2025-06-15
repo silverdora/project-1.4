@@ -8,7 +8,9 @@ namespace Chapeau.Models
         public Employee Employee { get; set; }
         public Table Table { get; set; }
         public DateTime OrderTime { get; set; }
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();     
+        //public bool IsServed { get; set; }
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+           
         public bool? IsPaid { get; set; } = false;
         public Status Status { get; set; }
         public Order()

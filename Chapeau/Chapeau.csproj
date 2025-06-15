@@ -12,10 +12,7 @@
     <None Remove="Repositories\" />
     <None Remove="Services\" />
     <None Remove="ViewModels\" />
-    <None Remove="Views\RunningOrders\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\RunningOrders\" />
+    <None Remove="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
@@ -42,6 +39,9 @@
     <Compile Include="ViewModels\SplitPaymentViewModel.cs" />
     <Compile Include="ViewModels\ReadyToBeServedOrdersViewModel.cs" />
     <Compile Include="ViewModels\TableOrderViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Models\PaymentType.cs" />

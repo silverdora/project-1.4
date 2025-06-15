@@ -55,5 +55,62 @@ namespace Chapeau.Services
             // You could set the table as occupied here if needed
             _orderRepository.InsertOrder(order);
         }
+
+
+        //methods connected with bar or kitchen
+        public void ChangeOrderItemStatus(int orderItemID, Status status)
+        {
+            _orderItemRepository.ChangeOrderItemStatus(orderItemID, status);
+        }
+
+        public void ChangeAllOrderItemsStatus(int orderID, string type, Status currentStatus, Status newStatus)
+        {
+            // ...foreach orderitem in orderitems in ordercard
+            _orderItemRepository.ChangeAllOrderItemsStatus(orderID, type, currentStatus, newStatus);
+        }
+
+        public List<Order> GetOrdersByStatus(Status status, string type)
+        {
+            DateTime createdAfter = DateTime.Today;
+            return _orderRepository.GetOrdersByStatus(status, type, createdAfter);
+        }
+
+
+        public Dictionary<int, List<MenuCategory>> GetCategoriesOfAnOrder(List<Order> orders)
+        {
+            Dictionary<int, List<MenuCategory>> categoriesByOrderId = new Dictionary<int, List<MenuCategory>>();
+
+            List<MenuCategory> courses = new List<MenuCategory> { MenuCategory.Starters, MenuCategory.Mains, MenuCategory.Desserts, MenuCategory.Entremets, MenuCategory.Beer, MenuCategory.Wine, MenuCategory.Spirits, MenuCategory.Coffee, MenuCategory.Tea, MenuCategory.SoftDrink };
+            foreach (MenuCategory course in courses)
+            {
+                foreach (Order order in orders)
+                {
+                    foreach (OrderItem orderItem in order.OrderItems)
+                    {
+                        if (orderItem.MenuItem.Category == course)
+                        {
+                            if (!categoriesByOrderId.ContainsKey(order.OrderId))
+                            {
+                                categoriesByOrderId.Add(order.OrderId, new List<MenuCategory> { course });
+                            }
+                            else
+                            {
+                                if (!categoriesByOrderId[order.OrderId].Contains(course))
+                                {
+                                    categoriesByOrderId[order.OrderId].Add(course);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            return categoriesByOrderId;
+        }
+
+        public void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course)
+        {
+            _orderItemRepository.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
+        }
     }
 }

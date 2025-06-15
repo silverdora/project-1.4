@@ -45,8 +45,6 @@ namespace Chapeau.Service.Interface
         /// </summary>
         /// <param name="tableId">The ID of the table.</param>
         void MarkOrderAsServed(int tableId);
-
-
         public Table? GetTableById(int tableId);//(matheus)
 
         /// <summary>

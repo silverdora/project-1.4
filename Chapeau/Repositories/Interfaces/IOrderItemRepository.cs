@@ -4,10 +4,13 @@ namespace Chapeau.Repositories.Interfaces
 {
     public interface IOrderItemRepository
     {
+        //taking an order
         void Insert(OrderItem item, int orderId);
-        //OrderItem? GetByOrderAndItem(int orderId, int itemId);
 
-        //void UpdateQuantity(int orderId, int itemId, int newQuantity);        
-
+        //bar or kitchen
+        void ChangeOrderItemStatus(int orderItemID, Status status);
+        void ChangeAllOrderItemsStatus(int orderID, string type, Status currentStatus, Status newStatus);
+        void ChangeOrderItemsFromOneCourseStatus(int orderID, Status currentStatus, Status newStatus, MenuCategory course);
+        List<OrderItem> GetOrderItemsByOrderID(int id, Status status, string type);
     }
 }
