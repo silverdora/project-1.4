@@ -1,4 +1,5 @@
-﻿using Chapeau.Models;
+﻿// Required namespaces for data access, configuration, models, and view models
+using Chapeau.Models;
 using Chapeau.Repository.Interface;
 using Chapeau.ViewModels;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -10,15 +11,18 @@ using Chapeau.HelperMethods;
 
 namespace Chapeau.Repository
 {
+    // This repository handles all data access logic related to tables in the restaurant
     public class TableRepository : ITableRepository
     {
         private readonly string _connectionString;
 
+        // Constructor that retrieves the connection string from app configuration
         public TableRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        // Retrieves all tables with basic information (ID, number, occupancy)
         public List<Table> GetAllTables()
         {
             List<Table> tables = new List<Table>();
@@ -52,6 +56,7 @@ namespace Chapeau.Repository
             return tables;
         }
 
+        // Retrieves tables along with the status of their orders (if any)
         public List<Table> GetTablesWithOrderStatus()
         {
             List<Table> tables = new List<Table>();
@@ -96,6 +101,7 @@ namespace Chapeau.Repository
             return tables;
         }
 
+        // Retrieves a detailed view model for each table including drink and food status and items
         public List<TableOrderViewModel> GetTableOverview()
         {
             var tableOverview = new List<TableOrderViewModel>();
@@ -136,6 +142,8 @@ namespace Chapeau.Repository
                     {
                         var viewModel = MapTableHelper.MapFromReader(reader);
                         int tableId = viewModel.TableId;
+
+                        // Separate food and drink items for the view model
                         var allItems = GetOrderItemsByTable(tableId);
                         viewModel.FoodItems = allItems.Where(i => i.ItemType == "Dish").ToList();
                         viewModel.DrinkItems = allItems.Where(i => i.ItemType == "Drink").ToList();
@@ -150,6 +158,8 @@ namespace Chapeau.Repository
 
             return tableOverview;
         }
+
+        // Maps a SQL row into a TableOrderViewModel object
         private TableOrderViewModel MapTableOrderViewModel(SqlDataReader reader)
         {
             return new TableOrderViewModel
@@ -162,6 +172,7 @@ namespace Chapeau.Repository
             };
         }
 
+        // Updates the occupied status of a given table
         public void UpdateTableOccupiedStatus(int tableId, bool isOccupied)
         {
             try
@@ -180,6 +191,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Checks whether a table has any unpaid orders
         public bool HasUnservedOrders(int tableId)
         {
             try
@@ -202,6 +214,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Marks all "ReadyToBeServed" order items for a table as "Served"
         public void MarkReadyOrdersAsServed(int tableId)
         {
             try
@@ -226,6 +239,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Frees a table by marking it not occupied based on a given order ID
         public void MarkTableFreeByOrder(int orderId)
         {
             try
@@ -251,6 +265,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Marks an order as paid in the database
         public void MarkOrderAsPaid(int orderId)
         {
             try
@@ -268,6 +283,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Retrieves the most recent unpaid order ID for a given table
         public int? GetLatestUnpaidOrderIdByTable(int tableId)
         {
             try
@@ -291,6 +307,7 @@ namespace Chapeau.Repository
             }
         }
 
+        // Retrieves all unpaid order items (food or drink) for a specific table
         public List<OrderItemViewModel> GetOrderItemsByTable(int tableId)
         {
             var items = new List<OrderItemViewModel>();
