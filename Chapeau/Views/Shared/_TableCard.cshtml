@@ -6,10 +6,10 @@
     {
         return status switch
         {
-            Status.Ordered => "bg-primary",
+            Status.Ordered => "bg-primary text-white",
             Status.InProgress => "bg-warning text-dark",
-            Status.ReadyToBeServed => "bg-success",
-            Status.Served => "bg-secondary",
+            Status.ReadyToBeServed => "bg-success text-white",
+            Status.Served => "bg-secondary text-white",
             _ => "bg-light text-dark"
         };
     }
@@ -24,7 +24,8 @@
     </div>
 
     <div class="card-body p-4">
-        <div class="mb-3">
+        <!-- Top flags -->
+        <div class="mb-3 d-flex flex-wrap gap-2">
             @if (Model.FoodStatus.HasValue)
             {
                 <span class="badge @GetStatusBadgeClass(Model.FoodStatus.Value)">
@@ -45,9 +46,10 @@
             }
         </div>
 
+        <!-- Items with statuses -->
         @if (Model.FoodItems?.Any() == true)
         {
-            <div class="mb-2 ms-2">
+            <div class="mb-2">
                 <strong>Food Items:</strong>
                 <ul class="list-unstyled ms-3">
                     @foreach (var item in Model.FoodItems)
@@ -60,7 +62,7 @@
 
         @if (Model.DrinkItems?.Any() == true)
         {
-            <div class="mb-2 ms-2">
+            <div class="mb-2">
                 <strong>Drink Items:</strong>
                 <ul class="list-unstyled ms-3">
                     @foreach (var item in Model.DrinkItems)

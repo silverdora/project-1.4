@@ -36,10 +36,12 @@
             <div class="col">
                 <div class="card shadow-sm h-100"
                      onclick="openTableModal(
-                         @table.TableId,
-                         '@table.IsOccupied'.toLowerCase(),
-                         '@(table.FoodStatus?.ToString() ?? "null")',
-                         '@(table.DrinkStatus?.ToString() ?? "null")')">
+         @table.TableId,
+         '@table.IsOccupied'.toLowerCase(),
+         '@(table.FoodStatus?.ToString() ?? "null")',
+         '@(table.DrinkStatus?.ToString() ?? "null")',
+         '@table.HasReadyToBeServedItems.ToString().ToLower()')">
+
                     <div class="card-body">
                         <partial name="_TableCard" model="table" />
                     </div>
@@ -65,7 +67,7 @@
 </div>
 
 <script>
-    function openTableModal(tableId, isOccupied, foodStatus, drinkStatus) {
+    function openTableModal(tableId, isOccupied, foodStatus, drinkStatus, hasReadyItems) {
         const body = document.getElementById("modalBody");
         let html = `<p><strong>Table #${tableId}</strong></p>`;
 
@@ -109,7 +111,7 @@
         }
 
         // 4. Mark Order as Served
-        if (foodStatus === "ReadyToBeServed" || drinkStatus === "ReadyToBeServed") {
+        if (hasReadyItems === "true") {
             html += `
                 <form method="post" action="/Restaurant/MarkOrderServed?tableId=${tableId}">
                     <button type="submit" class="btn btn-outline-primary w-100 mb-2">✅ Mark Order as Served</button>
@@ -121,4 +123,3 @@
         modal.show();
     }
 </script>
- 
