@@ -1,45 +1,66 @@
-﻿@model List<Chapeau.Models.OrderItem>
+﻿@model Chapeau.ViewModels.OrderDetailsViewModel
 
-<h2>Order Details</h2>
+<h2>Order for Table @Model.TableNumber</h2>
 
-@if (Model == null || Model.Count == 0)
+@if (TempData["CommentSaved"] != null)
 {
-    <p>No items selected yet.</p>
+	<div class="alert alert-success" role="alert">
+		@TempData["CommentSaved"]
+	</div>
+}
+
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+	<p>No items selected yet.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>Quantity</th>
-                <th>Status</th>
-                <th>Waiting Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.MenuItem.Item_name</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.Status</td>
-                    <td>@item.WaitingTime.Minutes min</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Item Name</th>
+				<th>Quantity</th>
+				<th>Status</th>
+				<th>Waiting Time</th>
+				<th>Comment</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (OrderItem item in Model.Items)
+			{
+				<tr>
+					<td>@item.MenuItem.Item_name</td>
+					<td>
+						<!-- quantity management button -->
+						<form asp-controller="Order" asp-action="UpdateQuantity" method="post" class="d-flex align-items-center"> 		
+							<input type="hidden" name="menuItemId" value="@item.MenuItem.ItemId" />
+							<button type="submit" name="adjustment" value="-1" class="btn btn-sm btn-outline-secondary me-2">−</button>
+							<span>@item.Quantity</span>
+							<button type="submit" name="adjustment" value="1" class="btn btn-sm btn-outline-secondary ms-2">+</button>
+						</form>
+					</td>
+					<td>@item.Status</td>
+					<td>@item.WaitingTime.Minutes min</td>
+					<td>
+						<form asp-controller="Order" asp-action="MakeComment" method="post">
+							<input type="hidden" name="menuItemId" value="@item.MenuItem.ItemId" />
+							<input type="text" name="comment" value="@item.Comment" placeholder="Add comment..." />
+							<button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</tbody>
+		
+	</table>
 
-    <!-- Button to submit items to DB -->
-    <form asp-controller="Order" asp-action="SubmitOrder" method="post">
-        <input type="hidden" name="orderId" value="@TempData["CurrentOrderId"]" />
-        <button type="submit" class="btn btn-success">Submit Order</button>
-    </form>
 
-    <a asp-controller="MenuItem" asp-action="Index"
-       asp-route-orderId="@TempData["CurrentOrderId"]"
-       asp-route-tableId="@TempData["CurrentTableId"]"
-       class="btn btn-secondary">
-        &larr; Back to Menu
-    </a>
+<!-- Submit button -->
+<form asp-controller="Order" asp-action="SubmitOrder" method="post">
+	<button type="submit" class="btn btn-success">Submit Order</button>
+</form>
 }
+<!-- Back to menu -->
+<a asp-controller="MenuItem" asp-action="Index" class="btn btn-secondary mt-2">
+	← Back to Menu
+</a>

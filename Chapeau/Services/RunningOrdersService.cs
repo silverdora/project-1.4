@@ -48,15 +48,15 @@ namespace Chapeau.Services
                     {
                         if (orderItem.MenuItem.Category == course)
                         {
-                            if (!categoriesByOrderId.ContainsKey(order.OrderID))
+                            if (!categoriesByOrderId.ContainsKey(order.OrderId))
                             {
-                                categoriesByOrderId.Add(order.OrderID, new List<MenuCategory> {course});
+                                categoriesByOrderId.Add(order.OrderId, new List<MenuCategory> {course});
                             }
                             else
                             {
-                                if (!categoriesByOrderId[order.OrderID].Contains(course))
+                                if (!categoriesByOrderId[order.OrderId].Contains(course))
                                 {
-                                    categoriesByOrderId[order.OrderID].Add(course);
+                                    categoriesByOrderId[order.OrderId].Add(course);
                                 }
                                 
                             }

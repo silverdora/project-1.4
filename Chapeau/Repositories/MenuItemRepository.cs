@@ -27,7 +27,7 @@ namespace Chapeau.Repositories
 
             List<MenuItem> result = ExecuteQueryMapMenuItems(query, parameter);
 
-            foreach (var item in result)
+            foreach (MenuItem item in result)
             {
                 return item; // return the first one
             }
@@ -36,38 +36,30 @@ namespace Chapeau.Repositories
         }
 
         // Get items by card name (e.g., "Lunch", "Dinner", "Drinks")
-        public List<MenuItem> GetMenuItemsByCard(string cardName)
+        public List<MenuItem> GetMenuItemsByCard(MenuCard card)
         {
-            string query = @"
-                SELECT mi.*
-                FROM MenuItem mi
-                JOIN MenuCard mc ON mi.cardID = mc.icardID
-                WHERE mc.card_name = @card";
+            string query = "SELECT * FROM MenuItem WHERE card = @card";
 
-            SqlParameter cardParameter = new SqlParameter("@card", cardName);
+            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
             return ExecuteQueryMapMenuItems(query, cardParameter);
         }
 
         // Get items by category (e.g., "Starters")
-        public List<MenuItem> GetMenuItemsByCategory(string categoryName)
+        public List<MenuItem> GetMenuItemsByCategory(MenuCategory category)
         {
             string query = "SELECT * FROM MenuItem WHERE category = @category";
 
-            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
+            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
             return ExecuteQueryMapMenuItems(query, categoryParameter);
         }
 
         //Get items by both card and category
-        public List<MenuItem> GetMenuItemsByCardAndCategory(string cardName, string categoryName)
+        public List<MenuItem> GetMenuItemsByCardAndCategory(MenuCard card, MenuCategory category)
         {
-            string query = @"
-                SELECT mi.*
-                FROM MenuItem mi
-                JOIN MenuCard mc ON mi.cardID = mc.icardID
-                WHERE mc.card_name = @card AND mi.category = @category";
+            string query = "SELECT * FROM MenuItem WHERE card = @card AND category = @category";
 
-            SqlParameter cardParameter = new SqlParameter("@card", cardName);
-            SqlParameter categoryParameter = new SqlParameter("@category", categoryName);
+            SqlParameter cardParameter = new SqlParameter("@card", card.ToString());
+            SqlParameter categoryParameter = new SqlParameter("@category", category.ToString());
 
             return ExecuteQueryMapMenuItems(query, cardParameter, categoryParameter);
         }
@@ -76,16 +68,39 @@ namespace Chapeau.Repositories
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@itemId", itemId);
-                command.Parameters.AddWithValue("@amount", amount);
+                try
+                {
+                    string query = "UPDATE MenuItem SET stockQuantity = stockQuantity - @amount WHERE itemID = @itemId";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@itemId", itemId);
+                    command.Parameters.AddWithValue("@amount", amount);
 
-                connection.Open();
-                command.ExecuteNonQuery();
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Database error while reducing stock.", ex);
+                }
             }
         }
         // Shared helper methods
+
+        private MenuItem MapMenuItem(SqlDataReader reader)
+        {
+            return new MenuItem
+            {
+                ItemId = (int)reader["itemID"],
+                Item_name = reader["item_name"].ToString(),
+                Description = reader["description"].ToString(),
+                Price = (decimal)reader["price"],
+                VATPercent = (decimal)reader["VATpercent"],
+                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), reader["category"].ToString(), true),
+                StockQuantity = (int)reader["stockQuantity"],
+                Card = reader["card"].ToString()
+            };
+        }  
+        //using an array to allow me to pass many numbers of parameters
         private List<MenuItem> ExecuteQueryMapMenuItems(string query, params SqlParameter[] parameters)
         {
             List<MenuItem> items = new List<MenuItem>();
@@ -103,16 +118,7 @@ namespace Chapeau.Repositories
                     {
                         while (reader.Read())
                         {
-                            items.Add(new MenuItem
-                            {
-                                ItemID = (int)reader["itemID"],
-                                Item_name = reader["item_name"].ToString(),
-                                Description = reader["description"].ToString(),
-                                Price = (decimal)reader["price"],
-                                VATPercent = (decimal)reader["VATpercent"],
-                                Category = (MenuCategory)Enum.Parse(typeof(MenuCategory), (string)reader["category"], true),
-                                StockQuantity = (int)reader["stockQuantity"]
-                            });
+                            items.Add(MapMenuItem(reader));
                         }
                     }
                     catch (SqlException ex)
@@ -125,7 +131,6 @@ namespace Chapeau.Repositories
                     }
                 }
             }
-
             return items;
         }
     }

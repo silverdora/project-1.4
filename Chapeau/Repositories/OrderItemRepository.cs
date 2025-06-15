@@ -14,63 +14,34 @@ namespace Chapeau.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void Insert(OrderItem item)
+        public void Insert(OrderItem item, int orderId)
         {
-            string query = @"INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity)
-                             VALUES (@orderID, @itemID, @includeDate, @status, @quantity)";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
+            string query = @"INSERT INTO OrderItem (orderID, itemID, includeDate, status, quantity, comment)
+                             VALUES (@orderID, @itemID, @includeDate, @status, @quantity, @comment)";
+            try
             {
-                command.Parameters.AddWithValue("@orderID", item.OrderID);
-                command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemID);
-                command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
-                command.Parameters.AddWithValue("@status", item.Status.ToString());
-                command.Parameters.AddWithValue("@quantity", item.Quantity);
-
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-        }    
-    
-        public OrderItem? GetByOrderAndItem(int orderId, int itemId)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            string query = @"SELECT * FROM OrderItem WHERE orderID = @orderId AND itemID = @itemId";
-            var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@orderId", orderId);
-            cmd.Parameters.AddWithValue("@itemId", itemId);
-
-            conn.Open();
-            var reader = cmd.ExecuteReader();
-
-            if (reader.Read())
-            {
-                return new OrderItem
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    OrderID = orderId,
-                    ItemID = itemId,
-                    IncludeDate = Convert.ToDateTime(reader["includeDate"]),
-                    Status = Enum.Parse<Status>(reader["status"].ToString()),
-                    Quantity = Convert.ToInt32(reader["quantity"]),
-                    Comment = reader["comment"] as string
-                };
+                    AddOrderItemParameters(command, item, orderId);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
             }
-
-            return null;
+            catch (SqlException ex)
+            {
+                throw new Exception("Error inserting order item into database.", ex);
+            }
         }
 
-        public void UpdateQuantity(int orderId, int itemId, int newQuantity)
+        private void AddOrderItemParameters(SqlCommand command, OrderItem item, int orderId)
         {
-            using var conn = new SqlConnection(_connectionString);
-            string query = @"UPDATE OrderItem SET quantity = @quantity WHERE orderID = @orderId AND itemID = @itemId";
-            var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@quantity", newQuantity);
-            cmd.Parameters.AddWithValue("@orderId", orderId);
-            cmd.Parameters.AddWithValue("@itemId", itemId);
-
-            conn.Open();
-            cmd.ExecuteNonQuery();
+            command.Parameters.AddWithValue("@orderID", orderId);
+            command.Parameters.AddWithValue("@itemID", item.MenuItem.ItemId);
+            command.Parameters.AddWithValue("@includeDate", item.IncludeDate);
+            command.Parameters.AddWithValue("@status", item.Status.ToString());
+            command.Parameters.AddWithValue("@quantity", item.Quantity);
+            command.Parameters.AddWithValue("@comment", (object?)item.Comment ?? DBNull.Value);//expects an obj
         }
     }
 

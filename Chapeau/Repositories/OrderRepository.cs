@@ -21,70 +21,71 @@ namespace Chapeau.Repositories
 
         public void InsertOrder(Order order)
         {
-            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime) " +
-                           "VALUES (@employeeID, @tableID, @orderTime); " +
+            string query = "INSERT INTO [Order] (employeeID, tableID, orderTime, isPaid) " +
+                           "VALUES (@employeeID, @tableID, @orderTime, 0); " +
                            "SELECT SCOPE_IDENTITY();";
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
+            try
             {
-                command.Parameters.AddWithValue("@employeeID", order.Employee.employeeID);
-                command.Parameters.AddWithValue("@tableID", order.Table.TableId);
-                command.Parameters.AddWithValue("@orderTime", order.OrderTime);
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@employeeID", order.Employee.employeeID);
+                    command.Parameters.AddWithValue("@tableID", order.Table.TableId);
+                    command.Parameters.AddWithValue("@orderTime", order.OrderTime);
 
-                connection.Open();
-                object result = command.ExecuteScalar();
-                order.OrderID = Convert.ToInt32(result);
+                    connection.Open();
+                    object result = command.ExecuteScalar();
+                    order.OrderId = Convert.ToInt32(result);
+                }
             }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error while inserting order.", ex);
+            }
+
         }
 
         //get active order by table to double check that if there is any existent order, avoiding to creating everytime a new
         public Order? GetActiveOrderByTableId(int tableId)
         {
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+            try
             {
-                string query = @"
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = @"
                                SELECT * FROM [Order]
                                WHERE TableId = @tableId AND IsPaid = 0";
 
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@tableId", tableId);
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@tableId", tableId);
 
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
 
-                if (reader.Read())
-                {
-                    // Map to Order object
-                    return MapToOrder(reader);
+                    if (reader.Read())
+                    {
+                        return MapToOrder(reader);
+                    }
+                    return null;
                 }
-
-                return null;
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error while retrieving active order.", ex);
             }
         }
         private Order MapToOrder(SqlDataReader reader)
         {
             int tableId = Convert.ToInt32(reader["tableID"]);
-            Table matchedTable = null;
-            List<Table> allTables = _tableRepository.GetAllTables();
-
-            foreach (Table table in allTables)
-            {
-                if (table.TableId == tableId)
-                {
-                    matchedTable = table;
-                    break;
-                }
-            }
+            Table matchedTable = _tableRepository.GetTableById(tableId);
 
             return new Order
             {
-                OrderID = Convert.ToInt32(reader["orderID"]),
+                OrderId = Convert.ToInt32(reader["orderID"]),
                 OrderTime = Convert.ToDateTime(reader["orderTime"]),
                 IsPaid = Convert.ToBoolean(reader["isPaid"]),
                 Table = matchedTable,
                 Employee = _employeeRepository.GetEmployeeByID(Convert.ToInt32(reader["employeeID"])),
-                //Notes = reader["notes"]?.ToString()
             };
         }
     }

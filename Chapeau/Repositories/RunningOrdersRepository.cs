@@ -271,11 +271,13 @@ namespace Chapeau.Repositories
 
             DateTime includeDate = (DateTime)reader["includeDate"];
             Status status = (Status)Enum.Parse(typeof(Status), (string)reader["status"], true);
+
             //Status status = (Status)reader["status"];
             int quantity = (int)reader["quantity"];
-            //string notes = (string)reader["notes"];
+            string comment = (string)reader["comment"];
+            int orderItemId = (int)reader["orderItemID"];
 
-            return new OrderItem(itemID, menuItem, includeDate, status, quantity,null); //need to remove ItemID as it's now we are only using menyItem (MATHEUS)
+            return new OrderItem(menuItem, orderItemId, includeDate, status, quantity, comment);
         }
 
         public MenuItem GetMenuItemByID(int id)
@@ -306,7 +308,7 @@ namespace Chapeau.Repositories
 
             return new MenuItem
             {
-                ItemID = (int)reader["itemID"],
+                ItemId = (int)reader["itemID"],
                 Item_name = reader["item_name"].ToString(),
                 Description = reader["description"].ToString(),
                 Price = (decimal)reader["price"],

@@ -46,6 +46,9 @@ namespace Chapeau.Service.Interface
         /// <param name="tableId">The ID of the table.</param>
         void MarkOrderAsServed(int tableId);
 
+
+        public Table? GetTableById(int tableId);//(matheus)
+
         /// <summary>
         /// Marks the table as free based on the order ID.
         /// </summary>

@@ -48,7 +48,7 @@ namespace Chapeau.Services
 
             return new OrderSummaryViewModel
             {
-                OrderID = order.OrderID,
+                OrderID = order.OrderId,
                 TableNumber = order.Table.TableId,  // Set the table number
                 Items = groupedItems,
                 TotalAmount = totalAmount,

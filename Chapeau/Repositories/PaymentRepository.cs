@@ -227,7 +227,7 @@ namespace Chapeau.Repositories
                 {
                     order = new Order
                     {
-                        OrderID = reader.GetInt32(0),
+                        OrderId = reader.GetInt32(0),
                         Table = new Table { TableId = reader.GetInt32(1) },
                         OrderTime = reader.GetDateTime(2),
                         Status = reader.GetBoolean(3) ? Status.Served : Status.Ordered,
@@ -237,7 +237,7 @@ namespace Chapeau.Repositories
 
                 MenuItem menuItem = new MenuItem
                 {
-                    ItemID = reader.GetInt32(8),
+                    ItemId = reader.GetInt32(8),
                     Item_name = reader.GetString(9),
                     Price = reader.GetDecimal(10),
                     VATPercent = reader.GetDecimal(11)
@@ -245,7 +245,7 @@ namespace Chapeau.Repositories
 
                 OrderItem item = new OrderItem
                 {
-                    ItemID = reader.GetInt32(4),
+                    OrderItemId = reader.GetInt32(4),
                     Quantity = reader.GetInt32(5),
                     IncludeDate = reader.GetDateTime(6),
                     Status = (Status)Enum.Parse(typeof(Status), reader.GetString(7), true),
