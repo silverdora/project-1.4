@@ -20,7 +20,8 @@
                     }
 
                     <form asp-action="SplitBill" method="post">
-                        <input type="hidden" asp-for="OrderID" />
+                        <input type="hidden" asp-for="OrderID" /> 
+                        <input type="hidden" asp-for="NumberOfPeople" />
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Total Amount: @Model.TotalAmount.ToString("C")</label>
@@ -84,9 +85,24 @@
                             <a asp-action="FinishOrder" asp-route-orderId="@Model.OrderID" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to Payment
                             </a>
-                            <button type="submit" name="action" value="submit" class="btn btn-success">
+                            @{
+                                decimal totalPaid = Model.Payments.Sum(p => p.AmountPaid + p.TipAmount);
+                                decimal remaining = Model.TotalAmount - totalPaid;
+                            }
+                            <button type="submit" name="action" value="submit" class="btn btn-success" @(remaining > 0 ? "disabled" : "")>
                                 <i class="fas fa-check"></i> Confirm Split Payment
                             </button>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <strong>Remaining to be paid:</strong>
+                            @if (remaining > 0)
+                            {
+                                @remaining.ToString("C2")
+                            }
+                            else
+                            {
+                                <span>All paid!</span>
+                            }
                         </div>
                     </form>
                 </div>

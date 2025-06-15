@@ -96,9 +96,10 @@ namespace Chapeau.Controllers
 
         public IActionResult ViewOrder(int tableId)
         {
+            int? orderId = null;
             try
             {
-                int? orderId = _paymentService.GetLatestUnpaidOrderIdByTable(tableId);
+                orderId = _paymentService.GetLatestUnpaidOrderIdByTable(tableId);
                 if (orderId == null)
                 {
                     TempData["Error"] = "No unpaid order found for this table.";
@@ -115,7 +116,7 @@ namespace Chapeau.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Failed to view order: " + ex.Message;
+                TempData["Error"] = $"Failed to view order: {ex.Message} (orderId: {orderId})";
                 return RedirectToAction("Overview", "Restaurant");
             }
         }
@@ -125,7 +126,20 @@ namespace Chapeau.Controllers
         {
             try
             {
-                var model = new FinishOrderViewModel { OrderID = orderId };
+                var order = _orderService.GetOrderSummaryById(orderId);
+                if (order == null)
+                {
+                    TempData["Error"] = "Order not found.";
+                    return RedirectToAction("Overview", "Restaurant");
+                }
+
+                var model = new FinishOrderViewModel
+                {
+                    OrderID = orderId,
+                    LowVatAmount = order.LowVAT,
+                    HighVatAmount = order.HighVAT,
+                    AmountPaid = order.TotalAmount
+                };
                 return View(model);
             }
             catch (Exception ex)
@@ -239,11 +253,20 @@ namespace Chapeau.Controllers
                 Payments = new List<IndividualPayment>()
             };
 
-            decimal amountPerPerson = Math.Round(order.TotalAmount / 2, 2);
-            decimal remainingAmount = order.TotalAmount - amountPerPerson;
+            decimal total = order.TotalAmount;
+            int people = model.NumberOfPeople;
+            decimal baseAmount = Math.Floor((total / people) * 100) / 100;
+            decimal totalAssigned = baseAmount * people;
+            int remainderCents = (int)Math.Round((total - totalAssigned) * 100);
 
-            model.Payments.Add(new IndividualPayment { AmountPaid = amountPerPerson, TipAmount = 0, PaymentType = PaymentType.Cash });
-            model.Payments.Add(new IndividualPayment { AmountPaid = remainingAmount, TipAmount = 0, PaymentType = PaymentType.Cash });
+            for (int i = 0; i < people; i++)
+            {
+                decimal amount = baseAmount;
+                if (i < remainderCents)
+                    amount += 0.01m;
+
+                model.Payments.Add(new IndividualPayment { AmountPaid = amount, TipAmount = 0, PaymentType = PaymentType.Cash });
+            }
 
             return model;
         }
@@ -257,15 +280,24 @@ namespace Chapeau.Controllers
             }
 
             model.NumberOfPeople++;
-            decimal amountPerPerson = Math.Round(order.TotalAmount / model.NumberOfPeople, 2);
-            decimal remainingAmount = order.TotalAmount - (amountPerPerson * (model.NumberOfPeople - 1));
+            model.TotalAmount = order.TotalAmount;
+
+            decimal total = model.TotalAmount;
+            int people = model.NumberOfPeople;
+            decimal baseAmount = Math.Floor((total / people) * 100) / 100;
+            decimal totalAssigned = baseAmount * people;
+            int remainderCents = (int)Math.Round((total - totalAssigned) * 100);
 
             model.Payments = new List<IndividualPayment>();
-            for (int i = 0; i < model.NumberOfPeople; i++)
+            for (int i = 0; i < people; i++)
             {
+                decimal amount = baseAmount;
+                if (i < remainderCents)
+                    amount += 0.01m;
+
                 model.Payments.Add(new IndividualPayment
                 {
-                    AmountPaid = i == model.NumberOfPeople - 1 ? remainingAmount : amountPerPerson,
+                    AmountPaid = amount,
                     TipAmount = 0,
                     PaymentType = PaymentType.Cash
                 });
@@ -316,3 +348,4 @@ namespace Chapeau.Controllers
         }
     }
 }
+
