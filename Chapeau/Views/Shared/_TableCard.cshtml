@@ -1,0 +1,78 @@
+﻿@model TableOrderViewModel
+@using Chapeau.ViewModels
+
+@functions {
+    public string GetStatusBadgeClass(Status status)
+    {
+        return status switch
+        {
+            Status.Ordered => "bg-primary text-white",
+            Status.InProgress => "bg-warning text-dark",
+            Status.ReadyToBeServed => "bg-success text-white",
+            Status.Served => "bg-secondary text-white",
+            _ => "bg-light text-dark"
+        };
+    }
+}
+
+<div class="card border border-secondary-subtle shadow-sm h-100">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">Table @Model.TableNumber</h5>
+        <span class="badge rounded-pill px-3 py-2 fs-6 @(Model.IsOccupied ? "bg-danger" : "bg-success")">
+            @(Model.IsOccupied ? "Occupied" : "Free")
+        </span>
+    </div>
+
+    <div class="card-body p-4">
+        <!-- Top flags -->
+        <div class="mb-3 d-flex flex-wrap gap-2">
+            @if (Model.FoodStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.FoodStatus.Value)">
+                    Food: @Model.FoodStatus.Value
+                </span>
+            }
+
+            @if (Model.DrinkStatus.HasValue)
+            {
+                <span class="badge @GetStatusBadgeClass(Model.DrinkStatus.Value)">
+                    Drink: @Model.DrinkStatus.Value
+                </span>
+            }
+
+            @if (!Model.FoodStatus.HasValue && !Model.DrinkStatus.HasValue)
+            {
+                <span class="text-muted small">No Active Orders</span>
+            }
+        </div>
+
+        <!-- Items with statuses -->
+        @if (Model.FoodItems?.Any() == true)
+        {
+            <div class="mb-2">
+                <strong>Food Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.FoodItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        @if (Model.DrinkItems?.Any() == true)
+        {
+            <div class="mb-2">
+                <strong>Drink Items:</strong>
+                <ul class="list-unstyled ms-3">
+                    @foreach (var item in Model.DrinkItems)
+                    {
+                        <li>@item.ItemName (@item.Status)</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="text-center text-muted small">Click for more actions</div>
+    </div>
+</div>

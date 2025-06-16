@@ -1,0 +1,22 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Payment Confirmation";
+}
+
+<div class="text-center">
+    <h2 class="text-success">Payment Successful!</h2>
+
+    <div class="alert alert-success mt-4">
+        <h4>Payment Details</h4>
+        <p>The order has been successfully paid and the table has been marked as free.</p>
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="Table" asp-action="Index" class="btn btn-primary">Return to Tables</a>
+    </div>
+</div>
+
+
+

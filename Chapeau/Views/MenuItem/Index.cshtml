@@ -1,0 +1,154 @@
+﻿@model Chapeau.ViewModels.MenuSelectionViewModel
+@using Chapeau.Models
+@using Chapeau.Models.Extensions
+@{
+	Order currentOrder = Context.Session.GetObject<Order>("CurrentOrder");
+	// Define all available cards and categories
+	IEnumerable<MenuCard> cards = Enum.GetValues(typeof(MenuCard)).Cast<MenuCard>();
+	IEnumerable<MenuCategory> categories = Enum.GetValues(typeof(MenuCategory)).Cast<MenuCategory>();
+}
+<h2>Menu Selection</h2>
+
+<!-- To display a message confirming every item while is being added -->
+@if (TempData["AddedMessage"] != null)
+{
+	<div class="alert alert-success" role="alert">
+		@TempData["AddedMessage"]
+	</div>
+}
+
+<!-- CARD FILTER BUTTONS -->
+<div class="mb-3">
+	<!-- "All" card button -->
+	<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
+		<input type="hidden" name="tableID" value="@Model.TableID" />
+		<input type="hidden" name="orderID" value="@Model.OrderID" />
+		<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == null ? "active" : "")">
+			All
+		</button>
+	</form>
+
+	<!-- Card buttons -->
+	@foreach (MenuCard card in cards)
+	{
+		<form asp-controller="MenuItem" asp-action="Index" method="get" style="display:inline;">
+			<input type="hidden" name="card" value="@card" />
+			<input type="hidden" name="tableID" value="@Model.TableID" />
+			<input type="hidden" name="orderID" value="@Model.OrderID" />
+			<button type="submit" class="btn btn-outline-primary me-2 @(Model.SelectedCard == card ? "active" : "")">
+				@card
+			</button>
+		</form>
+	}
+</div>
+
+<!-- CATEGORY FILTER BUTTONS (only show when a card is selected) -->
+@if (Model.SelectedCard != null)
+{
+	<div class="mb-3">
+		<!-- "All" category -->
+		<a asp-controller="MenuItem" asp-action="Index"
+		   asp-route-card="@Model.SelectedCard"
+		   asp-route-tableID="@Model.TableID"
+		   asp-route-orderID="@Model.OrderID"
+		   class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == null ? "active" : "")">
+			All
+		</a>
+
+		<!-- Category buttons -->
+		@foreach (MenuCategory category in categories)
+		{
+			<a asp-controller="MenuItem" asp-action="Index"
+			   asp-route-card="@Model.SelectedCard"
+			   asp-route-category="@category"
+			   asp-route-tableID="@Model.TableID"
+			   asp-route-orderID="@Model.OrderID"
+               class="btn btn-outline-secondary me-2 @(Model.SelectedCategory == category ? "active" : "")">
+				@category
+			</a>
+		}
+	</div>
+}
+
+<!-- View Order Button -->
+@if (currentOrder != null && currentOrder.OrderId != 0)
+{
+	<div class="mb-3">
+	<form asp-controller="Order" asp-action="OrderDetails" method="get">
+	<input type="hidden" name="id" value="@Model.OrderID" />
+	<input type="hidden" name="tableID" value="@Model.TableID" />
+	<button type="submit">View Order Details</button>
+</form>
+	</div>
+}
+
+<!-- Menu Table -->
+<h3>Menu Items</h3>
+@if (Model.Items == null || Model.Items.Count == 0)
+{
+	<p>No items found for the selected filters.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Item Name</th>
+				<th>Description</th>
+				<th>Price</th>
+				<th>Category</th>
+				<th>Stock</th>
+				<th>Add</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (MenuItem item in Model.Items)
+			{
+				<tr>
+					<td>@item.Item_name</td>
+					<td>@item.Description</td>
+					<td>@item.Price.ToString("C")</td>
+					<td>@item.Category</td>
+					<td>
+						@{
+							string message;
+							string color;
+
+							if (item.StockQuantity == 0)
+							{
+								message = "Out of stock";
+								color = "red";
+							}
+							else if (item.StockQuantity <= 10)
+							{
+								message = $"Low ({item.StockQuantity})";
+								color = "orange";
+							}
+							else
+							{
+								message = $"In stock ({item.StockQuantity})";
+								color = "green";
+							}
+						}
+
+						<span style="color:@color;">@message</span>
+					</td>
+					<td>
+						@if (currentOrder != null && currentOrder.OrderId != 0 && item.StockQuantity > 0)
+						{
+							<form asp-controller="Order" asp-action="AddItem" method="post">
+								<input type="hidden" name="menuItemId" value="@item.ItemId" />
+								<input type="number" name="quantity" min="1" max="@item.StockQuantity" value="1" style="width: 60px;" />
+								<button type="submit">Add</button>
+							</form>
+						}						
+						else
+						{
+							<span style="color: gray;">N/A</span>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

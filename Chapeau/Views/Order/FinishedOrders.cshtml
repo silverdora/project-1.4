@@ -1,0 +1,52 @@
+﻿@model Chapeau.ViewModels.ReadyToBeServedOrdersViewModel
+
+
+@{
+    ViewData["Title"] = "RunningOrders";
+}
+<h2>Ready To Be Served Orders</h2>
+
+<div class="col mb-2" role="group">
+    <a class="btn btn-light" href="/Order/Index">Running Orders</a>
+    <a class="btn btn-dark" href="/Order/FinishedOrders">Finished Orders</a>
+</div>
+<a class="btn btn-primary mb-2" href="/Order/FinishedOrders">Refresh</a>
+@Html.Partial("_ChangeStatusAlert")
+
+<div class="mb-4">
+    <h4>Ready To Be Served</h4>
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            @{
+                foreach (Order order in Model.ReadyToBeServedOrders)
+                {
+                    var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.ReadyToBeServedOrdersByCourse },
+                        { "CurrentStatus", Status.ReadyToBeServed },
+                        { "NewStatus", Status.Served },
+                        {"EmployeeRole", Model.Employee.Role }
+                    };
+                    <partial name="_OrderCard" model="@order" view-data="viewData" />
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h4>Served Today</h4>
+    <div class="container">
+        <div class="row d-flex align-items-start">
+            @{
+                foreach (Order order in Model.ServedOrders)
+                {
+                    var viewData = new ViewDataDictionary(ViewData){
+                        { "OrdersByCourse", Model.ServedOrdersByCourse },
+                        {"EmployeeRole", Model.Employee.Role }
+                };
+                    <partial name="_FinishedOrderCard" model="@order" view-data="viewData" />
+                }
+            }
+        </div>
+    </div>
+</div>

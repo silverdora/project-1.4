@@ -1,0 +1,65 @@
+﻿@model Chapeau.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="w-100" style="max-width: 400px;">
+
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <img src="~/images/LogoPic.jpeg" alt="Chapeau Logo" class="img-fluid" style="max-height: 120px;" />
+        </div>
+
+        <h2 class="text-center mb-3">Login</h2>
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+        }
+
+        @if (TempData["LoggedOutMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["LoggedOutMessage"]</div>
+        }
+
+        <form method="post" asp-action="Login">
+            <div class="form-group mb-3">
+                <label asp-for="UserName">Username</label>
+                <input asp-for="UserName" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Password">Password</label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" type="password" id="passwordInput" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()" tabindex="-1">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById("passwordInput");
+            const icon = document.getElementById("toggleIcon");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        }
+    </script>
+}
