@@ -68,8 +68,7 @@ namespace Chapeau.Models
             if (existing != null)
             {
                 existing.Quantity += quantity;
-                existing.IncludeDate = DateTime.Now;
-            }
+                existing.IncludeDate = DateTime.Now;            }
             else
             {
                 OrderItems.Add(new OrderItem

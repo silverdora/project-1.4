@@ -18,7 +18,7 @@ namespace Chapeau.Services
         void FinalizeOrder(Order order);
         Order? GetActiveOrderByTableId(int tableId);
         Order GetOrCreateActiveOrder(int tableId, Employee employee);
-        void AddItemsToOrder(int orderId, List<OrderItem> items);
+        //void AddItemsToOrder(int orderId, List<OrderItem> items);
         // Methods from DummyOrderService
         OrderSummaryViewModel GetOrderSummaryById(int orderId);
         void MarkOrderAsPaid(int orderId);

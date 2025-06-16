@@ -90,7 +90,7 @@ namespace Chapeau.Controllers
             }
             if (order.OrderItems.Count >0)
             {
-                _orderService.FinalizeOrder(order);
+                _orderService.FinalizeOrder(order);//Insert items and update stock
                 Order.ClearFromSession(HttpContext.Session);
                 TempData["OrderSuccess"] = "The order was submitted successfully!";
             }
