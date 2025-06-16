@@ -4,10 +4,8 @@ using Chapeau.Services;
 using Chapeau.Services.Interfaces;
 using Chapeau.Models;
 using Chapeau.Services;
-
 using Microsoft.AspNetCore.Mvc;
 using Chapeau.ViewModels;
-
 namespace Chapeau.Controllers
 {
     public class PaymentController : Controller
