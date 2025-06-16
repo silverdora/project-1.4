@@ -33,6 +33,7 @@ namespace Chapeau.Services
                 IsPaid = false,
             };
             _orderRepository.InsertOrder(newOrder);
+
             return newOrder;
         }
         public void AddItemsToOrder(int orderId, List<OrderItem> items)
