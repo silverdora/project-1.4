@@ -1,4 +1,5 @@
 ﻿using Chapeau.Models;
+using Chapeau.ViewModels;
 using System.Security.Cryptography;
 
 namespace Chapeau.Services
@@ -18,5 +19,10 @@ namespace Chapeau.Services
         Order? GetActiveOrderByTableId(int tableId);
         Order GetOrCreateActiveOrder(int tableId, Employee employee);
         void AddItemsToOrder(int orderId, List<OrderItem> items);
+        // Methods from DummyOrderService
+        OrderSummaryViewModel GetOrderSummaryById(int orderId);
+        void MarkOrderAsPaid(int orderId);
+        Order GetOrderById(int orderId);
+        decimal GetOrderTotal(int orderId);
     }
 }

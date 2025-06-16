@@ -137,6 +137,109 @@ namespace Chapeau.Repositories
                 Employee = _employeeRepository.GetEmployeeByID(Convert.ToInt32(reader["employeeID"])),
             };
         }
+        //get active order by table to double check that if there is any existent order, avoiding to creating everytime a new
+       
+        
+
+        public Order GetOrderById(int orderId)
+        {
+            try
+            {
+                string query = @"
+                    SELECT o.orderID, o.tableID, o.orderTime, o.isPaid,
+                           oi.itemID, oi.quantity, oi.includeDate, oi.status AS itemStatus,
+                           m.itemID, m.item_name, m.price, m.VATPercent
+                    FROM [Order] o
+                    JOIN OrderItem oi ON o.orderID = oi.orderID
+                    JOIN MenuItem m ON oi.itemID = m.itemID
+                    WHERE o.orderID = @orderId";
+
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@orderId", orderId);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        return MapOrderFromReader(reader);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to retrieve order {orderId}", ex);
+            }
+        }
+
+        public void MarkOrderAsPaid(int orderId)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    string query = "UPDATE [Order] SET isPaid = 1 WHERE orderID = @orderId";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@orderId", orderId);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to mark order {orderId} as paid", ex);
+            }
+        }
+
+        private Order MapOrderFromReader(SqlDataReader reader)
+        {
+            Order order = null;
+            int itemCount = 0;
+            while (reader.Read())
+            {
+                if (order == null)
+                {
+                    order = new Order
+                    {
+                        OrderId = reader.GetInt32(0),
+                        Table = new Table { TableId = reader.GetInt32(1) },
+                        OrderTime = reader.GetDateTime(2),
+                        Status = reader.GetBoolean(3) ? Status.Served : Status.Ordered,
+                        OrderItems = new List<OrderItem>()
+                    };
+                }
+
+                MenuItem menuItem = new MenuItem
+                {
+                    ItemId = reader.GetInt32(8),
+                    Item_name = reader.GetString(9),
+                    Price = reader.GetDecimal(10),
+                    VATPercent = reader.GetDecimal(11)
+                };
+
+                OrderItem item = new OrderItem
+                {
+                    OrderItemId = reader.GetInt32(4),
+                    Quantity = reader.GetInt32(5),
+                    IncludeDate = reader.GetDateTime(6),
+                    Status = (Status)Enum.Parse(typeof(Status), reader.GetString(7), true),
+                    MenuItem = menuItem
+                };
+
+                order.OrderItems.Add(item);
+                itemCount++;
+            }
+            if (order == null)
+                throw new Exception("MapOrderFromReader: No rows returned from SQL query.");
+            if (itemCount == 0)
+                throw new Exception("MapOrderFromReader: Order found but no items were mapped.");
+            return order;
+        }
     }
 }
+
+
+    
+
 

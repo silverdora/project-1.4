@@ -4,18 +4,17 @@ using Chapeau.Services;
 using Chapeau.Services.Interfaces;
 using Chapeau.Models;
 using Chapeau.Services;
-
 using Microsoft.AspNetCore.Mvc;
 using Chapeau.ViewModels;
-
 namespace Chapeau.Controllers
 {
     public class PaymentController : Controller
     {
+
         private readonly IPaymentService _paymentService;
-        private readonly DummyOrderService _orderService;
+        private readonly IOrderService _orderService;
         // Use ONE constructor
-        public PaymentController(IPaymentService paymentService, DummyOrderService orderService)
+        public PaymentController(IPaymentService paymentService, IOrderService orderService)
         {
             _paymentService = paymentService;
             _orderService = orderService;

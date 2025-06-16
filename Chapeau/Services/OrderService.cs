@@ -1,5 +1,6 @@
 ﻿using Chapeau.Models;
 using Chapeau.Repositories.Interfaces;
+using Chapeau.ViewModels;
 
 namespace Chapeau.Services
 {
@@ -113,5 +114,62 @@ namespace Chapeau.Services
         {
             _orderItemRepository.ChangeOrderItemsFromOneCourseStatus(orderID, currentStatus, newStatus, course);
         }
+       //
+
+        // New methods from DummyOrderService
+        public OrderSummaryViewModel GetOrderSummaryById(int orderId)
+        {
+            var order = GetOrderById(orderId);
+            if (order == null)
+                return null;
+
+            var groupedItems = order.OrderItems
+                .GroupBy(i => i.MenuItem.Item_name)
+                .Select(g => new OrderItemViewModel
+                {
+                    ItemName = g.Key,
+                    Quantity = g.Sum(i => i.Quantity),
+                    UnitPrice = g.First().MenuItem.Price,
+                    VATRate = g.First().MenuItem.VATPercent
+                }).ToList();
+
+            decimal totalAmount = groupedItems.Sum(i => i.Quantity * i.UnitPrice);
+            decimal lowVAT = groupedItems
+                .Where(i => i.VATRate == 9)
+                .Sum(i => i.Quantity * i.UnitPrice * 0.09m);
+            decimal highVAT = groupedItems
+                .Where(i => i.VATRate == 21)
+                .Sum(i => i.Quantity * i.UnitPrice * 0.21m);
+
+            return new OrderSummaryViewModel
+            {
+                OrderID = order.OrderId,
+                TableNumber = order.Table.TableId,
+                Items = groupedItems,
+                TotalAmount = totalAmount,
+                LowVAT = lowVAT,
+                HighVAT = highVAT
+            };
+        }
+
+        public void MarkOrderAsPaid(int orderId)
+        {
+            _orderRepository.MarkOrderAsPaid(orderId);
+        }
+
+        public Order GetOrderById(int orderId)
+        {
+            return _orderRepository.GetOrderById(orderId);
+        }
+
+        public decimal GetOrderTotal(int orderId)
+        {
+            var order = GetOrderById(orderId);
+            if (order == null || order.OrderItems == null || order.OrderItems.Count == 0)
+                return 0;
+
+            return order.OrderItems.Sum(item => item.MenuItem.Price * item.Quantity);
+        }
     }
 }
+    

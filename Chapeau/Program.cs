@@ -36,7 +36,7 @@ public class Program
 
       
       
-        builder.Services.AddScoped<DummyOrderService>();
+      
 
 
 
@@ -62,7 +62,7 @@ public class Program
 
         builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
-        builder.Services.AddScoped<DummyOrderService>();
+       
         builder.Services.AddScoped<TableService>();
         builder.Services.AddScoped<ITableRepository, TableRepository>();
         builder.Services.AddScoped<ITableService, TableService>();

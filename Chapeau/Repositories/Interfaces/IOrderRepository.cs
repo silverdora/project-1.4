@@ -13,6 +13,10 @@ namespace Chapeau.Repositories.Interfaces
 
         Order? GetActiveOrderByTableId(int tableId);
 
+        Order GetOrderById(int orderId);
+
+        void MarkOrderAsPaid(int orderId);
+
 
     }
 }
